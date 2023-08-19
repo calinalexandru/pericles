@@ -15,15 +15,15 @@ export default () => {
     map(([ request, ]) => {
       console.log('api/action/request', request);
       const { activeTab, } = request;
-      if (activeTab.id && !window.periclesTabId) {
+      if (activeTab && activeTab.id && !window.periclesTabId) {
         window.periclesTabId = activeTab.id;
       }
       return {
         ...request.message,
         payload: {
-          ...request.message.payload,
+          ...(request?.message?.payload || {}),
           iframe: window !== window.top,
-          tab: activeTab.id,
+          ...(activeTab?.id && { tab: activeTab.id, }),
         },
       };
     }),

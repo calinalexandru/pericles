@@ -11,14 +11,6 @@ export default async () => {
       await store.current.dispatch(settings.set({ voices, }));
     })
     .catch((e) => console.log(e));
-  speechSynthesis.onvoiceschanged = () => {
-    // console.log('the voice has changed');
-    getBrowserAPIVoices()
-      .then(async (voices) => {
-        await store.current.dispatch(settings.set({ voices, }));
-      })
-      .catch((e) => console.log(e));
-  };
 
   // hook for azure neural voices
   await store.current.dispatch(app.init());

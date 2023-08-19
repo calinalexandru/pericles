@@ -16,3 +16,4 @@ export { default as LOCAL_STORAGE_SETTINGS, } from './localStorageSettings';
 export { default as ATTRIBUTES, } from './attributes';
 export { default as WORD_TRACKER_STYLES, } from './wordTrackerStyles';
 export { default as SECTION_HIGHLIGHT_STYLES, } from './sectionHighlightStyles';
+export { WEBEXT_PORT, } from './misc';

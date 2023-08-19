@@ -59,7 +59,9 @@ export default () => {
         //   break;
         case 'onStart':
           console.log('onStart', { playingTab, playerKey, });
-          store.current.dispatch(player.set({ status: PLAYER_STATUS.PLAYING, }));
+          store.current.dispatch(
+            player.set({ status: PLAYER_STATUS.PLAYING, })
+          );
           mpToContent(
             [ highlight.section(), autoscroll.set({ section: playerKey, }), ],
             playingTab

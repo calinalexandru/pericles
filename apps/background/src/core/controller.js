@@ -33,6 +33,7 @@ export default () => {
     map((tabs) => tabs),
     pluck('tabId'),
     tap((tabId) => {
+      console.log('set tab ID', tabId);
       store.current.dispatch(app.set({ activeTab: tabId, }));
     })
   );

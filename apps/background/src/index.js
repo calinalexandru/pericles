@@ -3,8 +3,10 @@ import { combineEpics, createEpicMiddleware, } from 'redux-observable';
 import thunk from 'redux-thunk';
 import { wrapStore, } from 'webext-redux';
 
-import core from '@/core'
-import store from '@/store'
+import core from '@/core';
+import store from '@/store';
+import { WEBEXT_PORT, } from '@pericles/constants';
+import { appActions, } from '@pericles/store';
 import { getBrowserAPI, } from '@pericles/util';
 
 import appEpic from './store/epics/app';
@@ -26,6 +28,8 @@ const initialState = {};
 // the service worker wakes up from idle.
 let isInitialized = false;
 
+const { app, } = appActions;
+
 const init = (preloadedState) => {
   const observableMiddleware = createEpicMiddleware();
   store.current = createStore(
@@ -40,7 +44,7 @@ const init = (preloadedState) => {
     }),
     applyMiddleware(observableMiddleware, thunk)
   );
-  wrapStore(store.current, { portName: 'WEBEXT_REDUX_TEST', });
+  wrapStore(store.current, { portName: WEBEXT_PORT, });
   observableMiddleware.run(
     combineEpics(
       playerEpic,
@@ -54,9 +58,20 @@ const init = (preloadedState) => {
 
   store.current.subscribe(() => {
     getBrowserAPI().api.storage.local.set({ state: store.current.getState(), });
-
-    console.log('aici subscriem');
+    console.log('store updated', store.current.getState());
   });
+
+  getBrowserAPI().api.tabs.query(
+    { active: true, currentWindow: true, },
+    (tabs) => {
+      const activeTab = tabs[0];
+      const activeTabId = activeTab.id;
+
+      // Dispatch the tab ID to your state here
+      console.log('dispatch tabId', activeTabId);
+      store.current.dispatch(app.set({ activeTab: activeTabId, }));
+    }
+  );
 };
 
 // Listens for incomming connections from content
@@ -64,21 +79,20 @@ const init = (preloadedState) => {
 // whenever the extension "wakes up" from idle.
 getBrowserAPI().api.runtime.onConnect.addListener((port) => {
   if ([ 'POPUP', 'CONTENT', ].includes(port.name)) {
-    console.log('the popup was poened, ', port.name);
-    // The popup was opened.
-    // Gets the current state from the storage.
-    getBrowserAPI().api.storage.local.get('state', (storage) => {
-      if (!isInitialized) {
-        // 1. Initializes the redux store and the message passing.
-        init(storage.state || initialState);
-        isInitialized = true;
+    console.log('Connection established:', port.name);
+
+    // Listen for messages on this port.
+    port.onMessage.addListener((msg) => {
+      if ([ 'CONTENT_READY', 'POPUP_READY', ].includes(msg.type)) {
+        getBrowserAPI().api.storage.local.get('state', (storage) => {
+          console.log('Fetching state:', { storage, isInitialized, store, });
+          if (!isInitialized) {
+            init(storage.state || initialState);
+            isInitialized = true;
+          }
+          port.postMessage({ type: 'STORE_INITIALIZED', });
+        });
       }
-      // 2. Sends a message to notify that the store is ready.
-      getBrowserAPI().api.runtime.sendMessage({ type: 'STORE_INITIALIZED', });
     });
-    
-    if (isInitialized) {
-      getBrowserAPI().api.runtime.sendMessage({ type: 'STORE_INITIALIZED', });
-    }
   }
 });

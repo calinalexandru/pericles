@@ -1,3 +1,3 @@
-const store = {current: null,}
+const store = { current: null, };
 
 export default store;

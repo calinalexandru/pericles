@@ -3,7 +3,7 @@ import { combineEpics, createEpicMiddleware, } from 'redux-observable';
 import thunk from 'redux-thunk';
 import { Store, applyMiddleware, } from 'webext-redux';
 
-import { DEFAULT_VALUES, MESSAGES, } from '@pericles/constants';
+import { DEFAULT_VALUES, MESSAGES, WEBEXT_PORT, } from '@pericles/constants';
 import { appActions, } from '@pericles/store';
 import { getBrowserAPI, } from '@pericles/util';
 
@@ -20,15 +20,16 @@ const { app, } = appActions;
 
 let initialized = false;
 export default () => {
-  console.log('function init');
-  getBrowserAPI().api.runtime.connect({ name: 'CONTENT', });
+  console.log('function initz', initialized, { store, });
+  const port = getBrowserAPI().api.runtime.connect({ name: 'CONTENT', });
+  port.postMessage({ type: 'CONTENT_READY', });
 
   const init = () => {
     console.log('init content');
     initialized = true;
     const rootEpic = combineEpics(parserEpic, appEpic);
     const observableMiddleware = createEpicMiddleware();
-    const s = new Store({ portName: 'WEBEXT_REDUX_TEST', });
+    const s = new Store({ portName: WEBEXT_PORT, });
     store.current = applyMiddleware(s, thunk, observableMiddleware);
     observableMiddleware.run(rootEpic);
 
@@ -57,9 +58,9 @@ export default () => {
   };
 
   // Listens for when the store gets initialized
-  getBrowserAPI().api.runtime.onMessage.addListener((req) => {
-    console.log('messaged recieved boss', req);
-    if (req.action === 'storeReady' && !initialized) {
+  port.onMessage.addListener((msg) => {
+    console.log('port msg', msg);
+    if (msg.type === 'STORE_INITIALIZED' && !initialized) {
       console.log('store initialized boss');
       init();
     }

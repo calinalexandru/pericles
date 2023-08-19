@@ -34,7 +34,7 @@
     "default_popup": "index.html",
     "default_title": "Pericles: Text to speech Screen Reader"
   },
-  "permissions": ["storage", "contextMenus", "tts", "ttsEngine"],
+  "permissions": ["storage", "contextMenus", "tts", "activeTab"],
   "icons": {
     "16": "icon/16-on.png",
     "32": "icon/32-on.png",

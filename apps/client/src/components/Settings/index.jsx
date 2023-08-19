@@ -175,10 +175,12 @@ export default function SettingsComponent() {
                   country={dialect} />
               </InputAdornment>
             );
-            return <TextField
-              {...params}
-              variant="outlined"
-              fullWidth={true} />;
+            return (
+              <TextField
+                {...params}
+                variant="outlined"
+                fullWidth={true} />
+            );
           }}
         />
         {!scholarMode && (

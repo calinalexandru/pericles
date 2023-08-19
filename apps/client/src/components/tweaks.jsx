@@ -159,10 +159,7 @@ export default function TweaksComponent() {
                 value={highlightStyle}
                 onChange={(e) => {
                   clearSections(playerTab);
-                  setAppSetting(
-                    VARIABLES.APP.HIGHLIGHT_STYLE,
-                    e.target.value
-                  );
+                  setAppSetting(VARIABLES.APP.HIGHLIGHT_STYLE, e.target.value);
                   highlightSection(playerTab);
                 }}
                 sx={{
