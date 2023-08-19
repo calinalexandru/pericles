@@ -33,7 +33,7 @@ export default () => {
     map((tabs) => tabs),
     pluck('tabId'),
     tap((tabId) => {
-      store.dispatch(app.set({ activeTab: tabId, }));
+      store.current.dispatch(app.set({ activeTab: tabId, }));
     })
   );
 
@@ -46,8 +46,8 @@ export default () => {
     filter((item) => item === ATTRIBUTES.CONTEXT_MENU.READ_SELECTION),
     tap(async () => {
       console.log('reading selection');
-      await store.dispatch(player.stop());
-      await store.dispatch(player.demand());
+      await store.current.dispatch(player.stop());
+      await store.current.dispatch(player.demand());
     })
   );
 
@@ -59,9 +59,9 @@ export default () => {
     pluck('menuItemId'),
     filter((item) => item === ATTRIBUTES.CONTEXT_MENU.READ_FROM_HERE),
     tap(async () => {
-      await store.dispatch(player.stop());
+      await store.current.dispatch(player.stop());
       setTimeout(async () => {
-        await store.dispatch(
+        await store.current.dispatch(
           player.play({ userGenerated: true, fromCursor: true, })
         );
       }, 500);

@@ -1,9 +1,11 @@
+import { getBrowserAPI, } from '@pericles/util';
+
 import Utterance from './utterance';
 
 export default class ChromeSynth {
 
   constructor() {
-    this.synth = window.speechSynthesis;
+    this.synth = getBrowserAPI().api.tts;
     this.onStart = () => {};
     this.onEnd = () => {};
     this.onBoundary = () => {};
@@ -92,10 +94,10 @@ export default class ChromeSynth {
     this.text = text;
     const voiceObj = await this.getVoiceByKey(this.voice);
 
-    this.msg = Utterance.getNew({
+    const ttsOptions = Utterance.getNew({
       lang: 'en',
       volume: this.volume,
-      voice: voiceObj,
+      voice: voiceObj, // Assuming voiceObj has a voiceName property that matches one from chrome.tts.getVoices
       pitch: this.pitch,
       rate: this.rate,
       text: this.text,
@@ -106,92 +108,17 @@ export default class ChromeSynth {
         this.onStart(e);
       },
       onBoundary: (params) => {
-        // this.boundaries += Number(params.charIndex);
-        this.onBoundary(
-          params
-          // charIndex: this.boundaries,
-          // charLength: params.charLength,
-        );
-        // this.boundaries += params.charLength;
+        this.onBoundary(params);
       },
       onEnd: (e) => {
         this.clearResumeInfinity();
         this.onEnd(e);
       },
-      onPause: () => null,
-      onResume: () => null,
       onError: () => this.onEnd({ continueSpeaking: true, }),
     });
-    this.synth.speak(this.msg);
-    // this.setBoundaries(boundaries);
-    // const sentences = getSentencesFromText(text);
-    // const texts = sentences.map((sentence) => sentence.text);
-    // console.log('Chrome.speak.texts', { texts });
-    // const voiceObj = await this.getVoiceByKey(this.voice);
-    // console.log('voiceObj', voiceObj);
 
-    // this.msgArr = texts.map((senText, i) =>
-    //   Utterance.getNew({
-    //     lang: 'en',
-    //     volume: this.volume,
-    //     voice: voiceObj,
-    //     pitch: this.pitch,
-    //     rate: this.rate,
-    //     text: senText,
-    //     onStart: (e) => {
-    //       if (i === 0) this.onBuffering({ buffering: false });
-    //       this.onStartS(i)(e);
-    //     },
-    //     onBoundary: (e) => {
-    //       this.onBoundaryS(i)(e);
-    //     },
-    //     onEnd: (e) => {
-    //       this.onEndS(i)(e);
-    //     },
-    //     onPause: () => null,
-    //     onResume: () => null,
-    //     onError: () => this.onEnd({ continueSpeaking: true }),
-    //   })
-    // );
-    // if (this.msgArr[key]) this.synth.speak(this.msgArr[key]);
-    // else this.onEnd({ continueSpeaking: true });
-    // console.log('synth.speak.msgArr', this.msgArr);
-    // const msg = new SpeechSynthesisUtterance(new Date().getTime());
-    // const msg2 = new SpeechSynthesisUtterance('uniq shit');
-    // msg.lang = 'en';
-    // msg2.lang = 'en';
-    // msg.volume = 1;
-    // msg2.volume = 1;
-    // msg.pitch = 1;
-    // msg2.pitch = 1;
-    // msg.text = `what the fuck is wrong with firefox`;
-    // msg2.text = `Firefox is a great privacy browser`;
-    // msg.rate = 1;
-    // msg2.rate = 1;
-    // console.log('this.synth', this.synth);
-    // console.log('this.synth.msg', msg);
-    // this.synth.cancel();
-    // // this.synth.speak(msg2)
-    // msg.onerror = (e) => {
-    //   console.error('error mayday', e);
-    // };
-
-    // msg.onpause = (e) => {
-    //   console.log('got paused, boss', e);
-    // };
-    // msg.onmark = (e) => {
-    //   console.log('got mark, boss', e);
-    // };
-    // msg.onword = (e) => {
-    //   console.log('got ord, boss', e);
-    // };
-    // msg.onstart = this.onStart;
-    // msg.onend = this.onEnd;
-    // msg.onboundary = this.onBoundary;
-
-    /* eslint-disable-next-line */
-    // window.speechSynthesis.speak(msg);
-    // this.synth.speak(msg)
+    const { text: ttsText, ...restTtsOptions } = ttsOptions;
+    getBrowserAPI().api.tts.speak(ttsText, restTtsOptions);
   }
 
   setVoice(val) {
@@ -249,7 +176,7 @@ export default class ChromeSynth {
   cancel() {
     console.log('synth.chrome.cancel');
     this.removeListeners();
-    this.synth.cancel();
+    this.synth.stop();
   }
 
   pause() {

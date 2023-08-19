@@ -32,7 +32,7 @@ export default () => {
     .pipe(
       tap((out) => {
         console.log('Speech.stream$.subscribe.out', out);
-        const state = store.getState();
+        const state = store.current.getState();
         const playingTab = playerTabSelector(state);
         const parserIframes = parserIframesSelector(state);
         const { event, params, } = out;
@@ -51,15 +51,15 @@ export default () => {
         switch (event) {
         // case 'onPause':
         //   console.log('onPause');
-        //   store.dispatch(player.set({ status: PLAYER_STATUS.PAUSED }));
+        //   store.current.dispatch(player.set({ status: PLAYER_STATUS.PAUSED }));
         //   break;
         // case 'onResume':
         //   console.log('onResume');
-        //   store.dispatch(player.resumeEvent());
+        //   store.current.dispatch(player.resumeEvent());
         //   break;
         case 'onStart':
           console.log('onStart', { playingTab, playerKey, });
-          store.dispatch(player.set({ status: PLAYER_STATUS.PLAYING, }));
+          store.current.dispatch(player.set({ status: PLAYER_STATUS.PLAYING, }));
           mpToContent(
             [ highlight.section(), autoscroll.set({ section: playerKey, }), ],
             playingTab
@@ -72,7 +72,7 @@ export default () => {
               parserKeySelector(state) - 1 > playerKey
           ) {
             console.log('going to next');
-            store.dispatch(player.next({ auto: true, }));
+            store.current.dispatch(player.next({ auto: true, }));
           } else if (parserEndSelector(state)) {
             console.log('parserIframes', parserIframes);
             const availableIframeKey = findAvailableIframe(parserIframes);
@@ -90,7 +90,7 @@ export default () => {
             }
             console.log('onEnd.iframe', newIframes);
             console.log('going to next.iframe');
-            store.dispatch(player.end({ iframes: newIframes, }));
+            store.current.dispatch(player.end({ iframes: newIframes, }));
           }
           break;
         case 'onBoundary':
@@ -103,26 +103,26 @@ export default () => {
           break;
         case 'onBuffering':
           // console.log('onBuffering', buffering);
-          store.dispatch(player.set({ buffering, }));
+          store.current.dispatch(player.set({ buffering, }));
           break;
         case 'onCreditsBurn':
           // console.log('onCreditsBurn', creditsVal);
-          store.dispatch(credits.burn(creditsVal));
+          store.current.dispatch(credits.burn(creditsVal));
           break;
         case 'onError':
           console.log('onError');
           if (errorCode === ERROR_CODES.WEBSOCKET.THROTTLE) {
-            store.dispatch(player.overload());
+            store.current.dispatch(player.overload());
           } else if (values(ERROR_CODES.WEBSOCKET).includes(errorCode)) {
-            store.dispatch(player.crash());
+            store.current.dispatch(player.crash());
           } else if (errorCode === ERROR_CODES.PLAYER.TIMEOUT) {
-            store.dispatch(player.timeout());
+            store.current.dispatch(player.timeout());
           } else if (errorCode === ERROR_CODES.PLAYER.TEXT_EXCEED) {
-            store.dispatch(
+            store.current.dispatch(
               player.crash({ message: 'Your text is too big for me, senapi', })
             );
           } else {
-            store.dispatch(player.crash());
+            store.current.dispatch(player.crash());
           }
           break;
         default:

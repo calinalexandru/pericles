@@ -24,7 +24,6 @@ import {
   appLanguageSelector,
   appRouteSelector,
   playerActions,
-  appActions,
   hotkeysSelector,
   hotkeysDisableSelector,
 } from '@pericles/store';
@@ -33,7 +32,6 @@ import routes from './routes';
 import { paletteDark, paletteLight, } from './theme';
 import './App.css';
 
-const { credits, } = appActions;
 const { notification, } = notificationActions;
 const { player, } = playerActions;
 
@@ -42,7 +40,6 @@ function App({
   notificationType,
   notificationText,
   onClearNotification,
-  onCreditsResetCheck,
   themeMode,
   language,
   hotkeys,

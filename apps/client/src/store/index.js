@@ -1,4 +1,2 @@
-import { Store, } from 'webext-redux';
-
-const store = new Store();
+const store = new Store({ portName: "WEBEXT_REDUX_TEST", });
 export default store;

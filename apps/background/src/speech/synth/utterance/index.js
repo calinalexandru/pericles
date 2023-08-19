@@ -14,23 +14,34 @@ export default class Utterance {
     onResume,
     onError,
   }) {
-    const msg = new SpeechSynthesisUtterance(text);
-    msg.lang = lang;
-    msg.onstart = onStart;
-    msg.onend = onEnd;
-    msg.onboundary = onBoundary;
-    msg.onpause = onPause;
-    msg.onresume = onResume;
-    msg.onerror = onError;
-    msg.volume = volume;
-    msg.pitch = pitch;
-    msg.text = text;
-    msg.rate = rate;
-    msg.voice = voice;
-    // msg.addEventListener('start', onStart);
-    // msg.addEventListener('end', onEnd);
-    // msg.addEventListener('boundary', onBoundary);
-    return msg;
+    return {
+      lang,
+      volume,
+      pitch,
+      rate,
+      voiceName: voice ? voice.voiceName : undefined,
+      text,
+      onEvent: (event) => {
+        switch (event.type) {
+        case 'start':
+          onStart(event);
+          break;
+        case 'word':
+          onBoundary(event);
+          break;
+        case 'end':
+          onEnd(event);
+          break;
+        case 'interrupted':
+        case 'cancelled':
+        case 'error':
+          onError(event);
+          break;
+        default:
+          break;
+        }
+      },
+    };
   }
 
 }

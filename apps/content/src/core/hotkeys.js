@@ -26,23 +26,23 @@ export default () => {
   const hotkeyEvents = {
     start: () => {
       console.log('hotkeyEvents.start');
-      store.dispatch(player.play({ userGenerated: true, }));
+      store.current.dispatch(player.play({ userGenerated: true, }));
     },
     play: () => {
       console.log('hotkeyEvents.toggle');
-      store.dispatch(player.toggle());
+      store.current.dispatch(player.toggle());
     },
     stop: () => {
       console.log('hotkeyEvents.stop');
-      store.dispatch(player.stop());
+      store.current.dispatch(player.stop());
     },
     next: () => {
       console.log('hotkeyEvents.next');
-      store.dispatch(player.softNext());
+      store.current.dispatch(player.softNext());
     },
     prev: () => {
       console.log('hotkeyEvents.prev');
-      store.dispatch(player.softPrev());
+      store.current.dispatch(player.softPrev());
     },
   };
   let keysMap = Object.create(null);

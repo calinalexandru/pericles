@@ -82,7 +82,7 @@ export default class Speech {
   }
 
   static stop() {
-    // console.log('stop');
+    console.log('stop', Speech.synth);
     Speech.synth.cancel();
   }
 

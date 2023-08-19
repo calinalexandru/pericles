@@ -34,6 +34,6 @@ export default () => {
   );
   onMessage$.subscribe((action) => {
     console.log('subscribe.api/action', action);
-    store.dispatch(action);
+    store.current.dispatch(action);
   });
 };

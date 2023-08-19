@@ -14,19 +14,19 @@ export default () => {
   const tabClosed$ = fromEvent(window, 'beforeunload').pipe(
     tap(async () => {
       const { periclesTabId: tab, } = window;
-      await store.dispatch(app.tabClosed({ tab, }));
+      await store.current.dispatch(app.tabClosed({ tab, }));
     })
   );
 
   const contextMenuOpen$ = fromEvent(document, 'contextmenu').pipe(
     tap(async (e) => {
       const textSelected = window.getSelection().toString();
-      await store.dispatch(
+      await store.current.dispatch(
         app.set({
           [VARIABLES.APP.SELECTED_TEXT]: textSelected,
         })
       );
-      await store.dispatch(app.set({ skipUntilY: e.pageY, }));
+      await store.current.dispatch(app.set({ skipUntilY: e.pageY, }));
     }),
     ignoreElements()
   );
@@ -77,12 +77,12 @@ export default () => {
       );
       if (sectionId < 0) return null;
       console.log('sectionClick$.sectionId, section', sectionId, sectionEl);
-      await store.dispatch(player.softHalt());
-      await store.dispatch(
+      await store.current.dispatch(player.softHalt());
+      await store.current.dispatch(
         player.set({ key: sectionId, status: PLAYER_STATUS.LOADING, })
       );
       setTimeout(async () => {
-        await store.dispatch(player.play());
+        await store.current.dispatch(player.play());
       }, 300);
 
       return true;
@@ -92,7 +92,7 @@ export default () => {
 
   const googleBookNext$ = fromEvent(document, 'click').pipe(
     map(async (e) => {
-      const state = store.getState();
+      const state = store.current.getState();
       if (!isGoogleBook(parserTypeSelector(state))) return true;
       const nextPageLabel = e.target.getAttribute('aria-label');
       if (
@@ -100,7 +100,7 @@ export default () => {
         e.target.innerHTML === 'chevron_right'
       ) {
         console.log('googleBookNext$', e.target);
-        await store.dispatch(player.stop());
+        await store.current.dispatch(player.stop());
       }
       return true;
     }),
@@ -117,7 +117,7 @@ export default () => {
         e.target.innerHTML === 'chevron_left'
       ) {
         console.log('googleBookPrev$', e.target);
-        await store.dispatch(player.stop());
+        await store.current.dispatch(player.stop());
       }
 
       return true;

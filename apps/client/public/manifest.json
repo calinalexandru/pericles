@@ -17,12 +17,14 @@
       "run_at": "document_start"
     }
   ],
-  "content_security_policy": "script-src 'self' https://www.gstatic.com/ https://www.googleapis.com https://apis.google.com; object-src 'self'",
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline';"
+  },
   "applications": { "gecko": { "id": "pericles@alexandrucalin.me" } },
   "background": {
-    "scripts": ["background-vendors.js", "background-bundle.js"]
+    "service_worker": "background-service-worker.js"
   },
-  "browser_action": {
+  "action": {
     "default_icon": {
       "16": "icon/16-on.png",
       "32": "icon/32-on.png",
@@ -32,7 +34,7 @@
     "default_popup": "index.html",
     "default_title": "Pericles: Text to speech Screen Reader"
   },
-  "permissions": ["storage", "contextMenus", "tts"],
+  "permissions": ["storage", "contextMenus", "tts", "ttsEngine"],
   "icons": {
     "16": "icon/16-on.png",
     "32": "icon/32-on.png",
@@ -40,5 +42,5 @@
     "128": "icon/128-on.png"
   },
   "web_accessible_resources": [],
-  "manifest_version": 2
+  "manifest_version": 3
 }
