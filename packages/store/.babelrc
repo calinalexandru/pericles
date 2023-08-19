@@ -1,0 +1,11 @@
+{
+  // "plugins": [
+  //   [
+  //     "ramda",
+  //     {
+  //       "useES": true
+  //     }
+  //   ]
+  // ],
+  "presets": [["@babel/preset-env", { "modules": false }]]
+}

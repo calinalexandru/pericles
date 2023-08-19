@@ -1,0 +1,53 @@
+{
+  "name": "@pericles/store",
+  "sideEffects": false,
+  "version": "1.0.26",
+  "description": "Pericles' reducers, initialState",
+  "main": "src/index.js",
+  "module": "es/index.js",
+  "files": [
+    "es",
+    "es/index.js"
+  ],
+  "scripts": {
+    "prepare": "npm run build",
+    "dev": "npm run build -- -w",
+    "build": "cross-env BABEL_ENV=es babel src --out-dir es",
+    "linking": "pnpm link ../constants",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [
+    "store",
+    "reducers",
+    "redux"
+  ],
+  "author": "Alexandru Calin",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/runtime": "7.18.3",
+    "@pericles/constants": "workspace:*",
+    "ramda": "0.27.1",
+    "redux": "4.1.2",
+    "redux-actions": "2.6.5",
+    "redux-observable": "2.0.0",
+    "redux-thunk": "2.4.1",
+    "reselect": "4.1.5"
+  },
+  "devDependencies": {
+    "@pericles/eslint-config": "workspace:*",
+    "@babel/cli": "^7.16.0",
+    "@babel/core": "^7.16.0",
+    "@babel/preset-env": "^7.16.4",
+    "babel-plugin-ramda": "^2.0.0",
+    "cross-env": "^7.0.3",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.24.0",
+    "prettier": "^2.5.1"
+  }
+}

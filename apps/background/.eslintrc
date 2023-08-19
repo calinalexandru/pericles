@@ -1,0 +1,10 @@
+{
+  "root": true,
+  "extends": ["@pericles/eslint-config"],
+  "plugins": ["react"],
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+#root {
+  min-width: 330px;
+  min-height: 133px;
+}
+
+.danger {
+  color: #fff;
+  background-color: #f44336;
+}

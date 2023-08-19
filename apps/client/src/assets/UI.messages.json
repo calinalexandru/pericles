@@ -1,0 +1,19 @@
+{
+  "readTime": {
+    "text": "reading time"
+  },
+  "loading": {
+    "text": "Loading audio..."
+  },
+  "start": {
+    "text": "Press play to start"
+  },
+  "failed": {
+    "title": "Parse Error",
+    "text": "Something went wrong!\nRefresh the page and try again or <a href=\"\">Report bug</a>"
+  },
+  "failed_timeout": {
+    "title": "Timeout Error",
+    "text": "Error! The document is too big."
+  }
+}

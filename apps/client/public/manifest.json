@@ -1,0 +1,44 @@
+{
+  "name": "Pericles: Text to Speech Screen Reader",
+  "version": "2.2.13",
+  "description": "Speech synthesis redesigned. Listen to emails, documents & websites.",
+  "homepage_url": "https://getpericles.com",
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["--dynamically-added-"],
+      "runAt": "document_end",
+      "all_frames": true
+    },
+    {
+      "all_frames": true,
+      "js": ["content-google-docs-inject.js"],
+      "matches": ["https://docs.google.com/*"],
+      "run_at": "document_start"
+    }
+  ],
+  "content_security_policy": "script-src 'self' https://www.gstatic.com/ https://www.googleapis.com https://apis.google.com; object-src 'self'",
+  "applications": { "gecko": { "id": "pericles@alexandrucalin.me" } },
+  "background": {
+    "scripts": ["background-vendors.js", "background-bundle.js"]
+  },
+  "browser_action": {
+    "default_icon": {
+      "16": "icon/16-on.png",
+      "32": "icon/32-on.png",
+      "96": "icon/96-on.png",
+      "128": "icon/128-on.png"
+    },
+    "default_popup": "index.html",
+    "default_title": "Pericles: Text to speech Screen Reader"
+  },
+  "permissions": ["storage", "contextMenus", "tts"],
+  "icons": {
+    "16": "icon/16-on.png",
+    "32": "icon/32-on.png",
+    "96": "icon/96-on.png",
+    "128": "icon/128-on.png"
+  },
+  "web_accessible_resources": [],
+  "manifest_version": 2
+}

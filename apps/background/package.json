@@ -1,0 +1,76 @@
+{
+  "name": "@pericles/background",
+  "version": "1.1.13",
+  "description": "Pericles background scripts",
+  "sideEffects": false,
+  "main": "src/index",
+  "files": [
+    "dist"
+  ],
+  "browserslist": [
+    "last 2 versions"
+  ],
+  "dependencies": {
+    "@lingui/core": "3.13.3",
+    "@lingui/macro": "3.13.3",
+    "@lingui/react": "3.13.3",
+    "@pericles/constants": "workspace:*",
+    "@pericles/store": "workspace:*",
+    "@pericles/util": "workspace:*",
+    "ramda": "0.27.1",
+    "react": "^18.1.0",
+    "redux": "4.1.2",
+    "redux-actions": "2.6.5",
+    "redux-observable": "2.0.0",
+    "redux-thunk": "2.4.1",
+    "rxjs": "7.5.1",
+    "typescript": "^4.6.4",
+    "webext-redux": "2.1.9"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.16.8",
+    "@babel/core": "^7.16.7",
+    "@babel/eslint-parser": "^7.17.0",
+    "@babel/preset-env": "^7.16.8",
+    "@pericles/eslint-config": "workspace:*",
+    "asn1.js": "^5.4.1",
+    "babel-loader": "^8.2.3",
+    "babel-plugin-import": "^1.13.3",
+    "babel-plugin-macros": "^3.1.0",
+    "babel-plugin-ramda": "^2.0.0",
+    "babel-plugin-transform-imports": "^2.0.0",
+    "dependency-cruiser": "^11.2.1",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-import-resolver-alias": "^1.1.2",
+    "eslint-plugin-import": "^2.25.4",
+    "node-fetch": "2",
+    "prettier": "^2.5.1",
+    "rimraf": "^3.0.2",
+    "terser-webpack-plugin": "^5.1.4",
+    "webpack": "^5.49.0",
+    "webpack-bundle-analyzer": "^4.5.0",
+    "webpack-cli": "^4.7.2"
+  },
+  "scripts": {
+    "dev": "npm run clean && NODE_ENV=development webpack --mode development --progress --color",
+    "build": "NODE_ENV=production NODE_OPTIONS=--openssl-legacy-provider webpack --mode production --progress --color",
+    "remotedev": "remotedev --hostname=localhost --port=8000",
+    "test": "jest",
+    "linking": "pnpm link ../constants && pnpm link ../store && pnpm link ../util",
+    "analyzer": "npm run clean && NODE_ENV=development webpack --mode development --progress --color --profile --json='dist/stats.json' && webpack-bundle-analyzer dist/stats.json",
+    "analyzer:build": "npm run clean && NODE_ENV=production webpack --mode production --progress --color --profile --json='dist/stats.json' && webpack-bundle-analyzer dist/stats.json",
+    "clean": "rimraf dist/*",
+    "clean:modules": "rimraf node_modules",
+    "clean:lock": "rimraf pnpm-lock.yaml",
+    "clean:store": "pnpm store prune",
+    "modules:install": "pnpm install"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "Alexandru Calin",
+  "license": "ISC"
+}

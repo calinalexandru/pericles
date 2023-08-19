@@ -1,0 +1,133 @@
+._pericles_action_prev,
+._pericles_action_next,
+._pericles_action_play,
+._pericles_action_stop,
+._pericles_action_pause {
+  cursor: pointer;
+  font-size: 19px;
+}
+
+._pericles_action_prev:hover,
+._pericles_action_next:hover,
+._pericles_action_play:hover,
+._pericles_action_stop:hover,
+._pericles_action_pause:hover {
+  font-size: 20px;
+}
+
+._pericles_action_prev:active,
+._pericles_action_next:active,
+._pericles_action_play:active,
+._pericles_action_stop:active,
+._pericles_action_pause:active {
+  font-size: 19px;
+}
+
+img._pericles_action_icon {
+  display: inline-block !important;
+  width: 24px !important;
+  height: 24px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  vertical-align: top !important;
+  opacity: 0.9 !important;
+}
+
+img._pericles_action_icon:hover {
+  opacity: 1 !important;
+}
+
+ps-section,
+ps-word {
+  display: inline;
+  margin: 0;
+  padding: 0;
+}
+
+ps-word[data-audio-index]:hover {
+  background: #ccc;
+  cursor: crosshair;
+}
+
+ps-section {
+  position: relative;
+  cursor: pointer;
+}
+
+ps-section:hover {
+  background: var(--pericles-section-background);
+}
+
+._pericles_action_container {
+  border-radius: 4px;
+  width: 50px;
+  /* width: 74px; */
+  height: 26px;
+  /* background: linear-gradient(180deg, #ccc, transparent); */
+  background: #eee;
+  line-height: 32px;
+  transition: opacity 0.55s ease-in-out;
+  -moz-transition: opacity 0.55s ease-in-out;
+  -webkit-transition: opacity 0.55s ease-in-out;
+}
+
+._pericles_inspector {
+  border: 1px solid #000;
+  background-color: rgba(102, 136, 253, 0.2) !important;
+  color: #000 !important;
+  /* opacity: 0.6; */
+}
+
+@keyframes _periclesFadeOut {
+  0% {
+    background: #ccc;
+    color: #000;
+  }
+
+  100% {
+    background: transparent;
+    color: inherit;
+  }
+}
+._pericles_word_tracker_style_fade,
+._pericles_prev_word_tracker_style_fade {
+  border-radius: 2px;
+  text-shadow: none;
+}
+
+._pericles_prev_word_tracker_style_fade {
+  background: transparent;
+  animation: _periclesFadeOut 2s ease-out;
+  color: inherit;
+}
+
+rect._pericles_section_highlight_style_background {
+  fill: var(--pericles-section-background);
+  opacity: 0.4;
+}
+
+._pericles_section_highlight_style_background {
+  background: var(--pericles-section-background);
+}
+
+._pericles_section_highlight_style_border {
+  border: 1px solid var(--pericles-section-background);
+}
+
+rect._pericles_section_highlight_style_border {
+  stroke: var(--pericles-section-background);
+}
+
+._pericles_word_tracker_style_background {
+  background: var(--pericles-word-background);
+}
+
+._pericles_word_tracker_style_underline {
+  border-top: 1px solid var(--pericles-word-background);
+  border-bottom: 1px solid var(--pericles-word-background);
+}
+
+._pericles_word_tracker_style_fade {
+  background: var(--pericles-word-background);
+  color: #fff;
+}

@@ -1,0 +1,35 @@
+{
+  "plugins": [
+    ["macros"],
+    ["ramda"],
+    [
+      "import",
+      {
+        "libraryName": "@material-ui/core",
+        "libraryDirectory": "components"
+      },
+      "comps"
+    ],
+    [
+      "import",
+      {
+        "libraryName": "@material-ui/core",
+        "libraryDirectory": "pages"
+      },
+      "pages"
+    ],
+    [
+      "import",
+      {
+        "libraryName": "@material-ui/core",
+        "libraryDirectory": "primitives"
+      },
+      "primitives"
+    ]
+    // ["@babel/plugin-transform-runtime", { "regenerator": true }],
+    // ["@babel/plugin-proposal-class-properties"],
+    // ["@babel/plugin-proposal-object-rest-spread"],
+    // ["@babel/plugin-syntax-dynamic-import"]
+  ],
+  "presets": ["@babel/preset-react", "@emotion/babel-preset-css-prop"]
+}

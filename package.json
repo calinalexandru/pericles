@@ -1,0 +1,17 @@
+{
+  "name": "pericles",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "NODE_OPTIONS=--openssl-legacy-provider turbo run start",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider turbo run build",
+    "dev": "NODE_OPTIONS=--openssl-legacy-provider turbo run dev",
+    "prettier": "prettier './{apps,packages}/**/src/**/*.{js,jsx,ts,tsx,json,css,scss,md}' --write",
+    "lint": "eslint './{apps,packages}/**/src/**/*.{js,jsx,ts,tsx,json,css,scss,md}'",
+    "lint:fix": "eslint './{apps,packages}/**/src/**/*.{js,jsx,ts,tsx,json,css,scss,md}' --fix"
+  },
+  "keywords": [],
+  "author": "Alexandru Calin",
+  "license": "ISC"
+}

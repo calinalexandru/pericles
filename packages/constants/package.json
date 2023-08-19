@@ -1,0 +1,43 @@
+{
+  "name": "@pericles/constants",
+  "sideEffects": false,
+  "version": "1.0.42",
+  "description": "Pericles' constants",
+  "main": "src/index.js",
+  "module": "es/index.js",
+  "files": [
+    "es",
+    "es/index.js"
+  ],
+  "scripts": {
+    "prepare": "npm run build",
+    "dev": "npm run build -- -w",
+    "build": "cross-env BABEL_ENV=es babel src --out-dir es",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [
+    "constants",
+    "strings"
+  ],
+  "dependencies": {
+    "@babel/runtime": "7.18.3"
+  },
+  "author": "Alexandru Calin",
+  "license": "ISC",
+  "devDependencies": {
+    "@pericles/eslint-config": "workspace:*",
+    "@babel/cli": "^7.16.8",
+    "@babel/core": "^7.16.7",
+    "@babel/preset-env": "^7.16.8",
+    "cross-env": "^7.0.3",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.24.0",
+    "prettier": "^2.5.1"
+  }
+}

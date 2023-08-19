@@ -1,0 +1,55 @@
+{
+  "name": "@pericles/util",
+  "sideEffects": false,
+  "version": "1.1.20",
+  "description": "Pericles' helpers & primitives",
+  "main": "es/index.js",
+  "files": [
+    "es"
+  ],
+  "scripts": {
+    "prepare": "npm run build",
+    "dev": "npm run build -- -w",
+    "build": "cross-env BABEL_ENV=es babel src --out-dir es",
+    "linking": "pnpm link ../constants && pnpm link ../store",
+    "test": "cross-env BABEL_ENV=test NODE_ENV=test jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "Alexandru Calin",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/runtime": "7.18.3",
+    "@pericles/constants": "workspace:*",
+    "@pericles/store": "workspace:*",
+    "compromise": "14.2.0",
+    "ramda": "0.27.1",
+    "rxjs": "7.5.1"
+  },
+  "devDependencies": {
+    "@pericles/eslint-config": "workspace:*",
+    "@babel/cli": "^7.16.0",
+    "@babel/core": "^7.16.0",
+    "@babel/plugin-proposal-class-properties": "^7.16.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.16.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/plugin-transform-modules-commonjs": "^7.18.2",
+    "@babel/plugin-transform-runtime": "^7.18.2",
+    "@babel/preset-env": "^7.16.5",
+    "@jest/globals": "^27.4.4",
+    "@types/jest": "^27.0.3",
+    "babel-jest": "^28.1.0",
+    "babel-plugin-module-resolver": "^4.1.0",
+    "babel-plugin-ramda": "^2.0.0",
+    "cross-env": "^7.0.3",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.24.0",
+    "jest": "^27.4.5",
+    "jsdom": "^19.0.0",
+    "prettier": "^2.5.1"
+  }
+}
