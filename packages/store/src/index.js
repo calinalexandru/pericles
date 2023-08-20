@@ -70,3 +70,5 @@ export { default as settingsActions, } from './actions/settings';
 export { default as appActions, } from './actions/app';
 export { default as hotkeysActions, } from './actions/hotkeys';
 export { default as initialState, } from './initialState';
+
+export { default as store, } from './ReduxStore';

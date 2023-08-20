@@ -1,13 +1,12 @@
 import { i18n, } from '@lingui/core';
 import { combineEpics, createEpicMiddleware, } from 'redux-observable';
 import thunk from 'redux-thunk';
-import { Store, applyMiddleware, } from 'webext-redux';
+import { applyMiddleware, } from 'webext-redux';
 
-import { DEFAULT_VALUES, MESSAGES, WEBEXT_PORT, } from '@pericles/constants';
-import { appActions, } from '@pericles/store';
+import { DEFAULT_VALUES, MESSAGES, } from '@pericles/constants';
+import { appActions, store, } from '@pericles/store';
 import { getBrowserAPI, } from '@pericles/util';
 
-import store from '../store';
 import appEpic from '../store/epics/app';
 import parserEpic from '../store/epics/parser';
 
@@ -29,8 +28,9 @@ export default () => {
     initialized = true;
     const rootEpic = combineEpics(parserEpic, appEpic);
     const observableMiddleware = createEpicMiddleware();
-    const s = new Store({ portName: WEBEXT_PORT, });
-    store.current = applyMiddleware(s, thunk, observableMiddleware);
+    store.initialize(
+      applyMiddleware(store.createStore(), thunk, observableMiddleware)
+    );
     observableMiddleware.run(rootEpic);
 
     api();
@@ -41,15 +41,13 @@ export default () => {
       hotkeys();
     }
     setTimeout(async () => {
-      await store.current.dispatch(
-        app.newContent({ iframe: window !== window.top, })
-      );
+      store.dispatch(app.newContent({ iframe: window !== window.top, }));
     }, 50);
 
     console.log('content.store', store);
 
-    store.current.subscribe(() => {
-      const state = store.current.getState();
+    store.subscribe(() => {
+      const state = store.getState();
       console.log('content.state', state);
     });
 

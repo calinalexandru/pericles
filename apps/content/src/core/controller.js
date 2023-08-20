@@ -2,9 +2,13 @@
 import { fromEvent, combineLatest, } from 'rxjs';
 import { tap, ignoreElements, map, } from 'rxjs/operators';
 
-import store from '@/store';
 import { ATTRIBUTES, PLAYER_STATUS, VARIABLES, } from '@pericles/constants';
-import { appActions, parserTypeSelector, playerActions, } from '@pericles/store';
+import {
+  store,
+  appActions,
+  parserTypeSelector,
+  playerActions,
+} from '@pericles/store';
 import { isGoogleBook, } from '@pericles/util';
 
 const { app, } = appActions;
@@ -12,21 +16,21 @@ const { player, } = playerActions;
 
 export default () => {
   const tabClosed$ = fromEvent(window, 'beforeunload').pipe(
-    tap(async () => {
+    tap(() => {
       const { periclesTabId: tab, } = window;
-      await store.current.dispatch(app.tabClosed({ tab, }));
+      store.dispatch(app.tabClosed({ tab, }));
     })
   );
 
   const contextMenuOpen$ = fromEvent(document, 'contextmenu').pipe(
-    tap(async (e) => {
+    tap((e) => {
       const textSelected = window.getSelection().toString();
-      await store.current.dispatch(
+      store.dispatch(
         app.set({
           [VARIABLES.APP.SELECTED_TEXT]: textSelected,
         })
       );
-      await store.current.dispatch(app.set({ skipUntilY: e.pageY, }));
+      store.dispatch(app.set({ skipUntilY: e.pageY, }));
     }),
     ignoreElements()
   );
@@ -65,7 +69,7 @@ export default () => {
   );
 
   const sectionClick$ = fromEvent(document, 'click').pipe(
-    map(async (e) => {
+    map((e) => {
       let sectionEl = e.target;
       if (e.target.tagName !== ATTRIBUTES.TAGS.SECTION)
         sectionEl = sectionEl.closest(ATTRIBUTES.TAGS.SECTION);
@@ -77,12 +81,12 @@ export default () => {
       );
       if (sectionId < 0) return null;
       console.log('sectionClick$.sectionId, section', sectionId, sectionEl);
-      await store.current.dispatch(player.softHalt());
-      await store.current.dispatch(
+      store.dispatch(player.softHalt());
+      store.dispatch(
         player.set({ key: sectionId, status: PLAYER_STATUS.LOADING, })
       );
-      setTimeout(async () => {
-        await store.current.dispatch(player.play());
+      setTimeout(() => {
+        store.dispatch(player.play());
       }, 300);
 
       return true;
@@ -91,8 +95,8 @@ export default () => {
   );
 
   const googleBookNext$ = fromEvent(document, 'click').pipe(
-    map(async (e) => {
-      const state = store.current.getState();
+    map((e) => {
+      const state = store.getState();
       if (!isGoogleBook(parserTypeSelector(state))) return true;
       const nextPageLabel = e.target.getAttribute('aria-label');
       if (
@@ -100,7 +104,7 @@ export default () => {
         e.target.innerHTML === 'chevron_right'
       ) {
         console.log('googleBookNext$', e.target);
-        await store.current.dispatch(player.stop());
+        store.dispatch(player.stop());
       }
       return true;
     }),
@@ -108,7 +112,7 @@ export default () => {
   );
 
   const googleBookPrev$ = fromEvent(document, 'click').pipe(
-    map(async (e) => {
+    map((e) => {
       const state = store.getState();
       if (!isGoogleBook(parserTypeSelector(state))) return true;
       const prevPageLabel = e.target.getAttribute('aria-label');
@@ -117,7 +121,7 @@ export default () => {
         e.target.innerHTML === 'chevron_left'
       ) {
         console.log('googleBookPrev$', e.target);
-        await store.current.dispatch(player.stop());
+        store.dispatch(player.stop());
       }
 
       return true;

@@ -4,9 +4,8 @@ import thunk from 'redux-thunk';
 import { wrapStore, } from 'webext-redux';
 
 import core from '@/core';
-import store from '@/store';
 import { WEBEXT_PORT, } from '@pericles/constants';
-import { appActions, } from '@pericles/store';
+import { appActions, store, } from '@pericles/store';
 import { getBrowserAPI, } from '@pericles/util';
 
 import appEpic from './store/epics/app';
@@ -32,17 +31,19 @@ const { app, } = appActions;
 
 const init = (preloadedState) => {
   const observableMiddleware = createEpicMiddleware();
-  store.current = createStore(
-    combineReducers({
-      app: appReducer,
-      player: playerReducer,
-      settings: settingsReducer,
-      parser: parserReducer,
-      notification: notificationReducer,
-      hotkeys: hotkeysReducer,
-      // ...preloadedState,
-    }),
-    applyMiddleware(observableMiddleware, thunk)
+  store.initialize(
+    createStore(
+      combineReducers({
+        app: appReducer,
+        player: playerReducer,
+        settings: settingsReducer,
+        parser: parserReducer,
+        notification: notificationReducer,
+        hotkeys: hotkeysReducer,
+        // ...preloadedState,
+      }),
+      applyMiddleware(observableMiddleware, thunk)
+    )
   );
   wrapStore(store.current, { portName: WEBEXT_PORT, });
   observableMiddleware.run(
@@ -56,9 +57,9 @@ const init = (preloadedState) => {
   );
   core();
 
-  store.current.subscribe(() => {
-    getBrowserAPI().api.storage.local.set({ state: store.current.getState(), });
-    console.log('store updated', store.current.getState());
+  store.subscribe(() => {
+    getBrowserAPI().api.storage.local.set({ state: store.getState(), });
+    console.log('store updated', store.getState());
   });
 
   getBrowserAPI().api.tabs.query(
@@ -69,7 +70,7 @@ const init = (preloadedState) => {
 
       // Dispatch the tab ID to your state here
       console.log('dispatch tabId', activeTabId);
-      store.current.dispatch(app.set({ activeTab: activeTabId, }));
+      store.dispatch(app.set({ activeTab: activeTabId, }));
     }
   );
 };

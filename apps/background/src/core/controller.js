@@ -4,9 +4,8 @@ import {
   filter, map, pluck, tap, 
 } from 'rxjs/operators';
 
-import store from '@/store';
 import { ATTRIBUTES, } from '@pericles/constants';
-import { appActions, playerActions, } from '@pericles/store';
+import { store, appActions, playerActions, } from '@pericles/store';
 import { getBrowserAPI, } from '@pericles/util';
 
 const { app, } = appActions;
@@ -34,7 +33,7 @@ export default () => {
     pluck('tabId'),
     tap((tabId) => {
       console.log('set tab ID', tabId);
-      store.current.dispatch(app.set({ activeTab: tabId, }));
+      store.dispatch(app.set({ activeTab: tabId, }));
     })
   );
 
@@ -45,10 +44,10 @@ export default () => {
     map(([ info, ]) => info),
     pluck('menuItemId'),
     filter((item) => item === ATTRIBUTES.CONTEXT_MENU.READ_SELECTION),
-    tap(async () => {
+    tap(() => {
       console.log('reading selection');
-      await store.current.dispatch(player.stop());
-      await store.current.dispatch(player.demand());
+      store.dispatch(player.stop());
+      store.dispatch(player.demand());
     })
   );
 
@@ -59,12 +58,10 @@ export default () => {
     map(([ info, ]) => info),
     pluck('menuItemId'),
     filter((item) => item === ATTRIBUTES.CONTEXT_MENU.READ_FROM_HERE),
-    tap(async () => {
-      await store.current.dispatch(player.stop());
+    tap(() => {
+      store.dispatch(player.stop());
       setTimeout(async () => {
-        await store.current.dispatch(
-          player.play({ userGenerated: true, fromCursor: true, })
-        );
+        store.dispatch(player.play({ userGenerated: true, fromCursor: true, }));
       }, 500);
     })
   );

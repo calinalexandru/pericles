@@ -2,7 +2,7 @@
 import { fromEventPattern, } from 'rxjs';
 import { map, tap, } from 'rxjs/operators';
 
-import store from '@/store';
+import { store, } from '@pericles/store';
 import { getBrowserAPI, } from '@pericles/util';
 
 const { api, } = getBrowserAPI();
@@ -34,6 +34,6 @@ export default () => {
   );
   onMessage$.subscribe((action) => {
     console.log('subscribe.api/action', action);
-    store.current.dispatch(action);
+    store.dispatch(action);
   });
 };

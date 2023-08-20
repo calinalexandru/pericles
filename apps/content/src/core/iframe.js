@@ -4,8 +4,8 @@ import reactDom from 'react-dom';
 import { Provider, } from 'react-redux';
 
 import MiniPlayer from '@/features/MiniPlayer';
-import store from '@/store';
 import miniPlayerInject from '@/util/miniPlayerInject';
+import { store, } from '@pericles/store';
 
 export default () => {
   store.ready().then(() =>

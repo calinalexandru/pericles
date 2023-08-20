@@ -3,9 +3,9 @@ import { values, } from 'ramda';
 import { tap, } from 'rxjs/operators';
 
 import Speech from '@/speech';
-import store from '@/store';
 import { ERROR_CODES, PLAYER_STATUS, } from '@pericles/constants';
 import {
+  store,
   appActions,
   parserActions,
   parserEndSelector,
@@ -32,7 +32,7 @@ export default () => {
     .pipe(
       tap((out) => {
         console.log('Speech.stream$.subscribe.out', out);
-        const state = store.current.getState();
+        const state = store.getState();
         const playingTab = playerTabSelector(state);
         const parserIframes = parserIframesSelector(state);
         const { event, params, } = out;
@@ -51,17 +51,15 @@ export default () => {
         switch (event) {
         // case 'onPause':
         //   console.log('onPause');
-        //   store.current.dispatch(player.set({ status: PLAYER_STATUS.PAUSED }));
+        //   store.dispatch(player.set({ status: PLAYER_STATUS.PAUSED }));
         //   break;
         // case 'onResume':
         //   console.log('onResume');
-        //   store.current.dispatch(player.resumeEvent());
+        //   store.dispatch(player.resumeEvent());
         //   break;
         case 'onStart':
           console.log('onStart', { playingTab, playerKey, });
-          store.current.dispatch(
-            player.set({ status: PLAYER_STATUS.PLAYING, })
-          );
+          store.dispatch(player.set({ status: PLAYER_STATUS.PLAYING, }));
           mpToContent(
             [ highlight.section(), autoscroll.set({ section: playerKey, }), ],
             playingTab
@@ -74,7 +72,7 @@ export default () => {
               parserKeySelector(state) - 1 > playerKey
           ) {
             console.log('going to next');
-            store.current.dispatch(player.next({ auto: true, }));
+            store.dispatch(player.next({ auto: true, }));
           } else if (parserEndSelector(state)) {
             console.log('parserIframes', parserIframes);
             const availableIframeKey = findAvailableIframe(parserIframes);
@@ -92,7 +90,7 @@ export default () => {
             }
             console.log('onEnd.iframe', newIframes);
             console.log('going to next.iframe');
-            store.current.dispatch(player.end({ iframes: newIframes, }));
+            store.dispatch(player.end({ iframes: newIframes, }));
           }
           break;
         case 'onBoundary':
@@ -105,26 +103,26 @@ export default () => {
           break;
         case 'onBuffering':
           // console.log('onBuffering', buffering);
-          store.current.dispatch(player.set({ buffering, }));
+          store.dispatch(player.set({ buffering, }));
           break;
         case 'onCreditsBurn':
           // console.log('onCreditsBurn', creditsVal);
-          store.current.dispatch(credits.burn(creditsVal));
+          store.dispatch(credits.burn(creditsVal));
           break;
         case 'onError':
           console.log('onError');
           if (errorCode === ERROR_CODES.WEBSOCKET.THROTTLE) {
-            store.current.dispatch(player.overload());
+            store.dispatch(player.overload());
           } else if (values(ERROR_CODES.WEBSOCKET).includes(errorCode)) {
-            store.current.dispatch(player.crash());
+            store.dispatch(player.crash());
           } else if (errorCode === ERROR_CODES.PLAYER.TIMEOUT) {
-            store.current.dispatch(player.timeout());
+            store.dispatch(player.timeout());
           } else if (errorCode === ERROR_CODES.PLAYER.TEXT_EXCEED) {
-            store.current.dispatch(
+            store.dispatch(
               player.crash({ message: 'Your text is too big for me, senapi', })
             );
           } else {
-            store.current.dispatch(player.crash());
+            store.dispatch(player.crash());
           }
           break;
         default:

@@ -3,8 +3,8 @@ import { keys, } from 'ramda';
 import { fromEvent, combineLatest, } from 'rxjs';
 import { tap, ignoreElements, } from 'rxjs/operators';
 
-import store from '@/store';
 import {
+  store,
   hotkeysDisableSelector,
   hotkeysSelector,
   playerActions,
@@ -26,23 +26,23 @@ export default () => {
   const hotkeyEvents = {
     start: () => {
       console.log('hotkeyEvents.start');
-      store.current.dispatch(player.play({ userGenerated: true, }));
+      store.dispatch(player.play({ userGenerated: true, }));
     },
     play: () => {
       console.log('hotkeyEvents.toggle');
-      store.current.dispatch(player.toggle());
+      store.dispatch(player.toggle());
     },
     stop: () => {
       console.log('hotkeyEvents.stop');
-      store.current.dispatch(player.stop());
+      store.dispatch(player.stop());
     },
     next: () => {
       console.log('hotkeyEvents.next');
-      store.current.dispatch(player.softNext());
+      store.dispatch(player.softNext());
     },
     prev: () => {
       console.log('hotkeyEvents.prev');
-      store.current.dispatch(player.softPrev());
+      store.dispatch(player.softPrev());
     },
   };
   let keysMap = Object.create(null);

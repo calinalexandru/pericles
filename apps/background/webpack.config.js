@@ -1,5 +1,7 @@
-const TerserPlugin = require('terser-webpack-plugin');
 const path = require('path');
+
+const CopyPlugin = require('copy-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 const mode = process.env.NODE_ENV || 'development';
 const isEnvProduction = mode === 'production';
@@ -11,7 +13,7 @@ const isEnvProduction = mode === 'production';
 const config = {
   performance: false,
   mode,
-  target: ['web'],
+  target: [ 'web', ],
   devtool: mode === 'development' ? 'inline-source-map' : false,
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -23,13 +25,26 @@ const config = {
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        use: ['babel-loader'],
+        use: [ 'babel-loader', ],
         resolve: {
           fullySpecified: false,
         },
       },
     ],
   },
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.resolve(__dirname, './background-service-worker.js'),
+          to: path.resolve(__dirname, 'dist'),
+        },
+      ],
+      options: {
+        concurrency: 100,
+      },
+    }),
+  ],
   optimization: {
     usedExports: true,
     flagIncludedChunks: isEnvProduction,
@@ -42,7 +57,7 @@ const config = {
     minimizer: [],
   },
   resolve: {
-    extensions: ['*', '.js', '.jsx'],
+    extensions: [ '*', '.js', '.jsx', ],
     alias: {
       '@/core': path.resolve(__dirname, 'src/core'),
       '@/store': path.resolve(__dirname, 'src/store'),

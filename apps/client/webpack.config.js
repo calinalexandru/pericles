@@ -1,28 +1,28 @@
+const fs = require('fs');
+const path = require('path');
+
+const { CleanWebpackPlugin, } = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
-const path = require('path');
-const fs = require('fs');
 
 const mode = process.env.NODE_ENV || 'development';
-const isEnvProduction = mode === 'production';
-// const isEnvDevelopment = mode === 'development';
+const isProduction = mode === 'production';
 
 const prepareManifest = () => {
   const manifest = JSON.parse(
     fs.readFileSync('./public/manifest.json', {
       encoding: 'utf8',
       flag: 'r',
-    }),
+    })
   );
 
   const contentVendors = fs
     .readdirSync(path.resolve('../content/dist/'))
     .filter((file) =>
       file.match(
-        /^content-vendors(\.[a-z0-9]+)?\.js$|MiniPlayer|^[0-9]+\.content-bundle\.js$/,
-      ),
+        /^content-vendors(\.[a-z0-9]+)?\.js$|MiniPlayer|^[0-9]+\.content-bundle\.js$/
+      )
     );
 
   const contentLazyAssets = fs
@@ -39,24 +39,46 @@ const prepareManifest = () => {
   fs.writeFileSync('./dist/manifest.json', JSON.stringify(manifest));
 };
 
-const config = {
-  performance: false,
+const optimization = {
+  usedExports: true,
+  splitChunks: {
+    filename: 'vendors.[chunkhash].js',
+    chunks: 'all',
+  },
+};
+
+if (isProduction) {
+  optimization.minimizer = [
+    new TerserPlugin({
+      terserOptions: {
+        mangle: true,
+        ecma: 2020,
+        compress: {
+          drop_console: true,
+        },
+      },
+    }),
+  ];
+}
+
+module.exports = {
   mode,
-  devtool: mode === 'development' ? 'inline-source-map' : false,
-  watch: mode === 'development',
+  performance: false,
+  devtool: isProduction ? false : 'inline-source-map',
+  watch: !isProduction,
   module: {
     rules: [
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        use: ['babel-loader'],
+        use: [ 'babel-loader', ],
         resolve: {
           fullySpecified: false,
         },
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
+        use: [ 'style-loader', 'css-loader', ],
       },
       {
         test: /\.svg$/,
@@ -72,22 +94,12 @@ const config = {
     ],
   },
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.join(__dirname, 'dist'),
     filename: 'index.js',
   },
-  optimization: {
-    usedExports: true,
-    flagIncludedChunks: isEnvProduction,
-    concatenateModules: isEnvProduction,
-    minimize: isEnvProduction,
-    splitChunks: {
-      filename: 'vendors.[chunkhash].js',
-      chunks: 'all',
-    },
-    minimizer: [],
-  },
+  optimization,
   resolve: {
-    extensions: ['*', '.js', '.jsx'],
+    extensions: [ '*', '.js', '.jsx', ],
     alias: {
       '@/assets': path.resolve(__dirname, 'src/assets'),
       '@/components': path.resolve(__dirname, 'src/components'),
@@ -97,28 +109,28 @@ const config = {
       '@/store': path.resolve(__dirname, 'src/store'),
     },
   },
-  target: ['web'],
+  target: [ 'web', ],
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       inject: true,
       template: './public/index.html',
-      ...(isEnvProduction
+      ...(isProduction
         ? {
-            minify: {
-              removeComments: true,
-              collapseWhitespace: true,
-              removeRedundantAttributes: true,
-              useShortDoctype: true,
-              removeEmptyAttributes: true,
-              removeStyleLinkTypeAttributes: true,
-              keepClosingSlash: true,
-              minifyJS: true,
-              minifyCSS: true,
-              minifyURLs: true,
-            },
-          }
-        : undefined),
+          minify: {
+            removeComments: true,
+            collapseWhitespace: true,
+            removeRedundantAttributes: true,
+            useShortDoctype: true,
+            removeEmptyAttributes: true,
+            removeStyleLinkTypeAttributes: true,
+            keepClosingSlash: true,
+            minifyJS: true,
+            minifyCSS: true,
+            minifyURLs: true,
+          },
+        }
+        : {}),
     }),
     new CopyPlugin({
       patterns: [
@@ -133,7 +145,7 @@ const config = {
         {
           from: path.resolve(
             __dirname,
-            '../content/src/util/googleDocsInject.js',
+            '../content/src/util/googleDocsInject.js'
           ),
           to: path.resolve(__dirname, 'dist/content-google-docs-inject.js'),
         },
@@ -148,26 +160,8 @@ const config = {
     }),
     {
       apply: (compiler) => {
-        compiler.hooks.done.tap('Prepare manifest hook\n', () => {
-          prepareManifest();
-        });
+        compiler.hooks.done.tap('Prepare manifest hook\n', prepareManifest);
       },
     },
   ],
 };
-
-if (isEnvProduction) {
-  config.optimization.minimizer.push(
-    new TerserPlugin({
-      terserOptions: {
-        mangle: true,
-        ecma: 2020,
-        compress: {
-          drop_console: true,
-        },
-      },
-    }),
-  );
-}
-
-module.exports = config;

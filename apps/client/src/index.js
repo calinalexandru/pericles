@@ -5,9 +5,9 @@ import './index.css';
 import { Provider, } from 'react-redux';
 import { I18nProvider, } from '@lingui/react';
 import { i18n, } from '@lingui/core';
-import { Store, } from 'webext-redux';
 
-import { MESSAGES, DEFAULT_VALUES, WEBEXT_PORT, } from '@pericles/constants';
+import { MESSAGES, DEFAULT_VALUES, } from '@pericles/constants';
+import { store as ReduxStore, } from '@pericles/store';
 import { getBrowserAPI, } from '@pericles/util';
 
 import App from './App';
@@ -20,7 +20,7 @@ const port = getBrowserAPI().api.runtime.connect({ name: 'POPUP', });
 port.postMessage({ type: 'POPUP_READY', });
 
 const initPopup = () => {
-  const store = new Store({ portName: WEBEXT_PORT, });
+  const store = ReduxStore.createStore();
   store.ready().then(() => {
     ReactDOM.render(
       <Provider store={store}>
