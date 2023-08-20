@@ -70,6 +70,7 @@ const playOrRequest = (state, payload, actions) => {
   const playingTab = playerTabSelector(state.value);
   const activeTab = appActiveTabSelector(state.value);
   console.log('play.epic debug', {
+    actions,
     playerSections,
     playerKey,
     playerKeyPayload,
@@ -83,9 +84,18 @@ const playOrRequest = (state, payload, actions) => {
     (!playerSections.length && isGoogleDocsSvg(parserTypeSelector(state.value)))
   ) {
     Speech.stop();
-    console.log('playOrRequest.userGenerated.requestAndPlay');
+    console.log('playOrRequest.userGenerated.requestAndPlay', {
+      userGenerated,
+      playingTab,
+      activeTab,
+      playerSections,
+    });
     mpToContent(
-      [ parser.reset(), player.reset(), sections.requestAndPlay(payload), ],
+      [
+        parser.reset(),
+        player.reset({ tab: activeTab, }),
+        sections.requestAndPlay(payload),
+      ],
       activeTab
     );
   } else if (
@@ -94,7 +104,11 @@ const playOrRequest = (state, payload, actions) => {
     !hasSectionsInAdvance(playerSections, playerKey)
   ) {
     Speech.stop();
-    console.log('playOrRequest.!hasSectionsInAdvance.requestAndPlay');
+    console.log(
+      'playOrRequest.!hasSectionsInAdvance.requestAndPlay',
+      playerSections,
+      playerKey
+    );
 
     mpToContent([ sections.requestAndPlay(payload), ], playingTab);
   } else if (actions.length === 0) {
@@ -164,7 +178,16 @@ const playEpic = (action, state) =>
       // let text;
       const actions = [];
 
-      const out = [ ...actions, player.set({ buffering: true, }), ];
+      const out = [
+        ...actions,
+        player.set({
+          buffering: true,
+          // ...(appActiveTabSelector(state) !== -1 && {
+          // tab: appActiveTabSelector(state),
+          // }),
+          // tab: 1879991899,
+        }),
+      ];
       if (userGenerated) out.push(player.healthCheck());
       console.log('checkAuth.out', out, actions);
       if (!actions.length) {
@@ -463,7 +486,7 @@ const endEpic = (action, state) =>
       mpToContent(
         [
           parser.reset({ revertHtml: true, }),
-          player.reset(),
+          player.reset({ tab: appActiveTabSelector(state), }),
           parser.set({
             type: parserTypeSelector(state.value),
             page: nextPage,

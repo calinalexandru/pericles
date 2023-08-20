@@ -26,6 +26,7 @@ export default class ChromeSynth {
     this.serviceKey = '';
     this.serviceRegion = '';
     this.resumeTimer = 0;
+    this.isCanceled = false;
   }
 
   clearMessages() {
@@ -49,6 +50,7 @@ export default class ChromeSynth {
   }
 
   async speak(text, key = 0, boundaries = []) {
+    this.isCanceled = false;
     console.log('speak', text, key);
     this.setBoundaries(boundaries);
     this.text = text;
@@ -63,19 +65,25 @@ export default class ChromeSynth {
       rate: this.rate,
       text: this.text,
       onStart: (e) => {
+        if (this.isCanceled) return;
         this.clearResumeInfinity();
         this.activateResumeInfinity();
         this.onBuffering({ buffering: false, });
         this.onStart(e);
       },
       onBoundary: (params) => {
+        if (this.isCanceled) return;
         this.onBoundary(params);
       },
       onEnd: (e) => {
+        if (this.isCanceled) return;
         this.clearResumeInfinity();
         this.onEnd(e);
       },
-      onError: () => this.onEnd({ continueSpeaking: true, }),
+      onError: () => {
+        if (this.isCanceled) return;
+        this.onEnd({ continueSpeaking: true, });
+      },
     });
 
     const { text: ttsText, ...restTtsOptions } = ttsOptions;
@@ -115,20 +123,6 @@ export default class ChromeSynth {
     ChromeSynth.voices = voices;
   }
 
-  removeListeners() {
-    console.log('synth.chrome.removeListeners');
-    this.clearResumeInfinity();
-    this.msg.onstart = () => {};
-    this.msg.onend = () => {};
-    this.msg.onboundary = () => {};
-    this.msg.onerror = () => {};
-    // this.msgArr.forEach((arr, i) => {
-    //   this.msgArr[i].onstart = () => {};
-    //   this.msgArr[i].onend = () => {};
-    //   this.msgArr[i].onboundary = () => {};
-    // });
-  }
-
   continue() {
     console.log('Speech.chrome.continue');
     this.cancel();
@@ -137,7 +131,7 @@ export default class ChromeSynth {
 
   cancel() {
     console.log('synth.chrome.cancel');
-    this.removeListeners();
+    this.isCanceled = true;
     this.synth.stop();
   }
 

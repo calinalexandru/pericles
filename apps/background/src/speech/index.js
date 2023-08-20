@@ -14,6 +14,7 @@ export default class Speech {
   }
 
   static attachStreams() {
+    console.log('Speech.attachStreams');
     Speech.synth.onStart = (params) => {
       Speech.stream$.next({ event: 'onStart', params, });
     };

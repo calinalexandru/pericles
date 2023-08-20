@@ -1,5 +1,5 @@
 // /* eslint-disable no-unused-vars */
-import { length, pathOr, } from 'ramda';
+import { length, } from 'ramda';
 import { handleActions, } from 'redux-actions';
 
 import { PLAYER_STATUS, } from '@pericles/constants';
@@ -10,20 +10,18 @@ const { player: defaultValues, } = initialState;
 
 export default handleActions(
   {
-    [player.play]: (state, { payload, }) => {
-      console.log('player.play.reducer');
+    [player.play]: (state) => {
+      console.log('player.play.reducer ');
       return {
         ...state,
-        tab: pathOr(state.tab, [ 'tab', ], payload),
         status: PLAYER_STATUS.LOADING,
         buffering: true,
       };
     },
-    [player.demand]: (state, { payload, }) => {
+    [player.demand]: (state) => {
       console.log('player.demand.reducer');
       return {
         ...state,
-        tab: pathOr(state.tab, [ 'tab', ], payload),
         status: PLAYER_STATUS.LOADING,
       };
     },
@@ -99,7 +97,10 @@ export default handleActions(
       ...state,
       ...payload,
     }),
-    [player.reset]: () => ({ ...defaultValues, }),
+    [player.reset]: (_, { payload = {}, } = {}) => ({
+      ...defaultValues,
+      ...payload,
+    }),
     [sections.set]: (state, { payload, }) => {
       console.log('sections.set', state, payload);
       return {

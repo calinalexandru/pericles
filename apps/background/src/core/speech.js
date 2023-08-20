@@ -59,7 +59,11 @@ export default () => {
         //   break;
         case 'onStart':
           console.log('onStart', { playingTab, playerKey, });
-          store.dispatch(player.set({ status: PLAYER_STATUS.PLAYING, }));
+          store.dispatch(
+            player.set({
+              status: PLAYER_STATUS.PLAYING,
+            })
+          );
           mpToContent(
             [ highlight.section(), autoscroll.set({ section: playerKey, }), ],
             playingTab
@@ -71,7 +75,9 @@ export default () => {
             isPlayingOrReady(playerStatusSelector(state)) &&
               parserKeySelector(state) - 1 > playerKey
           ) {
-            console.log('going to next');
+            console.log('going to next', {
+              playerStatus: playerStatusSelector(state),
+            });
             store.dispatch(player.next({ auto: true, }));
           } else if (parserEndSelector(state)) {
             console.log('parserIframes', parserIframes);

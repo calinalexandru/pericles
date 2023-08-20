@@ -23,7 +23,6 @@ export default () => {
         payload: {
           ...(request?.message?.payload || {}),
           iframe: window !== window.top,
-          ...(activeTab?.id && { tab: activeTab.id, }),
         },
       };
     }),
