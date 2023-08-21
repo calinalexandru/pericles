@@ -4,15 +4,10 @@
   "version": "1.0.42",
   "description": "Pericles' constants",
   "main": "src/index.js",
-  "module": "es/index.js",
   "files": [
-    "es",
-    "es/index.js"
+    "src"
   ],
   "scripts": {
-    "prepare": "npm run build",
-    "dev": "npm run build -- -w",
-    "build": "cross-env BABEL_ENV=es babel src --out-dir es",
     "test": "jest"
   },
   "repository": {

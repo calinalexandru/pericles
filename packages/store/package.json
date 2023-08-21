@@ -4,16 +4,10 @@
   "version": "1.0.26",
   "description": "Pericles' reducers, initialState",
   "main": "src/index.js",
-  "module": "es/index.js",
   "files": [
-    "es",
-    "es/index.js"
+    "src"
   ],
   "scripts": {
-    "prepare": "npm run build",
-    "dev": "npm run build -- -w",
-    "build": "cross-env BABEL_ENV=es babel src --out-dir es",
-    "linking": "pnpm link ../constants",
     "test": "jest"
   },
   "repository": {

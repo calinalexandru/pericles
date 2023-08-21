@@ -3,15 +3,11 @@
   "sideEffects": false,
   "version": "1.1.20",
   "description": "Pericles' helpers & primitives",
-  "main": "es/index.js",
+  "main": "src/index.js",
   "files": [
-    "es"
+    "src"
   ],
   "scripts": {
-    "prepare": "npm run build",
-    "dev": "npm run build -- -w",
-    "build": "cross-env BABEL_ENV=es babel src --out-dir es",
-    "linking": "pnpm link ../constants && pnpm link ../store",
     "test": "cross-env BABEL_ENV=test NODE_ENV=test jest"
   },
   "repository": {
