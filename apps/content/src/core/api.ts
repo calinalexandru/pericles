@@ -1,17 +1,17 @@
 import { fromEventPattern, Observable, } from 'rxjs';
-import { NodeEventHandler, } from 'rxjs/internal/observable/fromEvent';
 import { map, tap, } from 'rxjs/operators';
 
-import { Action, MessageRequest, } from '@/interfaces/api';
 import { store, } from '@pericles/store';
 import { getBrowserAPI, } from '@pericles/util';
+
+import { Action, MessageRequest, } from '../interfaces/api';
 
 const { api, } = getBrowserAPI();
 
 export default (): void => {
   const onMessage$: Observable<Action> = fromEventPattern(
-    (handler: NodeEventHandler) => api.runtime.onMessage.addListener(handler),
-    (handler: NodeEventHandler) => api.runtime.onMessage.removeListener(handler)
+    (handler: any) => api.runtime.onMessage.addListener(handler),
+    (handler: any) => api.runtime.onMessage.removeListener(handler)
   ).pipe(
     map(([ request, ]: [MessageRequest]) => {
       console.log('api/action/request', request);

@@ -23,9 +23,27 @@ const config = {
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.(ts|tsx)$/,
         exclude: /node_modules/,
-        use: [ 'babel-loader', ],
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true,
+              compilerOptions: {
+                skipLibCheck: true,
+              },
+            },
+          },
+        ],
+      },
+      {
+        test: /\.(js|jsx)$/,
+        use: [
+          {
+            loader: 'babel-loader',
+          },
+        ],
         resolve: {
           fullySpecified: false,
         },
@@ -57,7 +75,7 @@ const config = {
     minimizer: [],
   },
   resolve: {
-    extensions: [ '*', '.js', '.jsx', ],
+    extensions: [ '*', '.js', '.jsx', '.ts', '.tsx', ],
     alias: {
       '@/core': path.resolve(__dirname, 'src/core'),
       '@/store': path.resolve(__dirname, 'src/store'),

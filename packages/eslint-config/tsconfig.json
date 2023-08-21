@@ -14,15 +14,6 @@
     "noEmit": false,
     "jsx": "react-jsx"
   },
-  "include": [
-    "apps/**/**/*.ts",
-    "apps/**/**/*.tsx",
-    "apps/**/**/*.js",
-    "apps/**/**/*.jsx",
-    "packages/**/**/*.ts",
-    "packages/**/**/*.tsx",
-    "packages/**/**/*.js",
-    "packages/**/**/*.jsx"
-  ],
-  "exclude": ["node_modules", ".git", "bundle", "**/dist", "**/node_modules"]
+  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
+  "exclude": ["node_modules"]
 }

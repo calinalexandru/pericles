@@ -28,9 +28,28 @@ const config = {
   module: {
     rules: [
       {
-        test: /\.(js|jsx|ts|tsx)$/,
-        exclude: /node_modules/,
-        use: [ 'babel-loader', ],
+        test: /\.(ts|tsx)$/,
+        // exclude: [ /node_modules/, /compromise/, ],
+        exclude: [ /node_modules/, ],
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              // transpileOnly: true,
+              compilerOptions: {
+                skipLibCheck: true,
+              },
+            },
+          },
+        ],
+      },
+      {
+        test: /\.(js|jsx)$/,
+        use: [
+          {
+            loader: 'babel-loader',
+          },
+        ],
         resolve: {
           fullySpecified: false,
         },
@@ -62,6 +81,7 @@ const config = {
     ],
   },
   resolve: {
+    // symlinks: false,
     extensions: [ '*', '.js', '.jsx', '.ts', '.tsx', ],
     alias: {
       '@/core': path.resolve(__dirname, 'src/core'),

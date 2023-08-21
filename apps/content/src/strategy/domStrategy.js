@@ -1,4 +1,4 @@
-import { PARSER_TYPES } from '@pericles/constants';
+import { PARSER_TYPES, } from '@pericles/constants';
 import {
   getElementFromPoint,
   getGoogleBookPage,
@@ -19,6 +19,7 @@ import {
 } from '@pericles/util';
 
 export default class DomStrategy {
+
   type = PARSER_TYPES.DEFAULT;
 
   iframes = {};
@@ -52,7 +53,7 @@ export default class DomStrategy {
   }
 
   getSections() {
-    const { hostname } = window.location;
+    const { hostname, } = window.location;
     let pageIndex = 0;
     let maxPage = 0;
     let out = [];
@@ -62,29 +63,29 @@ export default class DomStrategy {
       : getLastNode(this.parserKey ? this.parserKey - 1 : 0);
     if (isGoogleBook(this.type)) {
       pageIndex = getGoogleBookPage(window);
-      ({ maxPage, out } = getGoogleBookSections(pageIndex));
+      ({ maxPage, out, } = getGoogleBookSections(pageIndex));
     } else if (isGoogleDocsSvg(this.type)) {
       pageIndex = getGoogleDocsPageByQuery();
-      ({ maxPage, out } = getGoogleDocsSectionsSvg(pageIndex));
+      ({ maxPage, out, } = getGoogleDocsSectionsSvg(pageIndex));
     } else if (isGoogleDocs(this.type)) {
       pageIndex = getGoogleDocsPageByQuery();
-      ({ maxPage, out } = getGoogleDocsSections(pageIndex));
+      ({ maxPage, out, } = getGoogleDocsSections(pageIndex));
     } else if (this.type === PARSER_TYPES.GOOGLE_FORM) {
-      ({ maxPage, out } = getGoogleFormsSections());
+      ({ maxPage, out, } = getGoogleFormsSections());
     } else if (this.type === PARSER_TYPES.OPEN_BOOK) {
       // TODO: implement this
-      ({ maxPage, out } = getOpenBookSections(1));
+      ({ maxPage, out, } = getOpenBookSections(1));
       console.log('open-book.sections', out);
     } else {
       setWindowSentenceBuffer('');
-      ({ out, blocked } = walkTheDOM({
+      ({ out, blocked, } = walkTheDOM({
         node:
           !this.working && this.userGenerated
             ? getElementFromPoint(
-                (isIframeParsing(hostname, this.parserIframes) &&
+              (isIframeParsing(hostname, this.parserIframes) &&
                   this.parserIframes?.[hostname]?.top) ||
                   0
-              )
+            )
             : nextNode,
         buffer: [],
         lastKey: this.parserKey,
@@ -100,4 +101,5 @@ export default class DomStrategy {
       pageIndex,
     };
   }
+
 }

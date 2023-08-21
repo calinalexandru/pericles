@@ -12,17 +12,9 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": false,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "outDir": "./dist"
   },
-  "include": [
-    "apps/**/**/*.ts",
-    "apps/**/**/*.tsx",
-    "apps/**/**/*.js",
-    "apps/**/**/*.jsx",
-    "packages/**/**/*.ts",
-    "packages/**/**/*.tsx",
-    "packages/**/**/*.js",
-    "packages/**/**/*.jsx"
-  ],
-  "exclude": ["node_modules", ".git", "bundle", "**/dist", "**/node_modules"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.js", "src/**/*.jsx"],
+  "exclude": ["node_modules"]
 }

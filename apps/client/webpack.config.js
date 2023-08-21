@@ -69,9 +69,27 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.(ts|tsx)$/,
         exclude: /node_modules/,
-        use: [ 'babel-loader', ],
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true,
+              compilerOptions: {
+                skipLibCheck: true,
+              },
+            },
+          },
+        ],
+      },
+      {
+        test: /\.(js|jsx)$/,
+        use: [
+          {
+            loader: 'babel-loader',
+          },
+        ],
         resolve: {
           fullySpecified: false,
         },
@@ -99,7 +117,7 @@ module.exports = {
   },
   optimization,
   resolve: {
-    extensions: [ '*', '.js', '.jsx', ],
+    extensions: [ '*', '.js', '.jsx', '.ts', '.tsx', ],
     alias: {
       '@/assets': path.resolve(__dirname, 'src/assets'),
       '@/components': path.resolve(__dirname, 'src/components'),

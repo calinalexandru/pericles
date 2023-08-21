@@ -31,5 +31,5 @@
     // ["@babel/plugin-proposal-object-rest-spread"],
     // ["@babel/plugin-syntax-dynamic-import"]
   ],
-  "presets": ["@babel/preset-react", "@emotion/babel-preset-css-prop"]
+  "presets": ["@babel/preset-react", "@emotion/babel-preset-css-prop", "@babel/preset-typescript"]
 }
