@@ -61,14 +61,14 @@ export type Variables = {
     RATE: number;
     PITCH: number;
     VOICE: number;
-    NEURAL_VOICES: string[];  // assuming it's an array of string, adjust if different
-    VOICES: string[];  // assuming it's an array of string, adjust if different
+    NEURAL_VOICES: string[];
+    VOICES: string[];
   };
 
   PLAYER: {
-    SECTIONS: any[];  // adjust with the actual type of sections
+    SECTIONS: any[];
     KEY: number;
-    STATUS: any;  // adjust with actual type of PLAYER_STATUS
+    STATUS: any;
     TAB: number;
     BUFFERING: boolean;
   };

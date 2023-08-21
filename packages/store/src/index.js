@@ -61,7 +61,7 @@ export { default as settingsNeuralVoicesSelector, } from './selectors/settings/s
 export { default as notificationActions, } from './actions/notification';
 export { default as playerActions, } from './actions/player';
 export { default as parserActions, } from './actions/parser';
-export { default as settingsActions, } from './actions/settings';
+export * from './actions/settings';
 export { default as appActions, } from './actions/app';
 export { default as hotkeysActions, } from './actions/hotkeys';
 export * from './initialState';

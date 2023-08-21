@@ -3,11 +3,11 @@ import {
   store,
   appActions,
   hotkeysActions,
-  settingsActions,
+  setFreeVoice,
+  setSettings,
 } from '@pericles/store';
 import { LocalStorage, } from '@pericles/util';
 
-const { settings, } = settingsActions;
 const { app, } = appActions;
 const { hotkeys, } = hotkeysActions;
 
@@ -16,14 +16,14 @@ export default async () => {
   // try to set best avail voice in case storage is empty
   const storedVoice = await LocalStorage.getAsync(VARIABLES.SETTINGS.VOICE);
   if (storedVoice.voice === null) {
-    store.dispatch(settings.setFreeVoice());
+    store.dispatch(setFreeVoice());
   }
 
   LocalStorage.getItemsFromStorage(
     LOCAL_STORAGE_SETTINGS.SETTINGS.ITEMS
   ).subscribe(async (payload) => {
     console.log('LocalStorage.settingsArr', payload);
-    store.dispatch(settings.set(payload));
+    store.dispatch(setSettings(payload));
   });
 
   LocalStorage.getItemsFromStorage(LOCAL_STORAGE_SETTINGS.APP.ITEMS).subscribe(

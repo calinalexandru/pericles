@@ -1,6 +1,6 @@
-import {  DEFAULT_VALUES, } from '@pericles/constants';
+import { DEFAULT_VALUES, } from '@pericles/constants';
 
-type ParserState = {
+export type ParserState = {
   key: typeof DEFAULT_VALUES.PARSER.KEY;
   end: typeof DEFAULT_VALUES.PARSER.END;
   type: typeof DEFAULT_VALUES.PARSER.TYPE;
@@ -9,7 +9,7 @@ type ParserState = {
   iframes: typeof DEFAULT_VALUES.PARSER.IFRAMES;
 };
 
-type AppState = {
+export type AppState = {
   selectedText: typeof DEFAULT_VALUES.APP.SELECTED_TEXT;
   themeMode: typeof DEFAULT_VALUES.APP.THEME_MODE;
   wordTracker: typeof DEFAULT_VALUES.APP.WORD_TRACKER;
@@ -28,12 +28,12 @@ type AppState = {
   language: typeof DEFAULT_VALUES.APP.LANGUAGE;
 };
 
-type NotificationState = {
+export type NotificationState = {
   type: typeof DEFAULT_VALUES.NOTIFICATION.TYPE;
   text: typeof DEFAULT_VALUES.NOTIFICATION.TEXT;
 };
 
-type SettingsState = {
+export type SettingsState = {
   visible: typeof DEFAULT_VALUES.SETTINGS.VISIBLE;
   volume: typeof DEFAULT_VALUES.SETTINGS.VOLUME;
   pitch: typeof DEFAULT_VALUES.SETTINGS.PITCH;
@@ -42,7 +42,7 @@ type SettingsState = {
   voices: typeof DEFAULT_VALUES.SETTINGS.VOICES;
 };
 
-type PlayerState = {
+export type PlayerState = {
   sections: typeof DEFAULT_VALUES.PLAYER.SECTIONS;
   key: typeof DEFAULT_VALUES.PLAYER.KEY;
   status: typeof DEFAULT_VALUES.PLAYER.STATUS;
@@ -50,7 +50,7 @@ type PlayerState = {
   buffering: typeof DEFAULT_VALUES.PLAYER.BUFFERING;
 };
 
-type HotkeysState = {
+export type HotkeysState = {
   disable: typeof DEFAULT_VALUES.HOTKEYS.DISABLE;
   start: typeof DEFAULT_VALUES.HOTKEYS.START;
   play: typeof DEFAULT_VALUES.HOTKEYS.PLAY;

@@ -162,6 +162,9 @@ module.exports = {
     // allow nested ternary
     'no-nested-ternary': ['off'],
 
+    'no-shadow': 'off',
+    '@typescript-eslint/no-shadow': ['error'],
+
     // allow ShortCircuit
     'no-unused-expressions': [
       'error',

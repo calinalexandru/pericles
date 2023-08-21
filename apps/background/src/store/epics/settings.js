@@ -7,10 +7,12 @@ import { pluck, map, concatMap, } from 'rxjs/operators';
 import Speech from '@/speech';
 import { LOCAL_STORAGE_SETTINGS, } from '@pericles/constants';
 import {
-  settingsActions,
   playerStatusSelector,
   playerActions,
   settingsVoicesSelector,
+  SettingsActionTypes,
+  setFreeVoice,
+  setSettings,
 } from '@pericles/store';
 import {
   isPaused,
@@ -19,12 +21,11 @@ import {
   getEnglishVoiceKey,
 } from '@pericles/util';
 
-const { settings, } = settingsActions;
 const { player, } = playerActions;
 
 const settingsSetEpic = (action, state) =>
   action.pipe(
-    ofType(settings.set, settings.default),
+    ofType(SettingsActionTypes.SET, SettingsActionTypes.DEFAULT),
     pluck('payload'),
     map((payload) => {
       console.log('settings.set', payload);
@@ -72,13 +73,13 @@ const settingsSetEpic = (action, state) =>
 
 const settingsSetFreeVoiceEpic = (action, state) =>
   action.pipe(
-    ofType(settings.setFreeVoice),
+    ofType(setFreeVoice()),
     map(() => {
       console.log('settingsSetFreeVoiceEpic');
       //
       return getEnglishVoiceKey(settingsVoicesSelector(state.value));
     }),
-    map((voice) => settings.set({ voice, }))
+    map((voice) => setSettings({ voice, }))
   );
 
 export default combineEpics(settingsSetEpic, settingsSetFreeVoiceEpic);
