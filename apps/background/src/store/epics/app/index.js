@@ -1,6 +1,3 @@
-// /* eslint-disable no-unused-vars */
-import { i18n, } from '@lingui/core';
-import { isEmpty, pick, } from 'ramda';
 import { combineEpics, ofType, } from 'redux-observable';
 import { of, } from 'rxjs';
 import {
@@ -12,32 +9,26 @@ import {
   tap,
 } from 'rxjs/operators';
 
-import Speech from '@/speech';
-import { MESSAGES, VARIABLES, } from '@pericles/constants';
 import {
   appActions,
-  appSelector,
-  hotkeysActions,
-  initialState,
-  notificationActions,
   playerActions,
-  playerTabSelector,
   settingsActions,
-  settingsPitchSelector,
-  settingsRateSelector,
-  settingsVoiceSelector,
+  notificationActions,
+  hotkeysActions,
+  playerTabSelector,
   settingsVoicesSelector,
-  settingsVolumeSelector,
+  initialState,
 } from '@pericles/store';
 import {
   getBrowserAPI,
   getEnglishVoiceKey,
   LocalStorage,
-  mpToContent,
 } from '@pericles/util';
 
+import { handleAppInit, handleAppSet, } from './handlers';
+
 const { player, } = playerActions;
-const { app, highlight, } = appActions;
+const { app, } = appActions;
 const { settings, } = settingsActions;
 const { notification, } = notificationActions;
 const { hotkeys, } = hotkeysActions;
@@ -45,18 +36,7 @@ const { hotkeys, } = hotkeysActions;
 const appInitEpic = (action, state) =>
   action.pipe(
     ofType(app.init),
-    tap(() => {
-      console.log('app.init');
-      try {
-        Speech.setVolume(settingsVolumeSelector(state.value));
-        Speech.setPitch(settingsPitchSelector(state.value));
-        Speech.setRate(settingsRateSelector(state.value));
-        Speech.setVoice(settingsVoiceSelector(state.value));
-      } catch (e) {
-        console.warn('speech init failed', e);
-      }
-      i18n.load(MESSAGES);
-    }),
+    tap(() => handleAppInit(state)),
     ignoreElements()
   );
 
@@ -65,43 +45,15 @@ const tabClosedEpic = (action, state) =>
     ofType(app.tabClosed),
     pluck('payload', 'tab'),
     filter((tab) => tab === playerTabSelector(state.value)),
-    map(() => player.halt())
+    map(player.halt)
   );
 
 const appSetEpic = (action, state) =>
   action.pipe(
     ofType(app.set, app.default),
     pluck('payload'),
-    tap((payload = {}) => {
-      console.log('app.set', payload);
-      const appObj = {
-        ...appSelector(state.value),
-      };
-      LocalStorage.merge(appObj)
-        .then((response) => {
-          console.log('storage is merged', response);
-        })
-        .catch((e) => console.error(e));
-
-      if (
-        !isEmpty(
-          pick(
-            [ VARIABLES.APP.HIGHLIGHT_COLOR, VARIABLES.APP.WORD_TRACKER_COLOR, ],
-            payload
-          )
-        )
-      ) {
-        console.log('app.set -> highlight.reloadSettings');
-        mpToContent(highlight.reloadSettings());
-      }
-
-      if (!isEmpty(pick([ VARIABLES.APP.SERVICE_REGION, ], payload))) {
-        Speech.setServiceRegion(payload.serviceRegion);
-      }
-
-      if (!isEmpty(pick([ VARIABLES.APP.LANGUAGE, ], payload))) {
-        i18n.activate(payload[VARIABLES.APP.LANGUAGE]);
-      }
+    tap((payload) => {
+      handleAppSet(state, payload);
     }),
     ignoreElements()
   );

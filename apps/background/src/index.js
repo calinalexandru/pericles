@@ -5,7 +5,7 @@ import { wrapStore, } from 'webext-redux';
 
 import core from '@/core';
 import { WEBEXT_PORT, } from '@pericles/constants';
-import { appActions, store, } from '@pericles/store';
+import { appActions, initialState, store, } from '@pericles/store';
 import { getBrowserAPI, } from '@pericles/util';
 
 import appEpic from './store/epics/app';
@@ -19,8 +19,6 @@ import notificationReducer from './store/reducers/notification';
 import parserReducer from './store/reducers/parser';
 import playerReducer from './store/reducers/player';
 import settingsReducer from './store/reducers/settings';
-
-const initialState = {};
 
 // Since we are in a service worker, this is not persistent
 // and this will be reset to false, as expected, whenever

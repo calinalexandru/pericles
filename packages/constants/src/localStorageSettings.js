@@ -1,4 +1,4 @@
-import VARIABLES from './variables';
+import { VARIABLES, } from './variables';
 
 export default {
   HOTKEYS: {

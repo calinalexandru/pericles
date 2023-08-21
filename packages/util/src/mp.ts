@@ -10,18 +10,18 @@ interface Tab {
 
 interface PayloadAction {
   type: string;
-  payload: any;
+  payload?: any;
 }
 
 interface MessagePayload {
-  message: PayloadAction | any;
+  message: PayloadAction;
   activeTab: Tab;
 }
 
-function sendMessageToTab(tab: Tab, message: string | object): Promise<any> {
+function sendMessageToTab(tab: Tab, message: PayloadAction): Promise<any> {
   // console.log('sendMessageToTab - ', tab);
   const messagePayload: MessagePayload = { message, activeTab: tab, };
-  // console.log('messagePayload', messagePayload)
+  console.log('messagePayload', messagePayload);
 
   if (isFirefox) {
     return core.tabs
@@ -56,7 +56,7 @@ function sendMessageToTab(tab: Tab, message: string | object): Promise<any> {
   });
 }
 
-function internal(m: string | object, id: number): Promise<any> {
+function internal(m: PayloadAction, id: number): Promise<any> {
   return new Promise((resolve, reject) => {
     const queryTabs = (callback: (tabs: Tab[]) => void) => {
       if (isFirefox) {
@@ -91,10 +91,10 @@ function internal(m: string | object, id: number): Promise<any> {
 }
 
 export default function mpToContent(
-  message: string | object | (string | object)[],
+  message: PayloadAction | PayloadAction[],
   id = 0
 ): void {
   const messages = Array.isArray(message) ? message : [ message, ];
-  const promises = messages.map((m) => internal(m, id));
+  const promises = messages.map((m: PayloadAction) => internal(m, id));
   Promise.all(promises).catch(console.error);
 }

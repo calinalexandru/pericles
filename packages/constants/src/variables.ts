@@ -1,4 +1,4 @@
-export default {
+export const VARIABLES = {
   PARSER: {
     KEY: 'key',
     END: 'end',
@@ -6,13 +6,6 @@ export default {
     PAGE: 'page',
     MAX_PAGE: 'maxPage',
     IFRAMES: 'iframes',
-  },
-
-  AUTH: {
-    SUBSCRIPTION: 'subscription',
-    STATUS: 'status',
-    TOKEN: 'token',
-    BUFFERING: 'buffering',
   },
 
   NOTIFICATION: {

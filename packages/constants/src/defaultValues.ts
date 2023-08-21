@@ -1,3 +1,4 @@
+import { Variables, } from './interfaces';
 import PARSER_TYPES from './parserTypes';
 import PLAYER_STATUS from './playerStatus';
 import ROUTES from './routes';
@@ -5,7 +6,7 @@ import SECTION_HIGHLIGHT_STYLES from './sectionHighlightStyles';
 import TABS from './tabs';
 import WORD_TRACKER_STYLES from './wordTrackerStyles';
 
-export default {
+export const DEFAULT_VALUES: Variables = {
   PARSER: {
     KEY: 0,
     END: false,
