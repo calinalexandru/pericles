@@ -40,10 +40,6 @@ export default class Speech {
       Speech.stream$.next({ event: 'onWordsUpdate', params, });
     };
 
-    Speech.synth.onCreditsBurn = (params) => {
-      Speech.stream$.next({ event: 'onCreditsBurn', params, });
-    };
-
     // Speech.synth.onPause = () => {
     //   Speech.stream$.next({ event: 'onPause' });
     // };
@@ -186,7 +182,5 @@ Speech.stream$ = new Subject();
 Speech.volume = DEFAULT_VALUES.SETTINGS.VOLUME;
 Speech.pitch = DEFAULT_VALUES.SETTINGS.PITCH;
 Speech.rate = DEFAULT_VALUES.SETTINGS.RATE;
-Speech.serviceKey = DEFAULT_VALUES.APP.SERVICE_KEY;
-Speech.serviceRegion = DEFAULT_VALUES.APP.SERVICE_REGION;
 
 const a = new Speech();

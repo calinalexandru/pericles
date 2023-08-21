@@ -23,7 +23,7 @@ import {
 } from '@pericles/util';
 
 const { player, } = playerActions;
-const { highlight, autoscroll, credits, } = appActions;
+const { highlight, autoscroll, } = appActions;
 const { parser, } = parserActions;
 
 export default () => {
@@ -43,7 +43,6 @@ export default () => {
           buffering,
           // index,
           // continueSpeaking = false,
-          credits: creditsVal,
           code: errorCode,
         } = params || {};
         console.log('Speech.stream$.subscribe', { params, });
@@ -110,10 +109,6 @@ export default () => {
         case 'onBuffering':
           // console.log('onBuffering', buffering);
           store.dispatch(player.set({ buffering, }));
-          break;
-        case 'onCreditsBurn':
-          // console.log('onCreditsBurn', creditsVal);
-          store.dispatch(credits.burn(creditsVal));
           break;
         case 'onError':
           console.log('onError');

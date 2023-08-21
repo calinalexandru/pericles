@@ -13,14 +13,10 @@ import {
 } from 'rxjs/operators';
 
 import Speech from '@/speech';
-import { ATTRIBUTES, MESSAGES, VARIABLES, } from '@pericles/constants';
+import { MESSAGES, VARIABLES, } from '@pericles/constants';
 import {
   appActions,
-  appCreditsResetTimerSelector,
-  appCreditsSelector,
   appSelector,
-  appServiceKeySelector,
-  appServiceRegionSelector,
   hotkeysActions,
   initialState,
   notificationActions,
@@ -36,13 +32,12 @@ import {
 import {
   getBrowserAPI,
   getEnglishVoiceKey,
-  getTimestamp,
   LocalStorage,
   mpToContent,
 } from '@pericles/util';
 
 const { player, } = playerActions;
-const { app, credits, highlight, } = appActions;
+const { app, highlight, } = appActions;
 const { settings, } = settingsActions;
 const { notification, } = notificationActions;
 const { hotkeys, } = hotkeysActions;
@@ -57,8 +52,6 @@ const appInitEpic = (action, state) =>
         Speech.setPitch(settingsPitchSelector(state.value));
         Speech.setRate(settingsRateSelector(state.value));
         Speech.setVoice(settingsVoiceSelector(state.value));
-        Speech.setServiceRegion(appServiceRegionSelector(state.value));
-        Speech.setServiceKey(appServiceKeySelector(state.value));
       } catch (e) {
         console.warn('speech init failed', e);
       }
@@ -89,9 +82,6 @@ const appSetEpic = (action, state) =>
           console.log('storage is merged', response);
         })
         .catch((e) => console.error(e));
-      if (!isEmpty(pick([ VARIABLES.APP.SERVICE_KEY, ], payload))) {
-        Speech.setServiceKey(payload[VARIABLES.APP.SERVICE_KEY]);
-      }
 
       if (
         !isEmpty(
@@ -151,32 +141,10 @@ const appReloadEpic = (action) =>
     ignoreElements()
   );
 
-const appCreditsResetTimeCheckEpic = (action, state) =>
-  action.pipe(
-    ofType(credits.resetCheck),
-    map(() =>
-      app.set({
-        credits:
-          getTimestamp() >= appCreditsResetTimerSelector(state.value)
-            ? ATTRIBUTES.MISC.FREE_CREDITS
-            : appCreditsSelector(state.value),
-      })
-    )
-  );
-
-// export const appRouteErrorEpic = (action, state) =>
-//   action.pipe(
-//     ofType(route.error),
-//     delay(5000),
-//     concatMap(() => of(player.stop(), route.index()))
-//   );
-
 export default combineEpics(
   tabClosedEpic,
   appInitEpic,
   appSetEpic,
   appReloadEpic,
-  appFactoryResetEpic,
-  appCreditsResetTimeCheckEpic
-  // appRouteErrorEpic
+  appFactoryResetEpic
 );

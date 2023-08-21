@@ -1,25 +1,16 @@
-/* eslint-disable react/jsx-props-no-spreading */
-/* eslint-disable no-param-reassign */
 import { t, } from '@lingui/macro';
 import {
-  FormGroup,
   TextField,
   Box,
   Grid,
   Typography,
   Slider,
-  FormControlLabel,
-  Switch,
   InputAdornment,
   Autocomplete,
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { propOr, } from 'ramda';
-import React, { useEffect, useMemo, useState, } from 'react';
-
-// import useAppSettings from '@/hooks/useAppSettings';
-// import { FixedSizeTree } from 'react-vtree';
-// import ListboxComponent from '@/primitives/listbox';
+import React, { useMemo, useState, } from 'react';
 import { useSelector, } from 'react-redux';
 
 import useSettings from '@/hooks/useSettings';
@@ -33,21 +24,13 @@ import {
   ATTRIBUTES,
 } from '@pericles/constants';
 import {
-  settingsNeuralVoicesSelector,
-  appScholarModeSelector,
   settingsPitchSelector,
   settingsRateSelector,
   settingsVoiceSelector,
   settingsVoicesSelector,
   settingsVolumeSelector,
 } from '@pericles/store';
-import {
-  getPremiumVoiceId,
-  isPremiumVoice,
-  getIsoLangFromString,
-  getIsoLang,
-  getCountry,
-} from '@pericles/util';
+import { getIsoLangFromString, getIsoLang, getCountry, } from '@pericles/util';
 
 import filterFunc from './utils';
 
@@ -80,19 +63,12 @@ export default function SettingsComponent() {
   const pitch = useSelector(settingsPitchSelector);
   const voiceProp = useSelector(settingsVoiceSelector);
   const voices = useSelector(settingsVoicesSelector);
-  const neuralVoices = useSelector(settingsNeuralVoicesSelector);
-  const scholarMode = useSelector(appScholarModeSelector);
   const classes = useStyles();
-  const [ premium, setPremium, ] = useState(false);
   const [ inputVolume, setInputVolume, ] = useState(volume);
   const [ inputRate, setInputRate, ] = useState(rate);
   const [ inputPitch, setInputPitch, ] = useState(pitch);
 
-  useEffect(() => {
-    setPremium(isPremiumVoice(voiceProp));
-  }, [ voiceProp, ]);
-
-  const options = useMemo(() => (premium ? neuralVoices : voices), [ premium, ]);
+  const options = useMemo(() => voices, [ voices, ]);
 
   const voiceChanged = (event, value, key) => {
     console.log('voiceChanged-internal', event, value, key);
@@ -101,13 +77,8 @@ export default function SettingsComponent() {
   };
 
   const voice = useMemo(
-    () =>
-      propOr(
-        {},
-        isPremiumVoice(voiceProp) ? getPremiumVoiceId(voiceProp) : voiceProp,
-        isPremiumVoice(voiceProp) ? neuralVoices : voices
-      ),
-    [ voiceProp, ]
+    () => propOr({}, voiceProp, voices),
+    [ voiceProp, voices, ]
   );
 
   console.log('voices', voices);
@@ -183,23 +154,6 @@ export default function SettingsComponent() {
             );
           }}
         />
-        {!scholarMode && (
-          <FormGroup row={true}>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={premium}
-                  color="error"
-                  onChange={(_, value) => {
-                    setPremium(value);
-                  }}
-                  inputProps={{ 'aria-label': 'primary checkbox', }}
-                />
-              }
-              label="Neural"
-            />
-          </FormGroup>
-        )}
       </Box>
       <Grid container={true}>
         <Grid

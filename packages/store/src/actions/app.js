@@ -43,11 +43,6 @@ export default createActions({
     CLEAR: null,
   },
 
-  CREDITS: {
-    BURN: null,
-    RESET_CHECK: null,
-  },
-
   CONTENT: {
     LAST: null,
   },

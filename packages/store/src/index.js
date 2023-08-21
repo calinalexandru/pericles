@@ -7,10 +7,6 @@ export { default as appAutoscrollSelector, } from './selectors/app/appAutoscroll
 export { default as appActiveTabSelector, } from './selectors/app/appActiveTabSelector';
 export { default as appRouteSelector, } from './selectors/app/appRouteSelector';
 export { default as appRouteTabSelector, } from './selectors/app/appRouteTabSelector';
-export { default as appCreditsSelector, } from './selectors/app/appCreditsSelector';
-export { default as appCreditsResetTimerSelector, } from './selectors/app/appCreditsResetTimerSelector';
-export { default as appServiceRegionSelector, } from './selectors/app/appServiceRegionSelector';
-export { default as appServiceKeySelector, } from './selectors/app/appServiceKeySelector';
 export { default as appSkipDeadSectionsSelector, } from './selectors/app/appSkipDeadSectionsSelector';
 export { default as appWordTrackerSelector, } from './selectors/app/appWordTrackerSelector';
 export { default as appWordTrackerStyleSelector, } from './selectors/app/appWordTrackerStyleSelector';
@@ -20,7 +16,6 @@ export { default as appThemeModeSelector, } from './selectors/app/appThemeModeSe
 export { default as appMiniPlayerSelector, } from './selectors/app/appMiniPlayerSelector';
 export { default as appSkipUntilYSelector, } from './selectors/app/appSkipUntilYSelector';
 export { default as appLanguageSelector, } from './selectors/app/appLanguageSelector';
-export { default as appScholarModeSelector, } from './selectors/app/appScholarModeSelector';
 
 /* hotkeys */
 export { default as hotkeysSelector, } from './selectors/hotkeys/hotkeysSelector';

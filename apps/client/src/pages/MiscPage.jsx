@@ -14,7 +14,7 @@ import {
   ButtonGroup,
   Stack,
 } from '@mui/material';
-import { bool, func, string, } from 'prop-types';
+import { func, string, } from 'prop-types';
 import { applySpec, keys, propOr, } from 'ramda';
 import React, { useState, } from 'react';
 import { connect, } from 'react-redux';
@@ -24,15 +24,12 @@ import Subtitle from '@/primitives/subtitle';
 import {
   VARIABLES,
   MESSAGES,
-  REGIONS,
   DEFAULT_VALUES,
   ISO_LANGS,
 } from '@pericles/constants';
 import {
   appActions,
   appLanguageSelector,
-  appServiceRegionSelector,
-  appScholarModeSelector,
   appThemeModeSelector,
 } from '@pericles/store';
 import { getIsoLangFromString, } from '@pericles/util';
@@ -43,9 +40,7 @@ function MiscPage({
   onOtherSettingsChanged,
   onReloadApp,
   onFactoryReset,
-  serviceRegion,
   language,
-  scholarMode,
   setThemeMode,
   themeMode,
 }) {
@@ -122,42 +117,6 @@ function MiscPage({
           </Button>
         </ButtonGroup>
       </Box>
-
-      {!scholarMode && (
-        <Box
-          ml={2}
-          mr={2}>
-          <Subtitle>Service Region</Subtitle>
-          <FormControl
-            size="small"
-            fullWidth={true}>
-            <Select
-              labelId="service-region-select-label"
-              id="service-region-select"
-              value={serviceRegion}
-              label="Service Region"
-              onChange={(e) => {
-                onOtherSettingsChanged(
-                  VARIABLES.APP.SERVICE_REGION,
-                  e.target.value
-                );
-                onOtherSettingsChanged(
-                  VARIABLES.APP.SERVICE_KEY,
-                  REGIONS[e.target.value].key
-                );
-              }}
-            >
-              {keys(REGIONS).map((region) => (
-                <MenuItem
-                  key={region}
-                  value={region}>
-                  {REGIONS[region].name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Box>
-      )}
 
       <Box
         ml={2}
@@ -260,20 +219,16 @@ function MiscPage({
 }
 
 MiscPage.propTypes = {
-  serviceRegion: string,
   onOtherSettingsChanged: func,
   onReloadApp: func,
   onFactoryReset: func,
   language: string,
-  scholarMode: bool,
   setThemeMode: func,
   themeMode: string,
 };
 
 MiscPage.defaultProps = {
-  serviceRegion: DEFAULT_VALUES.APP.SERVICE_REGION,
   language: DEFAULT_VALUES.APP.LANGUAGE,
-  scholarMode: DEFAULT_VALUES.APP.SCHOLAR_MODE,
   onReloadApp: () => {},
   onFactoryReset: () => {},
   onOtherSettingsChanged: () => {},
@@ -282,9 +237,7 @@ MiscPage.defaultProps = {
 };
 
 const mapStateToProps = applySpec({
-  serviceRegion: appServiceRegionSelector,
   language: appLanguageSelector,
-  scholarMode: appScholarModeSelector,
   themeMode: appThemeModeSelector,
 });
 

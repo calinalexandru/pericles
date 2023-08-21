@@ -3,7 +3,7 @@ import { handleActions, } from 'redux-actions';
 import { ROUTES, VARIABLES, } from '@pericles/constants';
 import { appActions, initialState, } from '@pericles/store';
 
-const { app, route, credits, } = appActions;
+const { app, route, } = appActions;
 const { app: defaultValues, } = initialState;
 
 export default handleActions(
@@ -15,10 +15,6 @@ export default handleActions(
     [app.reset]: (state) => ({
       ...state,
       ...defaultValues,
-    }),
-    [credits.burn]: (state, { payload, }) => ({
-      ...state,
-      credits: state.credits - payload,
     }),
     [app.selectText]: (state, { payload, }) => ({
       ...state,

@@ -1,6 +1,5 @@
 import PARSER_TYPES from './parserTypes';
 import PLAYER_STATUS from './playerStatus';
-import REGIONS from './regions';
 import ROUTES from './routes';
 import SECTION_HIGHLIGHT_STYLES from './sectionHighlightStyles';
 import TABS from './tabs';
@@ -31,19 +30,14 @@ export default {
     SECTIONS_TRACKER: true,
     MINI_PLAYER: false,
     SKIP_DEAD_SECTIONS: false,
-    SERVICE_REGION: REGIONS.francecentral.index, // FRANCE_CENTRAL,
-    SERVICE_KEY: REGIONS.francecentral.key, // FRANCE_CENTRAL_KEY,
     AUTOSCROLL: true,
     HIGHLIGHT_COLOR: 'rgba(255, 254, 219, 1.54)',
     HIGHLIGHT_STYLE: SECTION_HIGHLIGHT_STYLES.BACKGROUND,
     ACTIVE_TAB: -1,
     ROUTE: ROUTES.INDEX,
     ROUTE_TAB: TABS.SETTINGS,
-    CREDITS: 0,
-    CREDITS_RESET_TIMER: 0,
     SKIP_UNTIL_Y: 0,
     LANGUAGE: 'en',
-    SCHOLAR_MODE: true,
     SELECTED_TEXT: '',
   },
 

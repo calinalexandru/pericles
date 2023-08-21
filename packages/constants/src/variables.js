@@ -22,8 +22,6 @@ export default {
 
   APP: {
     AUTOSCROLL: 'autoscroll',
-    CREDITS: 'credits',
-    CREDITS_RESET_TIMER: 'creditsResetTimer',
     SKIP_DEAD_SECTIONS: 'skipDeadSections',
     WORD_TRACKER: 'wordTracker',
     WORD_TRACKER_COLOR: 'wordTrackerColor',
@@ -32,15 +30,12 @@ export default {
     LANGUAGE: 'language',
     HIGHLIGHT_COLOR: 'highlightColor',
     HIGHLIGHT_STYLE: 'highlightStyle',
-    SERVICE_REGION: 'serviceRegion',
-    SERVICE_KEY: 'serviceKey',
     THEME_MODE: 'themeMode',
     MINI_PLAYER: 'miniPlayer',
     ACTIVE_TAB: 'activeTab',
     ROUTE: 'route',
     ROUTE_TAB: 'routeTab',
     SKIP_UNTIL_Y: 'skipUntilY',
-    SCHOLAR_MODE: 'scholarMode',
     SELECTED_TEXT: 'selectedText',
   },
 
