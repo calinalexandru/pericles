@@ -5,14 +5,16 @@ module.exports = {
     'prettier',
     'plugin:security/recommended',
     'plugin:sonarjs/recommended',
+    'plugin:@typescript-eslint/recommended',
   ],
-  plugins: ['react-hooks', 'prettier', 'security', 'react-perf', 'sonarjs'],
+  plugins: ['react-hooks', 'prettier', 'security', 'react-perf', 'sonarjs', '@typescript-eslint'],
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
     ecmaFeatures: {
       jsx: true,
     },
+    project: './tsconfig.json',
   },
   env: {
     browser: true,
@@ -21,6 +23,9 @@ module.exports = {
   // enable solving paths using webpack config
   // NOTE:: tables webpack.config.js as default
   settings: {
+    'import/parsers': {
+      '@typescript-eslint/parser': ['.ts', '.tsx'],
+    },
     'import/resolver': {
       node: {
         paths: ['src'],

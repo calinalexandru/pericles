@@ -1,5 +1,6 @@
-const TerserPlugin = require('terser-webpack-plugin');
 const path = require('path');
+
+const TerserPlugin = require('terser-webpack-plugin');
 
 const mode = process.env.NODE_ENV || 'development';
 const isEnvProduction = mode === 'production';
@@ -27,9 +28,9 @@ const config = {
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.(js|jsx|ts|tsx)$/,
         exclude: /node_modules/,
-        use: ['babel-loader'],
+        use: [ 'babel-loader', ],
         resolve: {
           fullySpecified: false,
         },
@@ -61,13 +62,14 @@ const config = {
     ],
   },
   resolve: {
-    extensions: ['*', '.js', '.jsx'],
+    extensions: [ '*', '.js', '.jsx', '.ts', '.tsx', ],
     alias: {
       '@/core': path.resolve(__dirname, 'src/core'),
       '@/store': path.resolve(__dirname, 'src/store'),
       '@/util': path.resolve(__dirname, 'src/util'),
       '@/features': path.resolve(__dirname, 'src/features'),
       '@/tests': path.resolve(__dirname, 'src/tests'),
+      '@/interfaces': path.resolve(__dirname, 'src/interfaces'),
       '@/strategy': path.resolve(__dirname, 'src/strategy'),
       '@/assets': path.resolve(__dirname, 'src/assets'),
     },
