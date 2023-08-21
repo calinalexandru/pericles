@@ -29,7 +29,7 @@
     "html"
   ],
   "author": "Alexandru Calin",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@lingui/core": "3.13.3",
     "@lingui/macro": "3.13.3",

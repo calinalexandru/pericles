@@ -24,7 +24,7 @@
     "firefox": "web-ext run --source-dir dist/"
   },
   "author": "Alexandru Calin",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@emotion/react": "11.7.1",
     "@emotion/styled": "11.6.0",

@@ -27,7 +27,7 @@
     "@babel/runtime": "7.18.3"
   },
   "author": "Alexandru Calin",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@pericles/eslint-config": "workspace:*",
     "@babel/cli": "^7.16.8",

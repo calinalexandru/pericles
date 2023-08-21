@@ -35,14 +35,6 @@ For a comprehensive guide on how to use Pericles, please visit our [User Guide](
 
 We welcome and appreciate contributions! Please check our Contribution Guidelines for detailed instructions on how to contribute.
 
-## 🤝 Code of Conduct
-
-We value our community and strive to create a welcoming and inclusive environment for everyone. Please take a moment to read our Code of Conduct.
-
-## 🔐 License
-
-Pericles is licensed under LICENSE_NAME.
-
 ## 📞 Contact & Support
 
 If you have any questions, feedback, or need assistance, please reach out to us at pericles.reader@gmail.com.

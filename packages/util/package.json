@@ -19,7 +19,7 @@
     "url": ""
   },
   "author": "Alexandru Calin",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@babel/runtime": "7.18.3",
     "@pericles/constants": "workspace:*",
