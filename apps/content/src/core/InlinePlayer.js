@@ -8,9 +8,9 @@ import miniPlayerInject from '@/util/miniPlayerInject';
 import { store, } from '@pericles/store';
 
 export default () => {
-  store.ready().then(() =>
+  store.current.ready().then(() =>
     reactDom.render(
-      <Provider store={store}>
+      <Provider store={store.current}>
         <MiniPlayer />
       </Provider>,
       miniPlayerInject()

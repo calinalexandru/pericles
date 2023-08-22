@@ -75,7 +75,7 @@ export default function MiniPlayer() {
 
     iframe.style.top = `${window.scrollY + adjustY + y}px`;
     iframe.style.left = `${window.scrollX + adjustX + x}px`;
-  }, [ currentSection, sections, status, ]);
+  }, [ currentSection, parserType, sections, status, ]);
 
   return (
     <Container>

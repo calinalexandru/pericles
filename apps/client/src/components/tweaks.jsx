@@ -60,6 +60,10 @@ export default function TweaksComponent() {
     else highlightSection(playerTab);
   }, [ clearSections, highlightSection, sectionTracker, playerTab, ]);
 
+  useEffect(() => {
+    if (!wordTracker) clearWords(playerTab);
+  }, [ wordTracker, clearWords, playerTab, ]);
+
   return (
     <List sx={{ width: '100%', bgcolor: 'background.paper', }}>
       <ListItem>
@@ -138,7 +142,6 @@ export default function TweaksComponent() {
           checked={wordTracker}
           color="info"
           onChange={(e, value) => {
-            if (!value) clearWords(playerTab);
             setAppSetting(VARIABLES.APP.WORD_TRACKER, value);
           }}
           inputProps={{ 'aria-label': 'primary checkbox', }}

@@ -13,7 +13,7 @@ import parserEpic from '../store/epics/parser';
 import api from './api';
 import controller from './controller';
 import hotkeys from './hotkeys';
-// import iframe from './iframe';
+import InlinePlayer from './InlinePlayer';
 
 const { app, } = appActions;
 
@@ -35,7 +35,7 @@ export default () => {
 
     api();
     controller();
-    // iframe();
+    InlinePlayer();
 
     if (window === window.top) {
       hotkeys();
