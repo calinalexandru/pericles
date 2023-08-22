@@ -1,24 +1,33 @@
 module.exports = {
   extends: [
+    'plugin:@typescript-eslint/recommended',
     'airbnb',
     // 'plugin:prettier/recommended',
     'prettier',
     'plugin:security/recommended',
     'plugin:sonarjs/recommended',
-    'plugin:@typescript-eslint/recommended',
   ],
-  plugins: ['react-hooks', 'prettier', 'security', 'react-perf', 'sonarjs', '@typescript-eslint'],
+  plugins: [
+    '@typescript-eslint',
+    'react-hooks',
+    'prettier',
+    'security',
+    'react-perf',
+    'sonarjs',
+    '@typescript-eslint',
+  ],
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
     ecmaFeatures: {
       jsx: true,
     },
-    project: './tsconfig.json',
+    project: 'tsconfig.json',
   },
   env: {
     browser: true,
   },
+
   // eslint-import-resolver-webpack plugin
   // enable solving paths using webpack config
   // NOTE:: tables webpack.config.js as default
@@ -27,6 +36,9 @@ module.exports = {
       '@typescript-eslint/parser': ['.ts', '.tsx'],
     },
     'import/resolver': {
+      typescript: {
+        alwaysTryTypes: true,
+      },
       node: {
         paths: ['src'],
       },
@@ -96,6 +108,17 @@ module.exports = {
         imports: 'always',
         exports: 'always',
         functions: 'never',
+      },
+    ],
+
+    'import/extensions': [
+      'error',
+      'ignorePackages',
+      {
+        js: 'never',
+        jsx: 'never',
+        ts: 'never',
+        tsx: 'never',
       },
     ],
 

@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -15,14 +19,16 @@
     "jsx": "react-jsx"
   },
   "include": [
-    "apps/**/**/*.ts",
-    "apps/**/**/*.tsx",
-    "apps/**/**/*.js",
-    "apps/**/**/*.jsx",
-    "packages/**/**/*.ts",
-    "packages/**/**/*.tsx",
-    "packages/**/**/*.js",
-    "packages/**/**/*.jsx"
+    "apps/*/src/**/*.ts",
+    "apps/*/src/**/*.tsx",
+    "packages/*/src/**/*.ts",
+    "packages/*/src/**/*.tsx"
   ],
-  "exclude": ["node_modules", ".git", "bundle", "**/dist", "**/node_modules"]
+  "exclude": [
+    "node_modules",
+    ".git",
+    "bundle",
+    "**/dist",
+    "**/node_modules"
+  ]
 }
