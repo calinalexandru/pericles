@@ -1,12 +1,11 @@
 import { useDispatch, } from 'react-redux';
 
-import { hotkeysActions, } from '@pericles/store';
+import { setHotkeys, } from '@pericles/store';
 
-const { hotkeys, } = hotkeysActions;
 export default function useHotkeysSettings() {
   const dispatch = useDispatch();
-  const setHotkeysSetting = (key, val) => dispatch(hotkeys.set({ [key]: val, }));
-  const onHotkeyFocus = (hotkey) => dispatch(hotkeys.set({ focus: hotkey, }));
+  const setHotkeysSetting = (key, val) => dispatch(setHotkeys({ [key]: val, }));
+  const onHotkeyFocus = (hotkey) => dispatch(setHotkeys({ focus: hotkey, }));
 
   return {
     setHotkeysSetting,

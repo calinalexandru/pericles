@@ -60,10 +60,10 @@ export { default as settingsNeuralVoicesSelector, } from './selectors/settings/s
 
 export * from './actions/notification';
 export { default as playerActions, } from './actions/player';
-export { default as parserActions, } from './actions/parser';
+export * from './actions/parser';
 export * from './actions/settings';
 export { default as appActions, } from './actions/app';
-export { default as hotkeysActions, } from './actions/hotkeys';
+export * from './actions/hotkeys';
 export * from './initialState';
 
 export { default as store, } from './ReduxStore';

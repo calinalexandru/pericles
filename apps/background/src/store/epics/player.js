@@ -19,12 +19,14 @@ import {
 import Speech from '@/speech';
 import { ATTRIBUTES, PARSER_TYPES, VARIABLES, } from '@pericles/constants';
 import {
+  PageTypes,
   appActions,
   appActiveTabSelector,
   appSelectedTextSelector,
   appSkipDeadSectionsSelector,
+  nextPage,
   notificationWarning,
-  parserActions,
+  pageMove,
   parserEndSelector,
   parserIframesSelector,
   parserMaxPageSelector,
@@ -35,6 +37,9 @@ import {
   playerSectionsSelector,
   playerStatusSelector,
   playerTabSelector,
+  prevPage,
+  resetParser,
+  setParser,
 } from '@pericles/store';
 import {
   hasSectionsInAdvance,
@@ -54,7 +59,6 @@ import {
 // let junk;
 
 const { player, sections, } = playerActions;
-const { parser, page, } = parserActions;
 const { autoscroll, route, highlight, } = appActions;
 
 const playOrRequest = (state, payload, actions) => {
@@ -91,7 +95,7 @@ const playOrRequest = (state, payload, actions) => {
     });
     mpToContent(
       [
-        parser.reset(),
+        resetParser(),
         player.reset({ tab: activeTab, }),
         sections.requestAndPlay(payload),
       ],
@@ -301,7 +305,7 @@ const stopEpic = (action, state) =>
       Speech.stop();
       const playerTab = playerTabSelector(state.value);
       mpToContent(
-        [ parser.reset({ revertHtml: true, }), autoscroll.clear(), ],
+        [ resetParser({ revertHtml: true, }), autoscroll.clear(), ],
         playerTab
       );
     }),
@@ -314,7 +318,7 @@ const haltEpic = (action) =>
     tap(() => {
       Speech.stop();
     }),
-    map(() => parser.reset())
+    map(resetParser)
   );
 
 const softHaltEpic = (action) =>
@@ -397,9 +401,9 @@ const nextMoveEpic = (action, state) =>
     ofType(player.nextMove),
     tap((payload) => {
       console.log('nextMoveEpic', payload);
-      mpToContent(page.next(), playerTabSelector(state.value));
+      mpToContent(nextPage(), playerTabSelector(state.value));
     }),
-    switchMap(() => action.pipe(ofType(page.moveComplete), first())),
+    switchMap(() => action.pipe(ofType(PageTypes.MOVE_COMPLETE), first())),
     delay(500),
     tap(() => {
       mpToContent(
@@ -425,9 +429,9 @@ const prevMoveEpic = (action, state) =>
     ofType(player.prevMove),
     tap((payload) => {
       console.log('prevMoveEpic', payload);
-      mpToContent(page.prev(), playerTabSelector(state.value));
+      mpToContent(prevPage(), playerTabSelector(state.value));
     }),
-    switchMap(() => action.pipe(ofType(page.moveComplete), first())),
+    switchMap(() => action.pipe(ofType(PageTypes.MOVE_COMPLETE), first())),
     delay(500),
     tap(() => {
       mpToContent(
@@ -484,19 +488,19 @@ const endEpic = (action, state) =>
       console.log('player.endEpic', { nextPage, });
       mpToContent(
         [
-          parser.reset({ revertHtml: true, }),
+          resetParser({ revertHtml: true, }),
           player.reset({ tab: appActiveTabSelector(state), }),
-          parser.set({
+          setParser({
             type: parserTypeSelector(state.value),
             page: nextPage,
             maxPage: parserMaxPageSelector(state.value),
           }),
-          page.move({ index: nextPage, }),
+          pageMove({ index: nextPage, }),
         ],
         playerTabSelector(state.value)
       );
     }),
-    switchMap(() => action.pipe(ofType(page.moveComplete), first())),
+    switchMap(() => action.pipe(ofType(PageTypes.MOVE_COMPLETE), first())),
     delay(500),
     concatMap(() => of(player.play()))
   );

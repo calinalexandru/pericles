@@ -7,7 +7,6 @@ import { ERROR_CODES, PLAYER_STATUS, } from '@pericles/constants';
 import {
   store,
   appActions,
-  parserActions,
   parserEndSelector,
   parserIframesSelector,
   parserKeySelector,
@@ -15,6 +14,7 @@ import {
   playerKeySelector,
   playerStatusSelector,
   playerTabSelector,
+  parserWordsUpdate,
 } from '@pericles/store';
 import {
   findAvailableIframe,
@@ -24,7 +24,6 @@ import {
 
 const { player, } = playerActions;
 const { highlight, autoscroll, } = appActions;
-const { parser, } = parserActions;
 
 export default () => {
   console.log('initialize speech');
@@ -104,7 +103,7 @@ export default () => {
           break;
         case 'onWordsUpdate':
           console.log('onWordsUpdate', wordList);
-          mpToContent(parser.wordsUpdate({ wordList, }), playingTab);
+          mpToContent(parserWordsUpdate({ wordList, }), playingTab);
           break;
         case 'onBuffering':
           // console.log('onBuffering', buffering);

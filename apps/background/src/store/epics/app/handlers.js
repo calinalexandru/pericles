@@ -6,10 +6,10 @@ import Speech from '@/speech';
 import { MESSAGES, VARIABLES, } from '@pericles/constants';
 import {
   appActions,
-  hotkeysActions,
   initialState,
   notificationInfo,
   playerActions,
+  setHotkeys,
   setSettings,
   settingsPitchSelector,
   settingsRateSelector,
@@ -22,7 +22,6 @@ import { getBrowserAPI, getEnglishVoiceKey, mpToContent, } from '@pericles/util'
 const { highlight, } = appActions;
 const { app, } = appActions;
 const { player, } = playerActions;
-const { hotkeys, } = hotkeysActions;
 
 export function handleAppInit(state) {
   console.log('app.init');
@@ -73,7 +72,7 @@ export const handleFactoryReset$ = (state) => {
       ...settingsDefaultValues,
       voice: getEnglishVoiceKey(settingsVoicesSelector(state)),
     }),
-    hotkeys.set(hotkeysDefaultValues),
+    setHotkeys(hotkeysDefaultValues),
     notificationInfo({ text: 'Your setting have been reset.', }),
     app.reload()
   );

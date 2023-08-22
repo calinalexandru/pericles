@@ -17,17 +17,23 @@ import DomStrategy from '@/strategy/domStrategy';
 import mutationCheck from '@/util/mutationCheck';
 import { ATTRIBUTES, PARSER_TYPES, PLAYER_STATUS, } from '@pericles/constants';
 import {
+  PageTypes,
+  ParserTypes,
   appActions,
   appSkipUntilYSelector,
   notificationError,
-  parserActions,
+  pageMoveComplete,
+  parserIdle,
   parserIframesSelector,
   parserKeySelector,
   parserPageSelector,
+  parserResetComplete,
   parserTypeSelector,
+  parserWordsUpdateWorker,
   playerActions,
   playerKeySelector,
   playerSectionsSelector,
+  setParser,
   settingsNeuralVoicesSelector,
   settingsVoiceSelector,
 } from '@pericles/store';
@@ -56,7 +62,6 @@ import {
 } from '@pericles/util';
 
 const { sections, player, } = playerActions;
-const { parser, page, } = parserActions;
 const { route, } = appActions;
 
 const mergedLanguages = [ 'ja', 'cn', 'ko', ];
@@ -210,7 +215,7 @@ export const getSectionsAndPlayEpic = (action, state) =>
             }
             console.log('newIframes', newIframes);
             return [
-              parser.set({
+              setParser({
                 iframes,
                 end,
                 type,
@@ -233,7 +238,7 @@ export const getSectionsAndPlayEpic = (action, state) =>
         ];
         if (!mergeSections.length && isGoogleBook(type)) {
           return from([
-            parser.set({ type, maxPage, page: pageIndex, end, }),
+            setParser({ type, maxPage, page: pageIndex, end, }),
             player.next(),
           ]);
         }
@@ -241,7 +246,7 @@ export const getSectionsAndPlayEpic = (action, state) =>
           maxPage === 0 || maxPage > parserPageSelector(state.value)
             ? [
               sections.set({ sections: mergeSections, }),
-              parser.set({
+              setParser({
                 iframes,
                 key: mergeSections.length,
                 end,
@@ -260,7 +265,7 @@ export const getSectionsAndPlayEpic = (action, state) =>
 
 export const pageMoveEpic = (action, state) =>
   action.pipe(
-    ofType(page.move),
+    ofType(PageTypes.MOVE),
     pluck('payload'),
     tap(async (payload) => {
       console.log('pageMoveEpic', payload);
@@ -276,12 +281,12 @@ export const pageMoveEpic = (action, state) =>
       }
     }),
     delay(500),
-    map(() => page.moveComplete())
+    map(pageMoveComplete)
   );
 
 export const pageNextEpic = (action, state) =>
   action.pipe(
-    ofType(page.next),
+    ofType(PageTypes.NEXT),
     pluck('payload'),
     filter(
       (payload = {}) =>
@@ -301,12 +306,12 @@ export const pageNextEpic = (action, state) =>
       )
     ),
     catchError(() => of(false)),
-    concatMap((check) => of(check ? page.moveComplete() : player.wank()))
+    concatMap((check) => of(check ? pageMoveComplete() : player.wank()))
   );
 
 export const pagePrevEpic = (action, state) =>
   action.pipe(
-    ofType(page.prev),
+    ofType(PageTypes.PREV),
     pluck('payload'),
     filter(
       (payload = {}) =>
@@ -326,31 +331,31 @@ export const pagePrevEpic = (action, state) =>
       )
     ),
     catchError(() => of(false)),
-    concatMap((check) => of(check ? page.moveComplete() : player.wank()))
+    concatMap((check) => of(check ? pageMoveComplete() : player.wank()))
   );
 
 export const pageAutosetEpic = (action) =>
   action.pipe(
-    ofType(page.autoset),
+    ofType(PageTypes.AUTOSET),
     pluck('payload'),
     filter((payload) => !payload.iframe),
     map(() => {
       console.log('pageAutosetEpic', action);
       const pageIndex = getGoogleDocsPageByScroll();
       console.log('page.autoset', pageIndex);
-      return parser.set({ page: pageIndex, });
+      return setParser({ page: pageIndex, });
     })
   );
 
 export const wordsUpdateEpic = (action, state) =>
   action.pipe(
-    ofType(parser.wordsUpdate),
+    ofType(ParserTypes.WORDS_UPDATE),
     pluck('payload', 'wordList'),
     map((wordList) => {
       console.log('wordsUpdateEpic');
       const sectionsArr = getSectionsById(playerKeySelector(state.value));
       removeWordTags(sectionsArr);
-      return parser.wordsUpdateWorker({
+      return parserWordsUpdateWorker({
         sections: sectionsArr,
         wordList,
       });
@@ -359,7 +364,7 @@ export const wordsUpdateEpic = (action, state) =>
 
 export const wordsUpdateWorkerEpic = (action) =>
   action.pipe(
-    ofType(parser.wordsUpdateWorker),
+    ofType(ParserTypes.WORDS_UPDATE_WORKER),
     pluck('payload'),
     map(({ sections: sectionsArr, wordList, wordIndex = 0, }) => {
       const [ { childNodes: [ node = false, ] = [], } = {}, ] = sectionsArr;
@@ -372,24 +377,24 @@ export const wordsUpdateWorkerEpic = (action) =>
         });
         const sectionsSliced = sectionsArr.slice(1);
         if (sectionsSliced.length) {
-          return parser.wordsUpdateWorker({
+          return parserWordsUpdateWorker({
             sections: sectionsSliced,
             wordList: out.wordList,
             wordIndex: out.wordIndex,
           });
         }
       }
-      return parser.wank();
+      return parserIdle();
     })
   );
 
 export const clearHelperTagsEpic = (action) =>
   action.pipe(
-    ofType(parser.reset),
+    ofType(ParserTypes.RESET),
     pluck('payload', 'revertHtml'),
     filter((revertHtml) => revertHtml === true),
     tap(removeAllHelperTags),
-    map(() => parser.resetComplete())
+    map(parserResetComplete)
   );
 
 export default combineEpics(
