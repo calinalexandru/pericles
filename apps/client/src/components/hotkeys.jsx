@@ -17,6 +17,10 @@ import {
 import { isStopped, } from '@pericles/util';
 
 let keysMap = Object.create(null);
+const textFieldInputProps = {
+  readOnly: true,
+};
+
 export default function HotkeysComponent() {
   const [ ignoreWarning, setIgnoreWarning, ] = useState(false);
   const { stop: playerStop, } = usePlayer();
@@ -35,7 +39,7 @@ export default function HotkeysComponent() {
     keys
       .map((playKey) => {
         // console.log('getKeyCombo', playKey);
-        if (playKey.key.trim().length) {
+        if (playKey?.key?.trim?.()?.length) {
           return playKey.key.toLocaleUpperCase();
         }
         return playKey.code.toLocaleUpperCase();
@@ -65,7 +69,7 @@ export default function HotkeysComponent() {
             direction="column"
             spacing={1}>
             <TextField
-              inputProps={{ readOnly: true, }}
+              inputProps={textFieldInputProps}
               id="filled-basic"
               label="start"
               variant="filled"
@@ -90,7 +94,7 @@ export default function HotkeysComponent() {
               </Alert>
             ) : null}
             <TextField
-              inputProps={{ readOnly: true, }}
+              inputProps={textFieldInputProps}
               id="filled-basic"
               label="play/pause"
               variant="filled"
@@ -106,12 +110,12 @@ export default function HotkeysComponent() {
             />
             <TextField
               id="filled-basic"
-              inputProps={{ readOnly: true, }}
-              label="playerStop"
+              inputProps={textFieldInputProps}
+              label="stop"
               variant="filled"
               onKeyUp={(e) => {
                 keysMap[e.code] = { key: e.key, code: e.code, };
-                setHotkeysSetting('playerStop', Object.values(keysMap));
+                setHotkeysSetting('stop', Object.values(keysMap));
               }}
               onKeyDown={() => {
                 keysMap = Object.create(null);
@@ -121,7 +125,7 @@ export default function HotkeysComponent() {
             />
             <TextField
               id="filled-basic"
-              inputProps={{ readOnly: true, }}
+              inputProps={textFieldInputProps}
               onKeyUp={(e) => {
                 keysMap[e.code] = { key: e.key, code: e.code, };
                 setHotkeysSetting('next', Object.values(keysMap));
@@ -135,7 +139,7 @@ export default function HotkeysComponent() {
               value={nextDefault}
             />
             <TextField
-              inputProps={{ readOnly: true, }}
+              inputProps={textFieldInputProps}
               id="filled-basic"
               label="prev"
               onKeyUp={(e) => {
