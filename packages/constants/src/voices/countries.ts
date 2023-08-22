@@ -1,4 +1,4 @@
-export default {
+export const COUNTRIES = {
   af: {
     tags: [ 'afghanistan', ],
     flag: 'afg.svg',
@@ -999,7 +999,7 @@ export default {
     tags: [ 'zimbabwe', ],
     flag: 'zwe.svg',
   },
-};
+} as const;
 
 // import countriesJSON from './countriesArr';
 

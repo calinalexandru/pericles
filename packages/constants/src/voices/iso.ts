@@ -1,4 +1,4 @@
-export default {
+export const ISO_LANGS = {
   ab: {
     name: 'Abkhaz',
     nativeName: 'аҧсуа',
@@ -758,4 +758,4 @@ export default {
     name: 'Zhuang, Chuang',
     nativeName: 'Saɯ cueŋƅ, Saw cuengh',
   },
-};
+} as const;

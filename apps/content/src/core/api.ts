@@ -1,15 +1,18 @@
+import { Action, } from 'redux';
 import { fromEventPattern, Observable, } from 'rxjs';
-import { map, tap, } from 'rxjs/operators';
+import { map, } from 'rxjs/operators';
 
 import { store, } from '@pericles/store';
 import { getBrowserAPI, } from '@pericles/util';
 
-import { Action, MessageRequest, } from '../interfaces/api';
+import { MaybeAction, MessageRequest, } from '../interfaces/api';
 
 const { api, } = getBrowserAPI();
 
+const isValidAction = (action: MaybeAction) => action?.type && action?.payload;
+
 export default (): void => {
-  const onMessage$: Observable<Action> = fromEventPattern(
+  const onMessage$: Observable<any> = fromEventPattern(
     (handler: any) => api.runtime.onMessage.addListener(handler),
     (handler: any) => api.runtime.onMessage.removeListener(handler)
   ).pipe(
@@ -23,15 +26,16 @@ export default (): void => {
           iframe: window !== window.top,
         },
       };
-    }),
-    tap((action: Action) => {
-      console.log('api/action', action);
-      // store.dispatch(action);
     })
   );
 
-  onMessage$.subscribe((action: Action) => {
+  onMessage$.subscribe((action: MaybeAction) => {
     console.log('subscribe.api/action', action);
-    store.dispatch(action);
+    if (isValidAction(action)) {
+      const validatedAction: Action = action as unknown as Action;
+      store.dispatch(validatedAction);
+    } else {
+      console.warn('Invalid action attemtped', action);
+    }
   });
 };

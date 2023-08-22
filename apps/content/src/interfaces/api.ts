@@ -7,9 +7,9 @@ export interface MessageRequest {
   };
 }
 
-export interface Action {
-  [key: string]: any;
+export interface MaybeAction {
   payload: {
     iframe: boolean;
   };
+  [key: string]: any;
 }

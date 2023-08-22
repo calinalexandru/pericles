@@ -1,6 +1,6 @@
-export { default as ISO_LANGS, } from './voices/iso';
-export { default as COUNTRIES, } from './voices/countries';
-export { default as MESSAGES, } from './i18n';
+export * from './voices/iso';
+export * from './voices/countries';
+export { MESSAGES, } from './i18n';
 export * from './nodeTypes';
 export * from './playerStatus';
 export * from './errorCodes';

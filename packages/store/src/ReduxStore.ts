@@ -1,38 +1,45 @@
-import { Store, } from 'webext-redux';
+import { Action, } from 'redux';
+import { Store as WebextStore, } from 'webext-redux';
 
 import { WEBEXT_PORT, } from '@pericles/constants';
 
+import { RootState, } from './initialState';
+
+const StoreNotInitWarn = 'store is already initialized';
 class ReduxStore {
+
+  private _store: WebextStore | null;
 
   constructor() {
     this._store = null;
   }
 
-  get current() {
+  get current(): WebextStore | null {
     return this._store;
   }
 
-  createStore() {
-    return new Store({ portName: WEBEXT_PORT, });
+  /* eslint-disable-next-line */
+  createStore(): WebextStore {
+    return new WebextStore({ portName: WEBEXT_PORT, });
   }
 
-  initialize(storeInstance) {
+  initialize(storeInstance: WebextStore): void {
     if (!this._store) {
       this._store = storeInstance;
     } else {
-      console.warn('Store is already initialized');
+      console.warn(StoreNotInitWarn);
     }
   }
 
-  dispatch(action) {
+  dispatch(action: Action): void {
     if (!this._store) {
-      console.warn('Store is not initialized yet');
+      console.warn(StoreNotInitWarn);
       return;
     }
     this._store.dispatch(action);
   }
 
-  getState() {
+  getState(): RootState {
     if (!this._store) {
       console.warn('Store is not initialized yet');
       return null;
@@ -40,7 +47,7 @@ class ReduxStore {
     return this._store.getState();
   }
 
-  subscribe(listener) {
+  subscribe(listener: () => void): void {
     if (!this._store) {
       console.warn('Store is not initialized yet');
       return;
