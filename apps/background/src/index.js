@@ -9,7 +9,6 @@ import { appActions, initialState, store, } from '@pericles/store';
 import { getBrowserAPI, } from '@pericles/util';
 
 import appEpic from './store/epics/app';
-import hotkeysEpic from './store/epics/hotkeys';
 import notificationEpic from './store/epics/notification';
 import playerEpic from './store/epics/player';
 import settingsEpic from './store/epics/settings';
@@ -28,6 +27,7 @@ let isInitialized = false;
 const { app, } = appActions;
 
 const init = (preloadedState) => {
+  console.log('preloadedState', preloadedState);
   const observableMiddleware = createEpicMiddleware();
   store.initialize(
     createStore(
@@ -38,20 +38,14 @@ const init = (preloadedState) => {
         parser: parserReducer,
         notification: notificationReducer,
         hotkeys: hotkeysReducer,
-        // ...preloadedState,
       }),
+      preloadedState,
       applyMiddleware(observableMiddleware, thunk)
     )
   );
   wrapStore(store.current, { portName: WEBEXT_PORT, });
   observableMiddleware.run(
-    combineEpics(
-      playerEpic,
-      appEpic,
-      settingsEpic,
-      hotkeysEpic,
-      notificationEpic
-    )
+    combineEpics(playerEpic, appEpic, settingsEpic, notificationEpic)
   );
   core();
 

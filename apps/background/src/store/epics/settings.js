@@ -11,15 +11,10 @@ import {
   playerActions,
   settingsVoicesSelector,
   SettingsActionTypes,
-  setFreeVoice,
+  freeVoice,
   setSettings,
 } from '@pericles/store';
-import {
-  isPaused,
-  isPlayingOrReady,
-  LocalStorage,
-  getEnglishVoiceKey,
-} from '@pericles/util';
+import { isPaused, isPlayingOrReady, getEnglishVoiceKey, } from '@pericles/util';
 
 const { player, } = playerActions;
 
@@ -31,17 +26,6 @@ const settingsSetEpic = (action, state) =>
       console.log('settings.set', payload);
       const seek = Speech.getSeekerTime();
       Speech.setSettingsFromObj(payload);
-      const savedSettings = pick(
-        LOCAL_STORAGE_SETTINGS.SETTINGS.ITEMS,
-        payload
-      );
-      if (!isEmpty(savedSettings)) {
-        LocalStorage.merge(savedSettings)
-          .then((response) => {
-            console.log('storage is merged', response);
-          })
-          .catch((e) => console.error(e));
-      }
       return { payload, seek, };
     }),
     concatMap(({ payload = {}, seek = 0, }) => {
@@ -73,7 +57,7 @@ const settingsSetEpic = (action, state) =>
 
 const settingsSetFreeVoiceEpic = (action, state) =>
   action.pipe(
-    ofType(setFreeVoice()),
+    ofType(freeVoice.request),
     map(() => {
       console.log('settingsSetFreeVoiceEpic');
       //

@@ -64,6 +64,12 @@ const appReloadTabEpic = (action) =>
 const highlightSectionEpic = (action$, state) =>
   action$.pipe(
     ofType(highlight.section),
+    tap(() => {
+      console.log(
+        'highlightSectionEpic.init',
+        appSectionTrackerSelector(state.value)
+      );
+    }),
     filter(() => appSectionTrackerSelector(state.value) === true),
     tap(() => {
       const highlightStyle = appHighlightStyleSelector(state.value);
@@ -77,6 +83,11 @@ const highlightSectionEpic = (action$, state) =>
         addClassToElements(activeRectSections, highlightStyle);
       } else {
         const activeSections = getSectionsById(playerKeySelector(state.value));
+        // console.log('highlightSectionEpic', {
+        //   playerKey: playerKeySelector(state.value),
+        //   activeSections,
+        //   highlightStyle,
+        // });
         addClassToElements(activeSections, highlightStyle);
       }
     }),

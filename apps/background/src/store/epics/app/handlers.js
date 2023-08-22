@@ -6,10 +6,10 @@ import Speech from '@/speech';
 import { MESSAGES, VARIABLES, } from '@pericles/constants';
 import {
   appActions,
-  appSelector,
   hotkeysActions,
   initialState,
   notificationActions,
+  playerActions,
   setSettings,
   settingsPitchSelector,
   settingsRateSelector,
@@ -17,15 +17,11 @@ import {
   settingsVoicesSelector,
   settingsVolumeSelector,
 } from '@pericles/store';
-import {
-  LocalStorage,
-  getBrowserAPI,
-  getEnglishVoiceKey,
-  mpToContent,
-} from '@pericles/util';
+import { getBrowserAPI, getEnglishVoiceKey, mpToContent, } from '@pericles/util';
 
 const { highlight, } = appActions;
 const { app, } = appActions;
+const { player, } = playerActions;
 const { notification, } = notificationActions;
 const { hotkeys, } = hotkeysActions;
 
@@ -44,14 +40,6 @@ export function handleAppInit(state) {
 
 export function handleAppSet(state, payload = {}) {
   console.log('app.set', payload);
-  const appObj = {
-    ...appSelector(state),
-  };
-  LocalStorage.merge(appObj)
-    .then((response) => {
-      console.log('storage is merged', response);
-    })
-    .catch((e) => console.error(e));
 
   const highlightSettings = pick(
     [ VARIABLES.APP.HIGHLIGHT_COLOR, VARIABLES.APP.WORD_TRACKER_COLOR, ],
@@ -73,14 +61,15 @@ export function handleAppSet(state, payload = {}) {
 
 export const handleFactoryReset$ = (state) => {
   const {
+    player: playerDefaultValues,
     app: appDefaultValues,
     settings: settingsDefaultValues,
     hotkeys: hotkeysDefaultValues,
   } = initialState;
-  LocalStorage.clearAll();
   console.log('appFactoryResetEpic');
   return of(
     app.set(appDefaultValues),
+    player.set(playerDefaultValues),
     setSettings({
       ...settingsDefaultValues,
       voice: getEnglishVoiceKey(settingsVoicesSelector(state)),

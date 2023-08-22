@@ -16,7 +16,7 @@ import {
   Divider,
 } from '@mui/material';
 import { keys, } from 'ramda';
-import React from 'react';
+import React, { useEffect, } from 'react';
 import { useSelector, } from 'react-redux';
 
 import useAppSettings from '@/hooks/useAppSettings';
@@ -54,6 +54,11 @@ export default function TweaksComponent() {
   const { setAppSetting, clearWords, highlightSection, clearSections, } =
     useAppSettings();
   const { setHotkeysSetting, } = useHotkeysSettings();
+
+  useEffect(() => {
+    if (!sectionTracker) clearSections(playerTab);
+    else highlightSection(playerTab);
+  }, [ clearSections, highlightSection, sectionTracker, playerTab, ]);
 
   return (
     <List sx={{ width: '100%', bgcolor: 'background.paper', }}>
@@ -193,8 +198,6 @@ export default function TweaksComponent() {
           color="primary"
           onChange={(e, value) => {
             setAppSetting(VARIABLES.APP.SECTION_TRACKER, value);
-            if (!value) clearSections(playerTab);
-            else highlightSection(playerTab);
           }}
           inputProps={{ 'aria-label': 'primary checkbox', }}
           value="1"

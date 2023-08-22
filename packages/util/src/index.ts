@@ -113,8 +113,7 @@ export { default as isTextNode, } from './predicates/isTextNode';
 export { default as isValidTag, } from './predicates/isValidTag';
 export { default as isWaiting, } from './predicates/isWaiting';
 export { default as isWikipedia, } from './predicates/isWikipedia';
-/* storage */
-export { default as LocalStorage, } from './storage';
+
 /* string-work */
 export { default as getInnerText, } from './string-work/getInnerText';
 export { default as findHotkeyEvent, } from './util/findHotkeyEvent';
