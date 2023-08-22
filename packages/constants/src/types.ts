@@ -1,3 +1,14 @@
+export type ParserTypes =
+  | 'default'
+  | 'googleDoc'
+  | 'googleDocSvg'
+  | 'googleForm'
+  | 'openBook'
+  | 'googleBook'
+  | 'grammarlyApp';
+
+export type PlayerStatusTypes = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+
 export type KeyCombo = {
   key: string;
   code: string;
@@ -13,7 +24,7 @@ export type Variables = {
   PARSER: {
     KEY: number;
     END: boolean;
-    TYPE: any;
+    TYPE: ParserTypes;
     IFRAMES: Record<string, any>;
     PAGE: number;
     MAX_PAGE: number;
@@ -66,9 +77,9 @@ export type Variables = {
   };
 
   PLAYER: {
-    SECTIONS: any[];
+    SECTIONS: string[];
     KEY: number;
-    STATUS: any;
+    STATUS: PlayerStatusTypes;
     TAB: number;
     BUFFERING: boolean;
   };

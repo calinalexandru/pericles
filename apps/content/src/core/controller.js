@@ -15,13 +15,6 @@ const { app, } = appActions;
 const { player, } = playerActions;
 
 export default () => {
-  const tabClosed$ = fromEvent(window, 'beforeunload').pipe(
-    tap(() => {
-      const { periclesTabId: tab, } = window;
-      store.dispatch(app.tabClosed({ tab, }));
-    })
-  );
-
   const contextMenuOpen$ = fromEvent(document, 'contextmenu').pipe(
     tap((e) => {
       const textSelected = window.getSelection().toString();
@@ -47,21 +40,6 @@ export default () => {
       const wordAudio = wordEl.getAttribute(ATTRIBUTES.ATTRS.WORD_AUDIO);
       if (wordAudio < 0) return null;
       console.log('wordAudio', wordAudio);
-      // const state = store.getState();
-      // const section = playerKeySelector(state);
-      // not ued
-      // if (section !== Number(sectionIndex)) {
-      //   await store.dispatch(player.softHalt());
-      //   await store.dispatch(player.set({ key: Number(sectionIndex) }));
-      //   await store.dispatch(
-      //     player.play({
-      //       key: Number(sectionIndex),
-      //       userGenerated: true,
-      //       seek: wordAudio,
-      //     })
-      //   );
-      // }
-      // await store.dispatch(player.seek(wordAudio));
 
       return true;
     }),
@@ -131,7 +109,6 @@ export default () => {
 
   // run
   combineLatest([
-    tabClosed$,
     contextMenuOpen$,
     wordClick$,
     sectionClick$,

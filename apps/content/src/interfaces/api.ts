@@ -1,4 +1,7 @@
 export interface MessageRequest {
+  activeTab?: {
+    id: number;
+  };
   message?: {
     payload?: Record<string, any>;
   };

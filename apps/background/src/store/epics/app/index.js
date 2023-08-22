@@ -30,7 +30,7 @@ const appInitEpic = (action, state) =>
 const tabClosedEpic = (action, state) =>
   action.pipe(
     ofType(app.tabClosed),
-    pluck('payload', 'tab'),
+    pluck('payload'),
     filter((tab) => tab === playerTabSelector(state.value)),
     map(player.halt)
   );

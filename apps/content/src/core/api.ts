@@ -19,6 +19,7 @@ export default (): void => {
         ...(request.message || {}),
         payload: {
           ...(request?.message?.payload || {}),
+          ...(request.activeTab && { tab: request.activeTab.id, }),
           iframe: window !== window.top,
         },
       };

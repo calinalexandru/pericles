@@ -13,6 +13,12 @@ const { player, } = playerActions;
 
 export default () => {
   const { api, } = getBrowserAPI();
+
+  api.tabs.onRemoved.addListener((tabId, removeInfo) => {
+    console.log('tab closed listener', tabId, removeInfo);
+    store.dispatch(app.tabClosed(tabId));
+  });
+
   api.contextMenus.create({
     id: ATTRIBUTES.CONTEXT_MENU.READ_FROM_HERE,
     title: 'Read from here',
