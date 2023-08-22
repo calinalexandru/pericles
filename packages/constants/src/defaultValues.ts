@@ -1,10 +1,10 @@
-import PARSER_TYPES from './parserTypes';
-import PLAYER_STATUS from './playerStatus';
-import ROUTES from './routes';
-import SECTION_HIGHLIGHT_STYLES from './sectionHighlightStyles';
-import TABS from './tabs';
+import { PARSER_TYPES, } from './parserTypes';
+import { PLAYER_STATUS, } from './playerStatus';
+import { ROUTES, } from './routes';
+import { SECTION_HIGHLIGHT_STYLES, } from './sectionHighlightStyles';
+import { TABS, } from './tabs';
 import { Variables, } from './types';
-import WORD_TRACKER_STYLES from './wordTrackerStyles';
+import { WORD_TRACKER_STYLES, } from './wordTrackerStyles';
 
 export const DEFAULT_VALUES: Variables = {
   PARSER: {

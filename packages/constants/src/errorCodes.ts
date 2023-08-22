@@ -1,4 +1,4 @@
-export default {
+export const ERROR_CODES = {
   PLAYER: {
     HTML: 100,
     WEBSOCKET: 102,
@@ -11,4 +11,4 @@ export default {
     TIMEOUT: 1006,
     THROTTLE: 1007,
   },
-};
+} as const;

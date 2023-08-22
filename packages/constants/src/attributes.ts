@@ -1,4 +1,4 @@
-export default {
+export const ATTRIBUTES = {
   CONTEXT_MENU: {
     READ_FROM_HERE: 'pericles-read-from-here',
     READ_SELECTION: 'pericles-read-selection',

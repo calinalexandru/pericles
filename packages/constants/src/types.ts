@@ -1,13 +1,13 @@
-export type ParserTypes =
-  | 'default'
-  | 'googleDoc'
-  | 'googleDocSvg'
-  | 'googleForm'
-  | 'openBook'
-  | 'googleBook'
-  | 'grammarlyApp';
+import { PARSER_TYPES, } from './parserTypes';
+import { PLAYER_STATUS, } from './playerStatus';
+import { RoutesTypes, } from './routes';
+import { SectionHighlightStylesTypes, } from './sectionHighlightStyles';
+import { TabsTypes, } from './tabs';
+import { WordTrackerStylesTypes, } from './wordTrackerStyles';
 
-export type PlayerStatusTypes = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+export type ParserTypes = typeof PARSER_TYPES[keyof typeof PARSER_TYPES];
+export type PlayerStatusTypes =
+  typeof PLAYER_STATUS[keyof typeof PLAYER_STATUS];
 
 export type KeyCombo = {
   key: string;
@@ -40,17 +40,17 @@ export type Variables = {
   APP: {
     THEME_MODE: 'light' | 'dark';
     WORD_TRACKER: boolean;
-    WORD_TRACKER_STYLE: any;
+    WORD_TRACKER_STYLE: WordTrackerStylesTypes;
     WORD_TRACKER_COLOR: string;
     SECTIONS_TRACKER: boolean;
     MINI_PLAYER: boolean;
     SKIP_DEAD_SECTIONS: boolean;
     AUTOSCROLL: boolean;
     HIGHLIGHT_COLOR: string;
-    HIGHLIGHT_STYLE: any;
+    HIGHLIGHT_STYLE: SectionHighlightStylesTypes;
     ACTIVE_TAB: number;
-    ROUTE: any;
-    ROUTE_TAB: any;
+    ROUTE: RoutesTypes;
+    ROUTE_TAB: TabsTypes;
     SKIP_UNTIL_Y: number;
     LANGUAGE: string;
     SELECTED_TEXT: string;

@@ -5,7 +5,6 @@ import { of, } from 'rxjs';
 import { pluck, map, concatMap, } from 'rxjs/operators';
 
 import Speech from '@/speech';
-import { LOCAL_STORAGE_SETTINGS, } from '@pericles/constants';
 import {
   playerStatusSelector,
   playerActions,
@@ -17,6 +16,8 @@ import {
 import { isPaused, isPlayingOrReady, getEnglishVoiceKey, } from '@pericles/util';
 
 const { player, } = playerActions;
+
+const settingsItems = [ 'volume', 'pitch', 'rate', 'voice', ];
 
 const settingsSetEpic = (action, state) =>
   action.pipe(
@@ -32,19 +33,15 @@ const settingsSetEpic = (action, state) =>
       console.log('settings.set epic', payload, state.value);
       if (
         isPaused(playerStatusSelector(state.value)) &&
-        !isEmpty(pick(LOCAL_STORAGE_SETTINGS.SETTINGS.ITEMS, payload))
+        !isEmpty(pick(settingsItems, payload))
       ) {
         return of(player.stop());
       }
       if (
         isPlayingOrReady(playerStatusSelector(state.value)) &&
-        !isEmpty(pick(LOCAL_STORAGE_SETTINGS.SETTINGS.ITEMS, payload))
+        !isEmpty(pick(settingsItems, payload))
       ) {
-        if (
-          Speech.isReplayStarved(
-            keys(pick(LOCAL_STORAGE_SETTINGS.SETTINGS.ITEMS, payload))
-          )
-        ) {
+        if (Speech.isReplayStarved(keys(pick(settingsItems, payload)))) {
           console.log('Speech.isReplayStarved -> settingsSetEpic.seek', seek);
           Speech.stop();
           return of(player.play({ userGenerated: true, seek, }));

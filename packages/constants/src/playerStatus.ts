@@ -1,4 +1,4 @@
-export default {
+export const PLAYER_STATUS = {
   STOPPED: 0,
   LOADING: 1,
   READY: 2,
@@ -7,4 +7,4 @@ export default {
   OVERLOAD: 5,
   WAITING: 6,
   ERROR: 7,
-};
+} as const;
