@@ -19,7 +19,7 @@ import { ATTRIBUTES, PARSER_TYPES, PLAYER_STATUS, } from '@pericles/constants';
 import {
   appActions,
   appSkipUntilYSelector,
-  notificationActions,
+  notificationError,
   parserActions,
   parserIframesSelector,
   parserKeySelector,
@@ -58,7 +58,6 @@ import {
 const { sections, player, } = playerActions;
 const { parser, page, } = parserActions;
 const { route, } = appActions;
-const { notification, } = notificationActions;
 
 const mergedLanguages = [ 'ja', 'cn', 'ko', ];
 
@@ -225,7 +224,7 @@ export const getSectionsAndPlayEpic = (action, state) =>
             ];
           }
           if (skip && message)
-            return [ player.error(), notification.error({ text: message, }), ];
+            return [ player.error(), notificationError({ text: message, }), ];
           return [ player.wank(), ];
         }
         const mergeSections = [

@@ -8,7 +8,7 @@ import {
   appActions,
   hotkeysActions,
   initialState,
-  notificationActions,
+  notificationInfo,
   playerActions,
   setSettings,
   settingsPitchSelector,
@@ -22,7 +22,6 @@ import { getBrowserAPI, getEnglishVoiceKey, mpToContent, } from '@pericles/util'
 const { highlight, } = appActions;
 const { app, } = appActions;
 const { player, } = playerActions;
-const { notification, } = notificationActions;
 const { hotkeys, } = hotkeysActions;
 
 export function handleAppInit(state) {
@@ -75,7 +74,7 @@ export const handleFactoryReset$ = (state) => {
       voice: getEnglishVoiceKey(settingsVoicesSelector(state)),
     }),
     hotkeys.set(hotkeysDefaultValues),
-    notification.info({ text: 'Your setting have been reset.', }),
+    notificationInfo({ text: 'Your setting have been reset.', }),
     app.reload()
   );
 };

@@ -17,7 +17,6 @@ import { connect, } from 'react-redux';
 import LoadingSpinner from '@/primitives/loadingSpinner';
 import { DEFAULT_VALUES, } from '@pericles/constants';
 import {
-  notificationActions,
   notificationTextSelector,
   notificationTypeSelector,
   appThemeModeSelector,
@@ -26,13 +25,13 @@ import {
   playerActions,
   hotkeysSelector,
   hotkeysDisableSelector,
+  notificationClear,
 } from '@pericles/store';
 
 import routes from './routes';
 import { paletteDark, paletteLight, } from './theme';
 import './App.css';
 
-const { notification, } = notificationActions;
 const { player, } = playerActions;
 
 function App({
@@ -201,7 +200,7 @@ const mapStateToProps = applySpec({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  onClearNotification: () => dispatch(notification.clear()),
+  onClearNotification: () => dispatch(notificationClear()),
   playerToggle: () => dispatch(player.toggle()),
   playerNext: () => dispatch(player.softNext()),
   playerPrev: () => dispatch(player.softPrev()),

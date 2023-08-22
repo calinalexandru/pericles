@@ -23,7 +23,7 @@ import {
   appActiveTabSelector,
   appSelectedTextSelector,
   appSkipDeadSectionsSelector,
-  notificationActions,
+  notificationWarning,
   parserActions,
   parserEndSelector,
   parserIframesSelector,
@@ -55,7 +55,6 @@ import {
 
 const { player, sections, } = playerActions;
 const { parser, page, } = parserActions;
-const { notification, } = notificationActions;
 const { autoscroll, route, highlight, } = appActions;
 
 const playOrRequest = (state, payload, actions) => {
@@ -284,7 +283,7 @@ const resumeEpic = (action, state) =>
         console.log('play.epic.switched tab');
         return of(
           player.stop(),
-          notification.warning({
+          notificationWarning({
             text: 'Player was active in another tab, press start again to begin',
           })
         );
@@ -332,7 +331,7 @@ const overloadEpic = (action) =>
     ofType(player.overload),
     concatMap(() =>
       of(
-        notification.warning({
+        notificationWarning({
           text: 'Overload! Player will enable again shortly',
         }),
         route.cooldown(),
@@ -581,7 +580,7 @@ const crashEpic = (action, state) =>
     concatMap((text) =>
       appSkipDeadSectionsSelector(state.value)
         ? of(route.index(), player.next())
-        : of(notification.warning({ text, }), route.skip())
+        : of(notificationWarning({ text, }), route.skip())
     )
   );
 

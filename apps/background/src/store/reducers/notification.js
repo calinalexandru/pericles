@@ -1,29 +1,28 @@
 import { handleActions, } from 'redux-actions';
 
-import { initialState, notificationActions, } from '@pericles/store';
+import { NotificationActionTypes, initialState, } from '@pericles/store';
 
-const { notification, } = notificationActions;
 const { notification: defaultValues, } = initialState;
 
 export default handleActions(
   {
-    [notification.error]: (state, { payload, }) => ({
+    [NotificationActionTypes.ERROR]: (state, { payload, }) => ({
       type: 'error',
       ...payload,
     }),
-    [notification.info]: (state, { payload, }) => ({
+    [NotificationActionTypes.INFO]: (state, { payload, }) => ({
       type: 'info',
       ...payload,
     }),
-    [notification.success]: (state, { payload, }) => ({
+    [NotificationActionTypes.SUCCESS]: (state, { payload, }) => ({
       type: 'success',
       ...payload,
     }),
-    [notification.warning]: (state, { payload, }) => ({
+    [NotificationActionTypes.WARNING]: (state, { payload, }) => ({
       type: 'warning',
       ...payload,
     }),
-    [notification.clear]: () => ({
+    [NotificationActionTypes.CLEAR]: () => ({
       ...defaultValues,
     }),
   },
