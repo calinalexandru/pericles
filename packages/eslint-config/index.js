@@ -1,7 +1,8 @@
 module.exports = {
   extends: [
-    'plugin:@typescript-eslint/recommended',
     'airbnb',
+    'airbnb-typescript',
+    'plugin:@typescript-eslint/recommended',
     // 'plugin:prettier/recommended',
     'prettier',
     'plugin:security/recommended',
@@ -111,16 +112,16 @@ module.exports = {
       },
     ],
 
-    'import/extensions': [
-      'error',
-      'ignorePackages',
-      {
-        js: 'never',
-        jsx: 'never',
-        ts: 'never',
-        tsx: 'never',
-      },
-    ],
+    // 'import/extensions': [
+    //   'error',
+    //   'ignorePackages',
+    //   {
+    //     js: 'never',
+    //     jsx: 'never',
+    //     ts: 'never',
+    //     tsx: 'never',
+    //   },
+    // ],
 
     // requires parens around arguments in all cases (arrow functions)
     'arrow-parens': ['error', 'always'],
@@ -226,6 +227,10 @@ module.exports = {
     // force indentation to 2 spaces to jsx
     'react/jsx-indent': ['error', 2],
 
+    'no-use-before-define': 'off',
+
+    '@typescript-eslint/no-use-before-define': ['error'],
+
     // force indentation to 2 spaces to props
     'react/jsx-indent-props': ['error', 2],
 
@@ -286,7 +291,7 @@ module.exports = {
     ],
 
     // enable jsx in both .js and .jsx files
-    'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
+    'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx', '.ts', '.tsx'] }],
 
     // react hooks errors
     'react-hooks/rules-of-hooks': 'error',
