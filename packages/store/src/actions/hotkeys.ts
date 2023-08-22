@@ -6,11 +6,9 @@ export enum HotkeysActionTypes {
   SET = 'HOTKEYS/SET',
   DEFAULT = 'HOTKEYS/DEFAULT',
 }
-  
+
 export const setHotkeys = createAction<Partial<HotkeysState>>(
   HotkeysActionTypes.SET
 );
 
-export const defaultHotkeys = createAction(
-  HotkeysActionTypes.DEFAULT
-);
+export const defaultHotkeys = createAction(HotkeysActionTypes.DEFAULT);

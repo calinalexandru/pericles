@@ -6,7 +6,6 @@ import Speech from '@/speech';
 import { ERROR_CODES, PLAYER_STATUS, } from '@pericles/constants';
 import {
   store,
-  appActions,
   parserEndSelector,
   parserIframesSelector,
   parserKeySelector,
@@ -15,6 +14,9 @@ import {
   playerStatusSelector,
   playerTabSelector,
   parserWordsUpdate,
+  highlightSection,
+  autoscrollSet,
+  highlightWord,
 } from '@pericles/store';
 import {
   findAvailableIframe,
@@ -23,7 +25,6 @@ import {
 } from '@pericles/util';
 
 const { player, } = playerActions;
-const { highlight, autoscroll, } = appActions;
 
 export default () => {
   console.log('initialize speech');
@@ -63,7 +64,7 @@ export default () => {
             })
           );
           mpToContent(
-            [ highlight.section(), autoscroll.set({ section: playerKey, }), ],
+            [ highlightSection(), autoscrollSet({ section: playerKey, }), ],
             playingTab
           );
           break;
@@ -99,7 +100,7 @@ export default () => {
           break;
         case 'onBoundary':
           console.log('onBoundary', charIndex, charLength);
-          mpToContent(highlight.word({ charIndex, charLength, }), playingTab);
+          mpToContent(highlightWord({ charIndex, charLength, }), playingTab);
           break;
         case 'onWordsUpdate':
           console.log('onWordsUpdate', wordList);

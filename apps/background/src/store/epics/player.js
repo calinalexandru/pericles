@@ -19,11 +19,13 @@ import {
 import Speech from '@/speech';
 import { ATTRIBUTES, PARSER_TYPES, VARIABLES, } from '@pericles/constants';
 import {
-  PageTypes,
-  appActions,
+  PageActionTypes,
   appActiveTabSelector,
   appSelectedTextSelector,
   appSkipDeadSectionsSelector,
+  autoscrollClear,
+  highlightClearWords,
+  highlightSection,
   nextPage,
   notificationWarning,
   pageMove,
@@ -39,6 +41,9 @@ import {
   playerTabSelector,
   prevPage,
   resetParser,
+  routeError,
+  routeIndex,
+  routeSkip,
   setParser,
 } from '@pericles/store';
 import {
@@ -59,7 +64,6 @@ import {
 // let junk;
 
 const { player, sections, } = playerActions;
-const { autoscroll, route, highlight, } = appActions;
 
 const playOrRequest = (state, payload, actions) => {
   console.log('play.epic', state, payload);
@@ -155,7 +159,7 @@ const healthCheckEpic = (action) =>
         catchError(() => of('timeout'))
       )
     ),
-    map((result) => (result === 'timeout' ? route.error() : player.wank()))
+    map((result) => (result === 'timeout' ? routeError() : player.wank()))
   );
 
 const proxyPlayEpic = (action, state) =>
@@ -210,7 +214,7 @@ const timeoutEpic = (action) =>
     tap(() => {
       console.log('player has timed out');
     }),
-    map(() => route.skip())
+    map(routeSkip)
   );
 
 const pauseEpic = (action) =>
@@ -305,7 +309,7 @@ const stopEpic = (action, state) =>
       Speech.stop();
       const playerTab = playerTabSelector(state.value);
       mpToContent(
-        [ resetParser({ revertHtml: true, }), autoscroll.clear(), ],
+        [ resetParser({ revertHtml: true, }), autoscrollClear(), ],
         playerTab
       );
     }),
@@ -328,20 +332,6 @@ const softHaltEpic = (action) =>
       Speech.stop();
     }),
     ignoreElements()
-  );
-
-const overloadEpic = (action) =>
-  action.pipe(
-    ofType(player.overload),
-    concatMap(() =>
-      of(
-        notificationWarning({
-          text: 'Overload! Player will enable again shortly',
-        }),
-        route.cooldown(),
-        player.chill()
-      )
-    )
   );
 
 const chillEpic = (action) =>
@@ -373,7 +363,7 @@ const nextEpic = (action, state) =>
     tap((payload) => {
       console.log('player.next', payload);
       mpToContent(
-        [ highlight.clearWords(), highlight.section(), ],
+        [ highlightClearWords(), highlightSection(), ],
         playerTabSelector(state.value)
       );
     }),
@@ -403,7 +393,9 @@ const nextMoveEpic = (action, state) =>
       console.log('nextMoveEpic', payload);
       mpToContent(nextPage(), playerTabSelector(state.value));
     }),
-    switchMap(() => action.pipe(ofType(PageTypes.MOVE_COMPLETE), first())),
+    switchMap(() =>
+      action.pipe(ofType(PageActionTypes.MOVE_COMPLETE), first())
+    ),
     delay(500),
     tap(() => {
       mpToContent(
@@ -431,7 +423,9 @@ const prevMoveEpic = (action, state) =>
       console.log('prevMoveEpic', payload);
       mpToContent(prevPage(), playerTabSelector(state.value));
     }),
-    switchMap(() => action.pipe(ofType(PageTypes.MOVE_COMPLETE), first())),
+    switchMap(() =>
+      action.pipe(ofType(PageActionTypes.MOVE_COMPLETE), first())
+    ),
     delay(500),
     tap(() => {
       mpToContent(
@@ -500,7 +494,9 @@ const endEpic = (action, state) =>
         playerTabSelector(state.value)
       );
     }),
-    switchMap(() => action.pipe(ofType(PageTypes.MOVE_COMPLETE), first())),
+    switchMap(() =>
+      action.pipe(ofType(PageActionTypes.MOVE_COMPLETE), first())
+    ),
     delay(500),
     concatMap(() => of(player.play()))
   );
@@ -557,7 +553,7 @@ const prevEpic = (action, state) =>
     tap(() => {
       console.log('player.prev');
       mpToContent(
-        [ highlight.clearWords(), highlight.section(), ],
+        [ highlightClearWords(), highlightSection(), ],
         playerTabSelector(state.value)
       );
     }),
@@ -583,8 +579,8 @@ const crashEpic = (action, state) =>
     pluck('payload', 'message'),
     concatMap((text) =>
       appSkipDeadSectionsSelector(state.value)
-        ? of(route.index(), player.next())
-        : of(notificationWarning({ text, }), route.skip())
+        ? of(routeIndex(), player.next())
+        : of(notificationWarning({ text, }), routeSkip())
     )
   );
 
@@ -609,7 +605,6 @@ export default combineEpics(
   nextEpicThrottled,
   prevEpic,
   prevEpicThrottled,
-  overloadEpic,
   chillEpic,
   crashEpic,
   haltEpic,

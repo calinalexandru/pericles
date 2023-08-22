@@ -15,9 +15,8 @@ import React from 'react';
 import { connect, } from 'react-redux';
 
 import { ATTRIBUTES, } from '@pericles/constants';
-import { appActions, playerActions, } from '@pericles/store';
+import { playerActions, routeIndex, } from '@pericles/store';
 
-const { route, } = appActions;
 const { player, } = playerActions;
 const useStyles = makeStyles(() => ({
   paper: {
@@ -104,7 +103,7 @@ const mapDispatchToProps = (dispatch) => ({
   onErrorClose: () => {
     dispatch(player.set({ buffering: false, }));
     dispatch(player.stop());
-    dispatch(route.index());
+    dispatch(routeIndex());
   },
 });
 

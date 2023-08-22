@@ -15,7 +15,9 @@ import {
   WORD_TRACKER_STYLES,
 } from '@pericles/constants';
 import {
-  appActions,
+  AppActionTypes,
+  AutoscrollActionTypes,
+  HighlightActionTypes,
   appAutoscrollSelector,
   appHighlightColorSelector,
   appHighlightStyleSelector,
@@ -23,6 +25,10 @@ import {
   appWordTrackerColorSelector,
   appWordTrackerSelector,
   appWordTrackerStyleSelector,
+  highlightClearSectionsComplete,
+  highlightClearWordsComplete,
+  highlightReloadSettings,
+  highlightSectionComplete,
   parserTypeSelector,
   playerKeySelector,
   playerSectionsSelector,
@@ -37,23 +43,21 @@ import {
   setWordBackground,
 } from '@pericles/util';
 
-const { highlight, autoscroll, app, } = appActions;
-
 const appNewContentEpic = (action) =>
   action.pipe(
-    ofType(app.newContent),
+    ofType(AppActionTypes.NEW_CONTENT),
     pluck('payload'),
     filter((payload = {}) => {
       console.log('appnewContentEpic', payload);
 
       return !payload.iframe;
     }),
-    map(() => highlight.reloadSettings())
+    map(highlightReloadSettings)
   );
 
 const appReloadTabEpic = (action) =>
   action.pipe(
-    ofType(app.reloadTab),
+    ofType(AppActionTypes.RELOAD_TAB),
     tap(() => {
       console.log('appReloadTabEpic');
       window.location.reload();
@@ -63,7 +67,7 @@ const appReloadTabEpic = (action) =>
 
 const highlightSectionEpic = (action$, state) =>
   action$.pipe(
-    ofType(highlight.section),
+    ofType(HighlightActionTypes.SECTION),
     tap(() => {
       console.log(
         'highlightSectionEpic.init',
@@ -91,12 +95,12 @@ const highlightSectionEpic = (action$, state) =>
         addClassToElements(activeSections, highlightStyle);
       }
     }),
-    map(() => highlight.sectionComplete())
+    map(highlightSectionComplete)
   );
 
 const highlightWordEpic = (action$, state) =>
   action$.pipe(
-    ofType(highlight.word),
+    ofType(HighlightActionTypes.WORD),
     filter(() => appWordTrackerSelector(state.value) === true),
     pluck('payload'),
     tap((data) => {
@@ -147,7 +151,7 @@ const highlightWordEpic = (action$, state) =>
 
 const autoscrollRunEpic = (action$, state) =>
   action$.pipe(
-    ofType(autoscroll.set),
+    ofType(AutoscrollActionTypes.SET),
     debounceTime(500),
     pluck('payload', 'section'),
     tap((section) => {
@@ -162,7 +166,7 @@ const autoscrollRunEpic = (action$, state) =>
 
 const autoscrollClearEpic = (action$) =>
   action$.pipe(
-    ofType(autoscroll.clear),
+    ofType(AutoscrollActionTypes.CLEAR),
     tap(() => {
       Autoscroll.clear();
     }),
@@ -171,7 +175,7 @@ const autoscrollClearEpic = (action$) =>
 
 const highlightReloadSettingsEpic = (action, state) =>
   action.pipe(
-    ofType(highlight.reloadSettings),
+    ofType(HighlightActionTypes.RELOAD_SETTINGS),
     tap(() => {
       console.log('highlight.reloadSettings epic', state.value);
       setWordBackground(appWordTrackerColorSelector(state.value));
@@ -180,37 +184,25 @@ const highlightReloadSettingsEpic = (action, state) =>
     ignoreElements()
   );
 
-const highlightClearAllEpic = (action, state) =>
-  action.pipe(
-    ofType(highlight.clearAll),
-    tap(() => {
-      // console.log('highlight.clearAll');
-      removeClassFromAll(appWordTrackerStyleSelector(state.value));
-      removeClassFromAll(ATTRIBUTES.ATTRS.PREV_WORD_TRACK_STYLE_FADE);
-      removeClassFromAll(appHighlightStyleSelector(state.value));
-    }),
-    map(() => highlight.clearAllComplete())
-  );
-
 const highlightClearWordsEpic = (action, state) =>
   action.pipe(
-    ofType(highlight.clearWords),
+    ofType(HighlightActionTypes.CLEAR_WORDS),
     tap(() => {
       // console.log('highlight.clearWords');
       removeClassFromAll(appWordTrackerStyleSelector(state.value));
       removeClassFromAll(ATTRIBUTES.ATTRS.PREV_WORD_TRACK_STYLE_FADE);
     }),
-    map(() => highlight.clearWordsComplete())
+    map(highlightClearWordsComplete)
   );
 
 const highlightClearSectionsEpic = (action, state) =>
   action.pipe(
-    ofType(highlight.clearSections),
+    ofType(HighlightActionTypes.CLEAR_SECTIONS),
     tap(() => {
       // console.log('highlight.clearSections');
       removeClassFromAll(appHighlightStyleSelector(state.value));
     }),
-    map(() => highlight.clearSectionsComplete())
+    map(highlightClearSectionsComplete)
   );
 
 export default combineEpics(
@@ -221,7 +213,6 @@ export default combineEpics(
   autoscrollRunEpic,
   autoscrollClearEpic,
   highlightReloadSettingsEpic,
-  highlightClearAllEpic,
   highlightClearWordsEpic,
   highlightClearSectionsEpic
 );

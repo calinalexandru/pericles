@@ -2,7 +2,7 @@ import { createAction, } from 'redux-actions';
 
 import { ParserState, } from '../initialState';
 
-export enum ParserTypes {
+export enum ParserActionTypes {
   SET = 'PARSER/SET',
   RESET = 'PARSER/RESET',
   RESET_COMPLETE = 'PARSER/RESET_COMPLETE',
@@ -11,7 +11,7 @@ export enum ParserTypes {
   IDLE = 'PARSER/IDLE',
 }
 
-export enum PageTypes {
+export enum PageActionTypes {
   SET = 'PAGE/SET',
   NEXT = 'PAGE/NEXT',
   PREV = 'PAGE/PREV',
@@ -20,23 +20,35 @@ export enum PageTypes {
   AUTOSET = 'PAGE/AUTOSET',
 }
 
-export const setPage = createAction<Partial<ParserState>>(PageTypes.SET);
-export const nextPage = createAction<Partial<ParserState>>(PageTypes.NEXT);
-export const prevPage = createAction<Partial<ParserState>>(PageTypes.PREV);
-export const pageMove = createAction<Partial<ParserState>>(PageTypes.MOVE);
-export const pageMoveComplete = createAction(PageTypes.MOVE_COMPLETE);
-export const pageAutoset = createAction(PageTypes.AUTOSET);
+export const setPage = createAction<Partial<ParserState>>(PageActionTypes.SET);
+export const nextPage = createAction<Partial<ParserState>>(
+  PageActionTypes.NEXT
+);
+export const prevPage = createAction<Partial<ParserState>>(
+  PageActionTypes.PREV
+);
+export const pageMove = createAction<Partial<ParserState>>(
+  PageActionTypes.MOVE
+);
+export const pageMoveComplete = createAction(PageActionTypes.MOVE_COMPLETE);
+export const pageAutoset = createAction(PageActionTypes.AUTOSET);
 
-export const setParser = createAction<Partial<ParserState>>(ParserTypes.SET);
-
-export const resetParser = createAction<any>(ParserTypes.RESET);
-
-export const parserResetComplete = createAction(ParserTypes.RESET_COMPLETE);
-
-export const parserWordsUpdate = createAction<any>(ParserTypes.WORDS_UPDATE);
-
-export const parserWordsUpdateWorker = createAction<any>(
-  ParserTypes.WORDS_UPDATE_WORKER
+export const setParser = createAction<Partial<ParserState>>(
+  ParserActionTypes.SET
 );
 
-export const parserIdle = createAction(ParserTypes.IDLE);
+export const resetParser = createAction<any>(ParserActionTypes.RESET);
+
+export const parserResetComplete = createAction(
+  ParserActionTypes.RESET_COMPLETE
+);
+
+export const parserWordsUpdate = createAction<any>(
+  ParserActionTypes.WORDS_UPDATE
+);
+
+export const parserWordsUpdateWorker = createAction<any>(
+  ParserActionTypes.WORDS_UPDATE_WORKER
+);
+
+export const parserIdle = createAction(ParserActionTypes.IDLE);

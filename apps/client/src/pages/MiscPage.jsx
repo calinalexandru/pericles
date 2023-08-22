@@ -28,13 +28,13 @@ import {
   ISO_LANGS,
 } from '@pericles/constants';
 import {
-  appActions,
+  appFactoryReset,
   appLanguageSelector,
+  appReload,
   appThemeModeSelector,
+  setApp,
 } from '@pericles/store';
 import { getIsoLangFromString, } from '@pericles/util';
-
-const { app, } = appActions;
 
 function MiscPage({
   onOtherSettingsChanged,
@@ -242,10 +242,10 @@ const mapStateToProps = applySpec({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  onOtherSettingsChanged: (key, val) => dispatch(app.set({ [key]: val, })),
-  onReloadApp: () => dispatch(app.reload()),
-  onFactoryReset: () => dispatch(app.factoryReset()),
-  setThemeMode: (themeMode) => dispatch(app.set({ themeMode, })),
+  onOtherSettingsChanged: (key, val) => dispatch(setApp({ [key]: val, })),
+  onReloadApp: () => dispatch(appReload()),
+  onFactoryReset: () => dispatch(appFactoryReset()),
+  setThemeMode: (themeMode) => dispatch(setApp({ themeMode, })),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(MiscPage);

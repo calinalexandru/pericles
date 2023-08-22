@@ -4,7 +4,7 @@ import thunk from 'redux-thunk';
 import { applyMiddleware, } from 'webext-redux';
 
 import { DEFAULT_VALUES, MESSAGES, } from '@pericles/constants';
-import { appActions, store, } from '@pericles/store';
+import { appNewContent, store, } from '@pericles/store';
 import { getBrowserAPI, } from '@pericles/util';
 
 import appEpic from '../store/epics/app';
@@ -14,8 +14,6 @@ import api from './api';
 import controller from './controller';
 import hotkeys from './hotkeys';
 import { InlinePlayer, } from './InlinePlayer';
-
-const { app, } = appActions;
 
 let initialized = false;
 export default () => {
@@ -41,7 +39,7 @@ export default () => {
       hotkeys();
     }
     setTimeout(async () => {
-      store.dispatch(app.newContent({ iframe: window !== window.top, }));
+      store.dispatch(appNewContent({ iframe: window !== window.top, }));
     }, 50);
 
     console.log('content.store', store);

@@ -62,7 +62,7 @@ export * from './actions/notification';
 export { default as playerActions, } from './actions/player';
 export * from './actions/parser';
 export * from './actions/settings';
-export { default as appActions, } from './actions/app';
+export * from './actions/app';
 export * from './actions/hotkeys';
 export * from './initialState';
 

@@ -8,7 +8,11 @@ import {
   tap,
 } from 'rxjs/operators';
 
-import { appActions, playerActions, playerTabSelector, } from '@pericles/store';
+import {
+  AppActionTypes,
+  playerActions,
+  playerTabSelector,
+} from '@pericles/store';
 
 import {
   handleAppInit,
@@ -18,18 +22,17 @@ import {
 } from './handlers';
 
 const { player, } = playerActions;
-const { app, } = appActions;
 
 const appInitEpic = (action, state) =>
   action.pipe(
-    ofType(app.init),
+    ofType(AppActionTypes.INIT),
     tap(() => handleAppInit(state.value)),
     ignoreElements()
   );
 
 const tabClosedEpic = (action, state) =>
   action.pipe(
-    ofType(app.tabClosed),
+    ofType(AppActionTypes.TAB_CLOSED),
     pluck('payload'),
     filter((tab) => tab === playerTabSelector(state.value)),
     map(player.halt)
@@ -37,7 +40,7 @@ const tabClosedEpic = (action, state) =>
 
 const appSetEpic = (action, state) =>
   action.pipe(
-    ofType(app.set, app.default),
+    ofType(AppActionTypes.SET, AppActionTypes.DEFAULT),
     pluck('payload'),
     tap((payload) => {
       handleAppSet(state.value, payload);
@@ -47,12 +50,16 @@ const appSetEpic = (action, state) =>
 
 const appFactoryResetEpic = (action, state) =>
   action.pipe(
-    ofType(app.factoryReset),
+    ofType(AppActionTypes.FACTORY_RESET),
     concatMap(() => handleFactoryReset$(state.value))
   );
 
 const appReloadEpic = (action) =>
-  action.pipe(ofType(app.reload), tap(handleAppReload), ignoreElements());
+  action.pipe(
+    ofType(AppActionTypes.RELOAD),
+    tap(handleAppReload),
+    ignoreElements()
+  );
 
 export default combineEpics(
   tabClosedEpic,

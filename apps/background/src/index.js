@@ -5,7 +5,7 @@ import { wrapStore, } from 'webext-redux';
 
 import core from '@/core';
 import { WEBEXT_PORT, } from '@pericles/constants';
-import { appActions, initialState, store, } from '@pericles/store';
+import { initialState, setApp, store, } from '@pericles/store';
 import { getBrowserAPI, } from '@pericles/util';
 
 import appEpic from './store/epics/app';
@@ -23,8 +23,6 @@ import settingsReducer from './store/reducers/settings';
 // and this will be reset to false, as expected, whenever
 // the service worker wakes up from idle.
 let isInitialized = false;
-
-const { app, } = appActions;
 
 const init = (preloadedState) => {
   console.log('preloadedState', preloadedState);
@@ -62,7 +60,7 @@ const init = (preloadedState) => {
 
       // Dispatch the tab ID to your state here
       console.log('dispatch tabId', activeTabId);
-      store.dispatch(app.set({ activeTab: activeTabId, }));
+      store.dispatch(setApp({ activeTab: activeTabId, }));
     }
   );
 };

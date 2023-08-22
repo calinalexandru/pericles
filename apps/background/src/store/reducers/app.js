@@ -1,33 +1,27 @@
 import { handleActions, } from 'redux-actions';
 
-import { ROUTES, VARIABLES, } from '@pericles/constants';
-import { appActions, initialState, } from '@pericles/store';
+import { ROUTES, } from '@pericles/constants';
+import {
+  AppActionTypes,
+  RouteActionTypes,
+  initialState,
+} from '@pericles/store';
 
-const { app, route, } = appActions;
 const { app: defaultValues, } = initialState;
 
 export default handleActions(
   {
-    [app.set]: (state, { payload, }) => ({
+    [AppActionTypes.SET]: (state, { payload, }) => ({
       ...state,
       ...payload,
     }),
-    [app.reset]: (state) => ({
+    [RouteActionTypes.INDEX]: (state) => ({ ...state, route: ROUTES.INDEX, }),
+    [RouteActionTypes.ERROR]: (state) => ({ ...state, route: ROUTES.ERROR, }),
+    [RouteActionTypes.ERROR_PDF]: (state) => ({
       ...state,
-      ...defaultValues,
+      route: ROUTES.ERROR_PDF,
     }),
-    [app.selectText]: (state, { payload, }) => ({
-      ...state,
-      [VARIABLES.APP.SELECTED_TEXT]: payload,
-    }),
-
-    [route.index]: (state) => ({ ...state, route: ROUTES.INDEX, }),
-    [route.user]: (state) => ({ ...state, route: ROUTES.USER, }),
-    [route.login]: (state) => ({ ...state, route: ROUTES.LOGIN, }),
-    [route.error]: (state) => ({ ...state, route: ROUTES.ERROR, }),
-    [route.errorPdf]: (state) => ({ ...state, route: ROUTES.ERROR_PDF, }),
-    [route.cooldown]: (state) => ({ ...state, route: ROUTES.COOLDOWN, }),
-    [route.skip]: (state) => ({ ...state, route: ROUTES.SKIP, }),
+    [RouteActionTypes.SKIP]: (state) => ({ ...state, route: ROUTES.SKIP, }),
   },
   defaultValues
 );

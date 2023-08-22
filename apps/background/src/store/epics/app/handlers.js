@@ -5,10 +5,12 @@ import { of, } from 'rxjs';
 import Speech from '@/speech';
 import { MESSAGES, VARIABLES, } from '@pericles/constants';
 import {
-  appActions,
+  appReload,
+  highlightReloadSettings,
   initialState,
   notificationInfo,
   playerActions,
+  setApp,
   setHotkeys,
   setSettings,
   settingsPitchSelector,
@@ -19,8 +21,6 @@ import {
 } from '@pericles/store';
 import { getBrowserAPI, getEnglishVoiceKey, mpToContent, } from '@pericles/util';
 
-const { highlight, } = appActions;
-const { app, } = appActions;
 const { player, } = playerActions;
 
 export function handleAppInit(state) {
@@ -45,7 +45,7 @@ export function handleAppSet(state, payload = {}) {
   );
   if (!isEmpty(highlightSettings)) {
     console.log('app.set -> highlight.reloadSettings');
-    mpToContent(highlight.reloadSettings());
+    mpToContent(highlightReloadSettings());
   }
 
   if (!isEmpty(pick([ VARIABLES.APP.SERVICE_REGION, ], payload))) {
@@ -66,7 +66,7 @@ export const handleFactoryReset$ = (state) => {
   } = initialState;
   console.log('appFactoryResetEpic');
   return of(
-    app.set(appDefaultValues),
+    setApp(appDefaultValues),
     player.set(playerDefaultValues),
     setSettings({
       ...settingsDefaultValues,
@@ -74,7 +74,7 @@ export const handleFactoryReset$ = (state) => {
     }),
     setHotkeys(hotkeysDefaultValues),
     notificationInfo({ text: 'Your setting have been reset.', }),
-    app.reload()
+    appReload()
   );
 };
 

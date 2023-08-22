@@ -5,13 +5,12 @@ import { tap, ignoreElements, map, } from 'rxjs/operators';
 import { ATTRIBUTES, PLAYER_STATUS, VARIABLES, } from '@pericles/constants';
 import {
   store,
-  appActions,
   parserTypeSelector,
   playerActions,
+  setApp,
 } from '@pericles/store';
 import { isGoogleBook, } from '@pericles/util';
 
-const { app, } = appActions;
 const { player, } = playerActions;
 
 export default () => {
@@ -19,11 +18,11 @@ export default () => {
     tap((e) => {
       const textSelected = window.getSelection().toString();
       store.dispatch(
-        app.set({
+        setApp({
           [VARIABLES.APP.SELECTED_TEXT]: textSelected,
         })
       );
-      store.dispatch(app.set({ skipUntilY: e.pageY, }));
+      store.dispatch(setApp({ skipUntilY: e.pageY, }));
     }),
     ignoreElements()
   );

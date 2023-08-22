@@ -17,9 +17,8 @@ import DomStrategy from '@/strategy/domStrategy';
 import mutationCheck from '@/util/mutationCheck';
 import { ATTRIBUTES, PARSER_TYPES, PLAYER_STATUS, } from '@pericles/constants';
 import {
-  PageTypes,
-  ParserTypes,
-  appActions,
+  PageActionTypes,
+  ParserActionTypes,
   appSkipUntilYSelector,
   notificationError,
   pageMoveComplete,
@@ -33,6 +32,7 @@ import {
   playerActions,
   playerKeySelector,
   playerSectionsSelector,
+  routeErrorPdf,
   setParser,
   settingsNeuralVoicesSelector,
   settingsVoiceSelector,
@@ -62,7 +62,6 @@ import {
 } from '@pericles/util';
 
 const { sections, player, } = playerActions;
-const { route, } = appActions;
 
 const mergedLanguages = [ 'ja', 'cn', 'ko', ];
 
@@ -195,7 +194,7 @@ export const getSectionsAndPlayEpic = (action, state) =>
           return [
             player.set({ status: PLAYER_STATUS.ERROR, }),
             sections.requestAndPlayComplete(),
-            route.errorPdf(),
+            routeErrorPdf(),
           ];
         }
         if (skip) {
@@ -265,7 +264,7 @@ export const getSectionsAndPlayEpic = (action, state) =>
 
 export const pageMoveEpic = (action, state) =>
   action.pipe(
-    ofType(PageTypes.MOVE),
+    ofType(PageActionTypes.MOVE),
     pluck('payload'),
     tap(async (payload) => {
       console.log('pageMoveEpic', payload);
@@ -286,7 +285,7 @@ export const pageMoveEpic = (action, state) =>
 
 export const pageNextEpic = (action, state) =>
   action.pipe(
-    ofType(PageTypes.NEXT),
+    ofType(PageActionTypes.NEXT),
     pluck('payload'),
     filter(
       (payload = {}) =>
@@ -311,7 +310,7 @@ export const pageNextEpic = (action, state) =>
 
 export const pagePrevEpic = (action, state) =>
   action.pipe(
-    ofType(PageTypes.PREV),
+    ofType(PageActionTypes.PREV),
     pluck('payload'),
     filter(
       (payload = {}) =>
@@ -336,7 +335,7 @@ export const pagePrevEpic = (action, state) =>
 
 export const pageAutosetEpic = (action) =>
   action.pipe(
-    ofType(PageTypes.AUTOSET),
+    ofType(PageActionTypes.AUTOSET),
     pluck('payload'),
     filter((payload) => !payload.iframe),
     map(() => {
@@ -349,7 +348,7 @@ export const pageAutosetEpic = (action) =>
 
 export const wordsUpdateEpic = (action, state) =>
   action.pipe(
-    ofType(ParserTypes.WORDS_UPDATE),
+    ofType(ParserActionTypes.WORDS_UPDATE),
     pluck('payload', 'wordList'),
     map((wordList) => {
       console.log('wordsUpdateEpic');
@@ -364,7 +363,7 @@ export const wordsUpdateEpic = (action, state) =>
 
 export const wordsUpdateWorkerEpic = (action) =>
   action.pipe(
-    ofType(ParserTypes.WORDS_UPDATE_WORKER),
+    ofType(ParserActionTypes.WORDS_UPDATE_WORKER),
     pluck('payload'),
     map(({ sections: sectionsArr, wordList, wordIndex = 0, }) => {
       const [ { childNodes: [ node = false, ] = [], } = {}, ] = sectionsArr;
@@ -390,7 +389,7 @@ export const wordsUpdateWorkerEpic = (action) =>
 
 export const clearHelperTagsEpic = (action) =>
   action.pipe(
-    ofType(ParserTypes.RESET),
+    ofType(ParserActionTypes.RESET),
     pluck('payload', 'revertHtml'),
     filter((revertHtml) => revertHtml === true),
     tap(removeAllHelperTags),
