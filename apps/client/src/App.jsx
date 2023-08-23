@@ -22,17 +22,18 @@ import {
   appThemeModeSelector,
   appLanguageSelector,
   appRouteSelector,
-  playerActions,
   hotkeysSelector,
   hotkeysDisableSelector,
   notificationClear,
+  playerToggle as actionPlayerToggle,
+  playerSoftNext,
+  playerSoftPrev,
+  playerStop as actionPlayerStop,
 } from '@pericles/store';
 
 import routes from './routes';
 import { paletteDark, paletteLight, } from './theme';
 import './App.css';
-
-const { player, } = playerActions;
 
 function App({
   appRoute,
@@ -201,10 +202,10 @@ const mapStateToProps = applySpec({
 
 const mapDispatchToProps = (dispatch) => ({
   onClearNotification: () => dispatch(notificationClear()),
-  playerToggle: () => dispatch(player.toggle()),
-  playerNext: () => dispatch(player.softNext()),
-  playerPrev: () => dispatch(player.softPrev()),
-  playerStop: () => dispatch(player.stop()),
+  playerToggle: () => dispatch(actionPlayerToggle()),
+  playerNext: () => dispatch(playerSoftNext()),
+  playerPrev: () => dispatch(playerSoftPrev()),
+  playerStop: () => dispatch(actionPlayerStop()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(memo(App));

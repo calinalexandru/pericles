@@ -18,12 +18,11 @@ import { connect, } from 'react-redux';
 import { VARIABLES, } from '@pericles/constants';
 import {
   appSkipDeadSectionsSelector,
-  playerActions,
+  playerNext,
+  playerStop,
   routeIndex,
   setApp,
 } from '@pericles/store';
-
-const { player, } = playerActions;
 
 const colorLoop = keyframes`
 0%, 100% {
@@ -115,12 +114,12 @@ SkipPage.defaultProps = {
 
 const continuePlaying = () => (dispatch) => {
   dispatch(routeIndex());
-  dispatch(player.next());
+  dispatch(playerNext());
 };
 
 const stopPlaying = () => (dispatch) => {
   dispatch(routeIndex());
-  dispatch(player.stop());
+  dispatch(playerStop());
 };
 
 const mapStateToProps = applySpec({

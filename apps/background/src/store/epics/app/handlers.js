@@ -9,9 +9,9 @@ import {
   highlightReloadSettings,
   initialState,
   notificationInfo,
-  playerActions,
   setApp,
   setHotkeys,
+  setPlayer,
   setSettings,
   settingsPitchSelector,
   settingsRateSelector,
@@ -20,8 +20,6 @@ import {
   settingsVolumeSelector,
 } from '@pericles/store';
 import { getBrowserAPI, getEnglishVoiceKey, mpToContent, } from '@pericles/util';
-
-const { player, } = playerActions;
 
 export function handleAppInit(state) {
   console.log('app.init');
@@ -67,7 +65,7 @@ export const handleFactoryReset$ = (state) => {
   console.log('appFactoryResetEpic');
   return of(
     setApp(appDefaultValues),
-    player.set(playerDefaultValues),
+    setPlayer(playerDefaultValues),
     setSettings({
       ...settingsDefaultValues,
       voice: getEnglishVoiceKey(settingsVoicesSelector(state)),

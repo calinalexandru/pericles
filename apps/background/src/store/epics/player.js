@@ -20,6 +20,7 @@ import Speech from '@/speech';
 import { ATTRIBUTES, PARSER_TYPES, VARIABLES, } from '@pericles/constants';
 import {
   PageActionTypes,
+  PlayerActionTypes,
   appActiveTabSelector,
   appSelectedTextSelector,
   appSkipDeadSectionsSelector,
@@ -34,17 +35,34 @@ import {
   parserMaxPageSelector,
   parserPageSelector,
   parserTypeSelector,
-  playerActions,
+  playerCrash,
+  playerHealthCheck,
+  playerIdle,
   playerKeySelector,
+  playerNext,
+  playerNextAuto,
+  playerNextMove,
+  playerNextSlow,
+  playerPause,
+  playerPlay,
+  playerPrev,
+  playerPrevMove,
+  playerPrevSlow,
+  playerReset,
+  playerResume,
   playerSectionsSelector,
   playerStatusSelector,
+  playerStop,
   playerTabSelector,
+  playerWait,
   prevPage,
   resetParser,
   routeError,
   routeIndex,
   routeSkip,
+  sectionsRequestAndPlay,
   setParser,
+  setPlayer,
 } from '@pericles/store';
 import {
   hasSectionsInAdvance,
@@ -57,13 +75,6 @@ import {
   isStopped,
   mpToContent,
 } from '@pericles/util';
-
-// TODO:: improve this line
-/* eslint-disable-next-line */
-// const junk = new Speech();
-// let junk;
-
-const { player, sections, } = playerActions;
 
 const playOrRequest = (state, payload, actions) => {
   console.log('play.epic', state, payload);
@@ -100,8 +111,8 @@ const playOrRequest = (state, payload, actions) => {
     mpToContent(
       [
         resetParser(),
-        player.reset({ tab: activeTab, }),
-        sections.requestAndPlay(payload),
+        playerReset({ tab: activeTab, }),
+        sectionsRequestAndPlay(payload),
       ],
       activeTab
     );
@@ -117,7 +128,7 @@ const playOrRequest = (state, payload, actions) => {
       playerKey
     );
 
-    mpToContent([ sections.requestAndPlay(payload), ], playingTab);
+    mpToContent([ sectionsRequestAndPlay(payload), ], playingTab);
   } else if (actions.length === 0) {
     Speech.stop();
     console.log(
@@ -138,7 +149,7 @@ const playOrRequest = (state, payload, actions) => {
       Speech.play(playerSections[playerKey].text, seek);
     } catch (e) {
       console.error('Player has crashed, rip', e);
-      return player.crash();
+      return playerCrash();
     }
   } else {
     console.log('Speech is switching to free, do nothing');
@@ -148,10 +159,10 @@ const playOrRequest = (state, payload, actions) => {
 
 const healthCheckEpic = (action) =>
   action.pipe(
-    ofType(player.healthCheck),
+    ofType(PlayerActionTypes.HEALTH_CHECK),
     switchMap(() =>
       action.pipe(
-        ofType(player.set, player.error),
+        ofType(PlayerActionTypes.SET, PlayerActionTypes.ERROR),
         first(),
         pluck('payload', VARIABLES.PLAYER.STATUS),
         filter((status) => isPlaying(status) || isError(status)),
@@ -159,22 +170,22 @@ const healthCheckEpic = (action) =>
         catchError(() => of('timeout'))
       )
     ),
-    map((result) => (result === 'timeout' ? routeError() : player.wank()))
+    map((result) => (result === 'timeout' ? routeError() : playerIdle()))
   );
 
 const proxyPlayEpic = (action, state) =>
   action.pipe(
-    ofType(player.proxyPlay),
+    ofType(PlayerActionTypes.PROXY_PLAY),
     tap(() => {
       console.log('player.proxyPlay', action, state);
     }),
     pluck('payload'),
-    map((payload) => player.play(payload))
+    map(playerPlay)
   );
 
 const playEpic = (action, state) =>
   action.pipe(
-    ofType(player.play),
+    ofType(PlayerActionTypes.PLAY),
     tap(() => {
       console.log('player.play', action, state);
     }),
@@ -187,7 +198,7 @@ const playEpic = (action, state) =>
 
       const out = [
         ...actions,
-        player.set({
+        setPlayer({
           buffering: true,
           // ...(appActiveTabSelector(state) !== -1 && {
           // tab: appActiveTabSelector(state),
@@ -195,12 +206,12 @@ const playEpic = (action, state) =>
           // tab: 1879991899,
         }),
       ];
-      if (userGenerated) out.push(player.healthCheck());
+      if (userGenerated) out.push(playerHealthCheck());
       console.log('checkAuth.out', out, actions);
       if (!actions.length) {
         const playOrRequestResponse = playOrRequest(state, payload, actions);
         if (playOrRequestResponse) out.push(playOrRequestResponse);
-        out.push(player.wank());
+        out.push(playerIdle());
         console.log('checkAuth.out.playOrReq', out);
       }
       return from(out);
@@ -210,7 +221,7 @@ const playEpic = (action, state) =>
 
 const timeoutEpic = (action) =>
   action.pipe(
-    ofType(player.timeout),
+    ofType(PlayerActionTypes.TIMEOUT),
     tap(() => {
       console.log('player has timed out');
     }),
@@ -219,7 +230,7 @@ const timeoutEpic = (action) =>
 
 const pauseEpic = (action) =>
   action.pipe(
-    ofType(player.pause),
+    ofType(PlayerActionTypes.PAUSE),
     tap(() => {
       // console.log('pauseEpic');
       Speech.pause();
@@ -227,62 +238,20 @@ const pauseEpic = (action) =>
     ignoreElements()
   );
 
-const seekEpic = (action) =>
-  action.pipe(
-    ofType(player.seek),
-    pluck('payload'),
-    tap((time) => {
-      console.log('seekEpic.time', time);
-      Speech.seek(Number(time || 0));
-    }),
-    ignoreElements()
-  );
-
 const toggleEpic = (action, state) =>
   action.pipe(
-    ofType(player.toggle),
+    ofType(PlayerActionTypes.TOGGLE),
     filter(() => !isStopped(playerStatusSelector(state.value))),
     map(() =>
       isPaused(playerStatusSelector(state.value))
-        ? player.resume()
-        : player.pause()
+        ? playerResume()
+        : playerPause()
     )
   );
 
-// const resumeEventEpic = (action, state) =>
-//   action.pipe(
-//     ofType(player.resumeEvent),
-//     filter(() => !isPlaying(playerStatusSelector(state.value))),
-//     switchMap(() =>
-//       action.pipe(
-//         ofType(player.set),
-//         pluck('payload'),
-//         filter((payload) => isPlaying(playerStatusSelector(payload))),
-//         timeout(3000),
-//         catchError(() => of({ timeout: true }))
-//       )
-//     ),
-//     tap((out) => {
-//       console.log('resumeEventEpic', out);
-//     }),
-//     concatMap((response = {}) =>
-//       of(response.timeout ? player.continue() : player.wank())
-//     )
-//   );
-
-// const continueEpic = (action) =>
-//   action.pipe(
-//     ofType(player.continue),
-//     tap(() => {
-//       console.log('player.continue');
-//       Speech.continue();
-//     }),
-//     ignoreElements()
-//   );
-
 const resumeEpic = (action, state) =>
   action.pipe(
-    ofType(player.resume),
+    ofType(PlayerActionTypes.RESUME),
     concatMap(() => {
       const playingTab = playerTabSelector(state.value);
       const activeTab = appActiveTabSelector(state.value);
@@ -290,20 +259,20 @@ const resumeEpic = (action, state) =>
       if (activeTab !== -1 && playingTab !== 0 && playingTab !== activeTab) {
         console.log('play.epic.switched tab');
         return of(
-          player.stop(),
+          playerStop(),
           notificationWarning({
             text: 'Player was active in another tab, press start again to begin',
           })
         );
       }
       Speech.resume();
-      return of(player.wank());
+      return of(playerIdle());
     })
   );
 
 const stopEpic = (action, state) =>
   action.pipe(
-    ofType(player.stop),
+    ofType(PlayerActionTypes.STOP),
     tap(() => {
       console.log('player.stop');
       Speech.stop();
@@ -318,7 +287,7 @@ const stopEpic = (action, state) =>
 
 const haltEpic = (action) =>
   action.pipe(
-    ofType(player.halt),
+    ofType(PlayerActionTypes.HALT),
     tap(() => {
       Speech.stop();
     }),
@@ -327,23 +296,16 @@ const haltEpic = (action) =>
 
 const softHaltEpic = (action) =>
   action.pipe(
-    ofType(player.softHalt),
+    ofType(PlayerActionTypes.SOFT_HALT),
     tap(() => {
       Speech.stop();
     }),
     ignoreElements()
   );
 
-const chillEpic = (action) =>
-  action.pipe(
-    ofType(player.chill),
-    delay(30000),
-    map(() => player.ready())
-  );
-
 const waitEpic = (action) =>
   action.pipe(
-    ofType(player.wait),
+    ofType(PlayerActionTypes.WAIT),
     tap(() => {
       // console.log('pauseEpic');
       Speech.pause();
@@ -353,7 +315,7 @@ const waitEpic = (action) =>
 
 const nextEpic = (action, state) =>
   action.pipe(
-    ofType(player.next),
+    ofType(PlayerActionTypes.NEXT),
     pluck('payload'),
     filter(
       (payload = {}) =>
@@ -368,27 +330,24 @@ const nextEpic = (action, state) =>
       );
     }),
     concatMap((payload = {}) =>
-      from([
-        player.wait(),
-        payload.auto ? player.nextAuto() : player.nextSlow(),
-      ])
+      from([ playerWait(), payload.auto ? playerNextAuto() : playerNextSlow(), ])
     )
   );
 
 const nextPageEpic = (action, state) =>
   action.pipe(
-    ofType(player.next),
+    ofType(PlayerActionTypes.NEXT),
     pluck('payload'),
     filter(
       (payload = {}) =>
         !payload.auto && isGoogleBook(parserTypeSelector(state.value))
     ),
-    concatMap(() => from([ player.stop(), player.nextMove(), ]))
+    concatMap(() => from([ playerStop(), playerNextMove(), ]))
   );
 
 const nextMoveEpic = (action, state) =>
   action.pipe(
-    ofType(player.nextMove),
+    ofType(PlayerActionTypes.NEXT_MOVE),
     tap((payload) => {
       console.log('nextMoveEpic', payload);
       mpToContent(nextPage(), playerTabSelector(state.value));
@@ -399,7 +358,7 @@ const nextMoveEpic = (action, state) =>
     delay(500),
     tap(() => {
       mpToContent(
-        sections.requestAndPlay({ userGenerated: true, }),
+        sectionsRequestAndPlay({ userGenerated: true, }),
         playerTabSelector(state.value)
       );
     })
@@ -407,18 +366,18 @@ const nextMoveEpic = (action, state) =>
 
 const prevPageEpic = (action, state) =>
   action.pipe(
-    ofType(player.prev),
+    ofType(PlayerActionTypes.PREV),
     pluck('payload'),
     filter(
       (payload = {}) =>
         !payload.auto && isGoogleBook(parserTypeSelector(state.value))
     ),
-    concatMap(() => from([ player.stop(), player.prevMove(), ]))
+    concatMap(() => from([ playerStop(), playerPrevMove(), ]))
   );
 
 const prevMoveEpic = (action, state) =>
   action.pipe(
-    ofType(player.prevMove),
+    ofType(PlayerActionTypes.PREV_MOVE),
     tap((payload) => {
       console.log('prevMoveEpic', payload);
       mpToContent(prevPage(), playerTabSelector(state.value));
@@ -429,7 +388,7 @@ const prevMoveEpic = (action, state) =>
     delay(500),
     tap(() => {
       mpToContent(
-        sections.requestAndPlay({ userGenerated: true, }),
+        sectionsRequestAndPlay({ userGenerated: true, }),
         playerTabSelector(state.value)
       );
     })
@@ -437,21 +396,21 @@ const prevMoveEpic = (action, state) =>
 
 const softNextEpic = (action, state) =>
   action.pipe(
-    ofType(player.softNext),
+    ofType(PlayerActionTypes.SOFT_NEXT),
     filter(() => !isStopped(playerStatusSelector(state.value))),
-    map(() => player.next())
+    map(playerNext)
   );
 
 const softPrevEpic = (action, state) =>
   action.pipe(
-    ofType(player.softPrev),
+    ofType(PlayerActionTypes.SOFT_PREV),
     filter(() => !isStopped(playerStatusSelector(state.value))),
-    map(() => player.prev())
+    map(playerPrev)
   );
 
 const endIframeEpic = (action, state) =>
   action.pipe(
-    ofType(player.end),
+    ofType(PlayerActionTypes.END),
     filter(() => {
       const someIframes = parserIframesSelector(state.value);
       return !Object.values(someIframes).every((val) => isIframeParsing(val));
@@ -460,7 +419,7 @@ const endIframeEpic = (action, state) =>
     tap((payload) => {
       console.log('endIframeEpic', payload);
       mpToContent(
-        [ sections.requestAndPlay({ ...payload, userGenerated: true, }), ],
+        [ sectionsRequestAndPlay({ ...payload, userGenerated: true, }), ],
         playerTabSelector(state.value)
       );
     }),
@@ -469,7 +428,7 @@ const endIframeEpic = (action, state) =>
 
 const endEpic = (action, state) =>
   action.pipe(
-    ofType(player.end),
+    ofType(PlayerActionTypes.END),
     filter(
       () =>
         [ PARSER_TYPES.GOOGLE_DOC, PARSER_TYPES.GOOGLE_DOC_SVG, ].includes(
@@ -483,7 +442,7 @@ const endEpic = (action, state) =>
       mpToContent(
         [
           resetParser({ revertHtml: true, }),
-          player.reset({ tab: appActiveTabSelector(state), }),
+          playerReset({ tab: appActiveTabSelector(state), }),
           setParser({
             type: parserTypeSelector(state.value),
             page: nextPage,
@@ -498,38 +457,38 @@ const endEpic = (action, state) =>
       action.pipe(ofType(PageActionTypes.MOVE_COMPLETE), first())
     ),
     delay(500),
-    concatMap(() => of(player.play()))
+    concatMap(() => of(playerPlay()))
   );
 
 const endPageEpic = (action, state) =>
   action.pipe(
-    ofType(player.end),
+    ofType(PlayerActionTypes.END),
     filter(() => isGoogleBook(parserTypeSelector(state.value))),
-    concatMap(() => from([ player.stop(), player.nextMove(), ]))
+    concatMap(() => from([ playerStop(), playerNextMove(), ]))
   );
 
 const nextAutoEpic = (action) =>
   action.pipe(
-    ofType(player.nextAuto),
+    ofType(PlayerActionTypes.NEXT_AUTO),
     tap(() => {
       console.log('player.nextAuto');
     }),
-    map(() => player.play())
+    map(playerPlay)
   );
 
 const nextEpicThrottled = (action) =>
   action.pipe(
-    ofType(player.nextSlow),
+    ofType(PlayerActionTypes.NEXT_SLOW),
     debounceTime(ATTRIBUTES.MISC.PLAYER_THROTTLE_TIME),
     tap(() => {
       console.log('player.nextSlow');
     }),
-    map(() => player.play())
+    map(playerPlay)
   );
 
 const demandPlayEpic = (action, state) =>
   action.pipe(
-    ofType(player.demand),
+    ofType(PlayerActionTypes.DEMAND),
     tap(() => {
       console.log('player.demand');
       try {
@@ -543,7 +502,7 @@ const demandPlayEpic = (action, state) =>
 
 const prevEpic = (action, state) =>
   action.pipe(
-    ofType(player.prev),
+    ofType(PlayerActionTypes.PREV),
     pluck('payload'),
     filter(
       (payload = {}) =>
@@ -557,36 +516,34 @@ const prevEpic = (action, state) =>
         playerTabSelector(state.value)
       );
     }),
-    concatMap(() => of(player.wait(), player.prevSlow()))
+    concatMap(() => of(playerWait(), playerPrevSlow()))
   );
 
 const prevEpicThrottled = (action) =>
   action.pipe(
-    ofType(player.prevSlow),
+    ofType(PlayerActionTypes.PREV_SLOW),
     debounceTime(ATTRIBUTES.MISC.PLAYER_THROTTLE_TIME),
     tap(() => {
       console.log('player.prev');
     }),
-    map(() => player.play())
+    map(playerPlay)
   );
 
 const crashEpic = (action, state) =>
   action.pipe(
-    ofType(player.crash),
+    ofType(PlayerActionTypes.CRASH),
     tap(() => {
       console.log('player.crash');
     }),
     pluck('payload', 'message'),
     concatMap((text) =>
       appSkipDeadSectionsSelector(state.value)
-        ? of(routeIndex(), player.next())
+        ? of(routeIndex(), playerNext())
         : of(notificationWarning({ text, }), routeSkip())
     )
   );
 
 export default combineEpics(
-  // continueEpic,
-  // resumeEventEpic,
   proxyPlayEpic,
   endIframeEpic,
   nextMoveEpic,
@@ -605,7 +562,6 @@ export default combineEpics(
   nextEpicThrottled,
   prevEpic,
   prevEpicThrottled,
-  chillEpic,
   crashEpic,
   haltEpic,
   softHaltEpic,
@@ -614,6 +570,5 @@ export default combineEpics(
   healthCheckEpic,
   toggleEpic,
   softNextEpic,
-  softPrevEpic,
-  seekEpic
+  softPrevEpic
 );

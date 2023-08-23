@@ -6,10 +6,9 @@ import { func, } from 'prop-types';
 import React from 'react';
 import { connect, } from 'react-redux';
 
-import { playerActions, } from '@pericles/store';
+import { playerStop, } from '@pericles/store';
 import { mpToContent, } from '@pericles/util';
 
-const { player, } = playerActions;
 const useStyles = makeStyles(() => ({
   paper: {
     display: 'flex',
@@ -68,7 +67,7 @@ const mapStateToProps = (state) => ({ status: state.player.status, });
 
 const mapDispatchToProps = (dispatch) => ({
   onErrorClose: () => {
-    dispatch(player.stop());
+    dispatch(playerStop());
   },
 });
 

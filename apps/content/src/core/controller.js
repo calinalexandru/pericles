@@ -6,12 +6,13 @@ import { ATTRIBUTES, PLAYER_STATUS, VARIABLES, } from '@pericles/constants';
 import {
   store,
   parserTypeSelector,
-  playerActions,
   setApp,
+  setPlayer,
+  playerPlay,
+  playerStop,
+  playerSoftHalt,
 } from '@pericles/store';
 import { isGoogleBook, } from '@pericles/util';
-
-const { player, } = playerActions;
 
 export default () => {
   const contextMenuOpen$ = fromEvent(document, 'contextmenu').pipe(
@@ -58,12 +59,12 @@ export default () => {
       );
       if (sectionId < 0) return null;
       console.log('sectionClick$.sectionId, section', sectionId, sectionEl);
-      store.dispatch(player.softHalt());
+      store.dispatch(playerSoftHalt());
       store.dispatch(
-        player.set({ key: sectionId, status: PLAYER_STATUS.LOADING, })
+        setPlayer({ key: sectionId, status: PLAYER_STATUS.LOADING, })
       );
       setTimeout(() => {
-        store.dispatch(player.play());
+        store.dispatch(playerPlay());
       }, 300);
 
       return true;
@@ -81,7 +82,7 @@ export default () => {
         e.target.innerHTML === 'chevron_right'
       ) {
         console.log('googleBookNext$', e.target);
-        store.dispatch(player.stop());
+        store.dispatch(playerStop());
       }
       return true;
     }),
@@ -98,7 +99,7 @@ export default () => {
         e.target.innerHTML === 'chevron_left'
       ) {
         console.log('googleBookPrev$', e.target);
-        store.dispatch(player.stop());
+        store.dispatch(playerStop());
       }
 
       return true;

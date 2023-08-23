@@ -9,7 +9,6 @@ import {
   parserEndSelector,
   parserIframesSelector,
   parserKeySelector,
-  playerActions,
   playerKeySelector,
   playerStatusSelector,
   playerTabSelector,
@@ -17,14 +16,17 @@ import {
   highlightSection,
   autoscrollSet,
   highlightWord,
+  setPlayer,
+  playerNext,
+  playerCrash,
+  playerTimeout,
+  playerEnd,
 } from '@pericles/store';
 import {
   findAvailableIframe,
   isPlayingOrReady,
   mpToContent,
 } from '@pericles/util';
-
-const { player, } = playerActions;
 
 export default () => {
   console.log('initialize speech');
@@ -48,18 +50,10 @@ export default () => {
         console.log('Speech.stream$.subscribe', { params, });
         const playerKey = playerKeySelector(state);
         switch (event) {
-        // case 'onPause':
-        //   console.log('onPause');
-        //   store.dispatch(player.set({ status: PLAYER_STATUS.PAUSED }));
-        //   break;
-        // case 'onResume':
-        //   console.log('onResume');
-        //   store.dispatch(player.resumeEvent());
-        //   break;
         case 'onStart':
           console.log('onStart', { playingTab, playerKey, });
           store.dispatch(
-            player.set({
+            setPlayer({
               status: PLAYER_STATUS.PLAYING,
             })
           );
@@ -77,7 +71,7 @@ export default () => {
             console.log('going to next', {
               playerStatus: playerStatusSelector(state),
             });
-            store.dispatch(player.next({ auto: true, }));
+            store.dispatch(playerNext({ auto: true, }));
           } else if (parserEndSelector(state)) {
             console.log('parserIframes', parserIframes);
             const availableIframeKey = findAvailableIframe(parserIframes);
@@ -95,7 +89,7 @@ export default () => {
             }
             console.log('onEnd.iframe', newIframes);
             console.log('going to next.iframe');
-            store.dispatch(player.end({ iframes: newIframes, }));
+            store.dispatch(playerEnd({ iframes: newIframes, }));
           }
           break;
         case 'onBoundary':
@@ -108,22 +102,20 @@ export default () => {
           break;
         case 'onBuffering':
           // console.log('onBuffering', buffering);
-          store.dispatch(player.set({ buffering, }));
+          store.dispatch(setPlayer({ buffering, }));
           break;
         case 'onError':
           console.log('onError');
-          if (errorCode === ERROR_CODES.WEBSOCKET.THROTTLE) {
-            store.dispatch(player.overload());
-          } else if (values(ERROR_CODES.WEBSOCKET).includes(errorCode)) {
-            store.dispatch(player.crash());
+          if (values(ERROR_CODES.WEBSOCKET).includes(errorCode)) {
+            store.dispatch(playerCrash());
           } else if (errorCode === ERROR_CODES.PLAYER.TIMEOUT) {
-            store.dispatch(player.timeout());
+            store.dispatch(playerTimeout());
           } else if (errorCode === ERROR_CODES.PLAYER.TEXT_EXCEED) {
             store.dispatch(
-              player.crash({ message: 'Your text is too big for me, senapi', })
+              playerCrash({ message: 'Your text is too big for me, senapi', })
             );
           } else {
-            store.dispatch(player.crash());
+            store.dispatch(playerCrash());
           }
           break;
         default:

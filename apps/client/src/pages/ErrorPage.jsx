@@ -15,9 +15,8 @@ import React from 'react';
 import { connect, } from 'react-redux';
 
 import { ATTRIBUTES, } from '@pericles/constants';
-import { playerActions, routeIndex, } from '@pericles/store';
+import { playerStop, routeIndex, setPlayer, } from '@pericles/store';
 
-const { player, } = playerActions;
 const useStyles = makeStyles(() => ({
   paper: {
     display: 'flex',
@@ -101,8 +100,8 @@ const mapStateToProps = (state) => ({ status: state.player.status, });
 
 const mapDispatchToProps = (dispatch) => ({
   onErrorClose: () => {
-    dispatch(player.set({ buffering: false, }));
-    dispatch(player.stop());
+    dispatch(setPlayer({ buffering: false, }));
+    dispatch(playerStop());
     dispatch(routeIndex());
   },
 });

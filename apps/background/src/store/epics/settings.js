@@ -7,15 +7,15 @@ import { pluck, map, concatMap, } from 'rxjs/operators';
 import Speech from '@/speech';
 import {
   playerStatusSelector,
-  playerActions,
   settingsVoicesSelector,
   SettingsActionTypes,
   freeVoice,
   setSettings,
+  playerPlay,
+  playerStop,
+  playerIdle,
 } from '@pericles/store';
 import { isPaused, isPlayingOrReady, getEnglishVoiceKey, } from '@pericles/util';
-
-const { player, } = playerActions;
 
 const settingsItems = [ 'volume', 'pitch', 'rate', 'voice', ];
 
@@ -35,7 +35,7 @@ const settingsSetEpic = (action, state) =>
         isPaused(playerStatusSelector(state.value)) &&
         !isEmpty(pick(settingsItems, payload))
       ) {
-        return of(player.stop());
+        return of(playerStop());
       }
       if (
         isPlayingOrReady(playerStatusSelector(state.value)) &&
@@ -44,11 +44,11 @@ const settingsSetEpic = (action, state) =>
         if (Speech.isReplayStarved(keys(pick(settingsItems, payload)))) {
           console.log('Speech.isReplayStarved -> settingsSetEpic.seek', seek);
           Speech.stop();
-          return of(player.play({ userGenerated: true, seek, }));
+          return of(playerPlay({ userGenerated: true, seek, }));
         }
       }
 
-      return of(player.wank());
+      return of(playerIdle());
     })
   );
 

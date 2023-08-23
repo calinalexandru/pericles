@@ -6,11 +6,14 @@ import {
 
 import { ATTRIBUTES, } from '@pericles/constants';
 import {
-  store, playerActions, setApp, appTabClosed, 
+  store,
+  setApp,
+  appTabClosed,
+  playerStop,
+  playerDemand,
+  playerPlay,
 } from '@pericles/store';
 import { getBrowserAPI, } from '@pericles/util';
-
-const { player, } = playerActions;
 
 export default () => {
   const { api, } = getBrowserAPI();
@@ -53,8 +56,8 @@ export default () => {
     filter((item) => item === ATTRIBUTES.CONTEXT_MENU.READ_SELECTION),
     tap(() => {
       console.log('reading selection');
-      store.dispatch(player.stop());
-      store.dispatch(player.demand());
+      store.dispatch(playerStop());
+      store.dispatch(playerDemand());
     })
   );
 
@@ -66,9 +69,9 @@ export default () => {
     pluck('menuItemId'),
     filter((item) => item === ATTRIBUTES.CONTEXT_MENU.READ_FROM_HERE),
     tap(() => {
-      store.dispatch(player.stop());
-      setTimeout(async () => {
-        store.dispatch(player.play({ userGenerated: true, fromCursor: true, }));
+      store.dispatch(playerStop());
+      setTimeout(() => {
+        store.dispatch(playerPlay({ userGenerated: true, fromCursor: true, }));
       }, 500);
     })
   );

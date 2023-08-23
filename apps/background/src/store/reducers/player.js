@@ -3,14 +3,17 @@ import { length, } from 'ramda';
 import { handleActions, } from 'redux-actions';
 
 import { PLAYER_STATUS, } from '@pericles/constants';
-import { initialState, playerActions, } from '@pericles/store';
+import {
+  PlayerActionTypes,
+  SectionsActionTypes,
+  initialState,
+} from '@pericles/store';
 
-const { player, sections, } = playerActions;
 const { player: defaultValues, } = initialState;
 
 export default handleActions(
   {
-    [player.play]: (state) => {
+    [PlayerActionTypes.PLAY]: (state) => {
       console.log('player.play.reducer ');
       return {
         ...state,
@@ -18,37 +21,37 @@ export default handleActions(
         buffering: true,
       };
     },
-    [player.demand]: (state) => {
+    [PlayerActionTypes.DEMAND]: (state) => {
       console.log('player.demand.reducer');
       return {
         ...state,
         status: PLAYER_STATUS.LOADING,
       };
     },
-    [player.wait]: (state) => ({
+    [PlayerActionTypes.WAIT]: (state) => ({
       ...state,
       status: PLAYER_STATUS.WAITING,
     }),
-    [player.stop]: (state) => ({
+    [PlayerActionTypes.STOP]: (state) => ({
       ...state,
       key: 0,
       sections: [],
       buffering: false,
       status: PLAYER_STATUS.STOPPED,
     }),
-    [player.halt]: (state) => ({
+    [PlayerActionTypes.HALT]: (state) => ({
       ...state,
       key: 0,
       sections: [],
       buffering: false,
       status: PLAYER_STATUS.STOPPED,
     }),
-    [player.softHalt]: (state) => ({
+    [PlayerActionTypes.SOFT_HALT]: (state) => ({
       ...state,
       buffering: false,
       status: PLAYER_STATUS.STOPPED,
     }),
-    [player.next]: (state) => {
+    [PlayerActionTypes.NEXT]: (state) => {
       const curKey = state.key;
       const sectionsLen = length(state.sections) - 1;
       const key = sectionsLen <= curKey ? sectionsLen : curKey + 1;
@@ -59,7 +62,7 @@ export default handleActions(
         status: PLAYER_STATUS.READY,
       };
     },
-    [player.prev]: (state) => {
+    [PlayerActionTypes.PREV]: (state) => {
       const curKey = state.key;
       const key = curKey > 0 ? curKey - 1 : 0;
       return {
@@ -68,40 +71,32 @@ export default handleActions(
         status: PLAYER_STATUS.READY,
       };
     },
-    [player.resume]: (state) => ({
+    [PlayerActionTypes.RESUME]: (state) => ({
       ...state,
       status: PLAYER_STATUS.PLAYING,
     }),
-    [player.pause]: (state) => ({
+    [PlayerActionTypes.PAUSE]: (state) => ({
       ...state,
       status: PLAYER_STATUS.PAUSED,
     }),
-    [player.loading]: (state) => ({
+    [PlayerActionTypes.LOADING]: (state) => ({
       ...state,
       status: PLAYER_STATUS.LOADING,
     }),
-    [player.ready]: (state) => ({
-      ...state,
-      status: PLAYER_STATUS.READY,
-    }),
-    [player.error]: (state) => ({
+    [PlayerActionTypes.ERROR]: (state) => ({
       ...state,
       buffering: false,
       status: PLAYER_STATUS.ERROR,
     }),
-    [player.overload]: (state) => ({
-      ...state,
-      status: PLAYER_STATUS.OVERLOAD,
-    }),
-    [player.set]: (state, { payload, }) => ({
+    [PlayerActionTypes.SET]: (state, { payload, }) => ({
       ...state,
       ...payload,
     }),
-    [player.reset]: (_, { payload = {}, } = {}) => ({
+    [PlayerActionTypes.RESET]: (_, { payload = {}, } = {}) => ({
       ...defaultValues,
       ...payload,
     }),
-    [sections.set]: (state, { payload, }) => {
+    [SectionsActionTypes.SET]: (state, { payload, }) => {
       console.log('sections.set', state, payload);
       return {
         ...state,

@@ -9,8 +9,10 @@ import { ATTRIBUTES, PLAYER_STATUS, } from '@pericles/constants';
 import {
   appMiniPlayerSelector,
   parserTypeSelector,
-  playerActions,
   playerKeySelector,
+  playerNext,
+  playerPause,
+  playerResume,
   playerSectionsSelector,
   playerStatusSelector,
 } from '@pericles/store';
@@ -22,8 +24,6 @@ import {
 
 import { Container, Button, Icon, } from './styles';
 
-const { player, } = playerActions;
-
 export default function MiniPlayer() {
   const parserType = useSelector(parserTypeSelector);
   const enabled = useSelector(appMiniPlayerSelector);
@@ -33,13 +33,13 @@ export default function MiniPlayer() {
   console.log('MiniPlayer', { parserType, sections, status, });
   const dispatch = useDispatch();
   const onNext = () => {
-    dispatch(player.next());
+    dispatch(playerNext());
   };
   const onPause = () => {
-    dispatch(player.pause());
+    dispatch(playerPause());
   };
   const onResume = () => {
-    dispatch(player.resume());
+    dispatch(playerResume());
   };
   const isPlaying = PLAYER_STATUS.PLAYING === status;
   const isLoading = [ PLAYER_STATUS.LOADING, PLAYER_STATUS.WAITING, ].includes(

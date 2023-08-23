@@ -59,7 +59,7 @@ export { default as settingsVoicesSelector, } from './selectors/settings/setting
 export { default as settingsNeuralVoicesSelector, } from './selectors/settings/settingsNeuralVoicesSelector';
 
 export * from './actions/notification';
-export { default as playerActions, } from './actions/player';
+export * from './actions/player';
 export * from './actions/parser';
 export * from './actions/settings';
 export * from './actions/app';

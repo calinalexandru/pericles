@@ -7,10 +7,12 @@ import {
   store,
   hotkeysDisableSelector,
   hotkeysSelector,
-  playerActions,
+  playerPlay,
+  playerToggle,
+  playerStop,
+  playerSoftNext,
+  playerSoftPrev,
 } from '@pericles/store';
-
-const { player, } = playerActions;
 
 const userIsTyping = (e) => {
   const { target, } = e;
@@ -26,23 +28,23 @@ export default () => {
   const hotkeyEvents = {
     start: () => {
       console.log('hotkeyEvents.start');
-      store.dispatch(player.play({ userGenerated: true, }));
+      store.dispatch(playerPlay({ userGenerated: true, }));
     },
     play: () => {
       console.log('hotkeyEvents.toggle');
-      store.dispatch(player.toggle());
+      store.dispatch(playerToggle());
     },
     stop: () => {
       console.log('hotkeyEvents.stop');
-      store.dispatch(player.stop());
+      store.dispatch(playerStop());
     },
     next: () => {
       console.log('hotkeyEvents.next');
-      store.dispatch(player.softNext());
+      store.dispatch(playerSoftNext());
     },
     prev: () => {
       console.log('hotkeyEvents.prev');
-      store.dispatch(player.softPrev());
+      store.dispatch(playerSoftPrev());
     },
   };
   let keysMap = Object.create(null);

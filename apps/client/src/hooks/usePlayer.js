@@ -1,35 +1,44 @@
 import { useCallback, } from 'react';
 import { useDispatch, } from 'react-redux';
 
-import { playerActions, } from '@pericles/store';
+import {
+  playerNext,
+  playerPause,
+  playerPlay,
+  playerPrev,
+  playerResume,
+  playerStop,
+} from '@pericles/store';
 
-const { player, } = playerActions;
 export default function usePlayer() {
   const dispatch = useDispatch();
 
-  const play = useCallback((params) => {
-    dispatch(player.play(params));
-  }, []);
+  const play = useCallback(
+    (params) => {
+      dispatch(playerPlay(params));
+    },
+    [ dispatch, ]
+  );
 
   const stop = useCallback(() => {
-    dispatch(player.stop());
-  }, []);
+    dispatch(playerStop());
+  }, [ dispatch, ]);
 
   const pause = useCallback(() => {
-    dispatch(player.pause());
-  }, []);
+    dispatch(playerPause());
+  }, [ dispatch, ]);
 
   const resume = useCallback(() => {
-    dispatch(player.resume());
-  }, []);
+    dispatch(playerResume());
+  }, [ dispatch, ]);
 
   const next = useCallback(() => {
-    dispatch(player.next());
-  }, []);
+    dispatch(playerNext());
+  }, [ dispatch, ]);
 
   const prev = useCallback(() => {
-    dispatch(player.prev());
-  }, []);
+    dispatch(playerPrev());
+  }, [ dispatch, ]);
 
   return {
     play,

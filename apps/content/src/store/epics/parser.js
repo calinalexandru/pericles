@@ -19,6 +19,7 @@ import { ATTRIBUTES, PARSER_TYPES, PLAYER_STATUS, } from '@pericles/constants';
 import {
   PageActionTypes,
   ParserActionTypes,
+  SectionsActionTypes,
   appSkipUntilYSelector,
   notificationError,
   pageMoveComplete,
@@ -29,11 +30,19 @@ import {
   parserResetComplete,
   parserTypeSelector,
   parserWordsUpdateWorker,
-  playerActions,
+  playerEnd,
+  playerError,
+  playerIdle,
   playerKeySelector,
+  playerNext,
+  playerProxyPlay,
   playerSectionsSelector,
+  playerStop,
   routeErrorPdf,
+  sectionsRequestAndPlayComplete,
   setParser,
+  setPlayer,
+  setSections,
   settingsNeuralVoicesSelector,
   settingsVoiceSelector,
 } from '@pericles/store';
@@ -61,13 +70,11 @@ import {
   wrapWordTagAzure,
 } from '@pericles/util';
 
-const { sections, player, } = playerActions;
-
 const mergedLanguages = [ 'ja', 'cn', 'ko', ];
 
 export const getSectionsAndPlayEpic = (action, state) =>
   action.pipe(
-    ofType(sections.requestAndPlay),
+    ofType(SectionsActionTypes.REQUEST_AND_PLAY),
     pluck('payload'),
     tap((data) => {
       console.log('getSectionsAndPlayEpic.init', action, state, data);
@@ -192,8 +199,8 @@ export const getSectionsAndPlayEpic = (action, state) =>
       }) => {
         if (error) {
           return [
-            player.set({ status: PLAYER_STATUS.ERROR, }),
-            sections.requestAndPlayComplete(),
+            setPlayer({ status: PLAYER_STATUS.ERROR, }),
+            sectionsRequestAndPlayComplete(),
             routeErrorPdf(),
           ];
         }
@@ -221,15 +228,15 @@ export const getSectionsAndPlayEpic = (action, state) =>
                 maxPage,
                 page: pageIndex,
               }),
-              player.end({
+              playerEnd({
                 fromCursor,
                 iframes: newIframes,
               }),
             ];
           }
           if (skip && message)
-            return [ player.error(), notificationError({ text: message, }), ];
-          return [ player.wank(), ];
+            return [ playerError(), notificationError({ text: message, }), ];
+          return [ playerIdle(), ];
         }
         const mergeSections = [
           ...playerSectionsSelector(state.value),
@@ -238,13 +245,13 @@ export const getSectionsAndPlayEpic = (action, state) =>
         if (!mergeSections.length && isGoogleBook(type)) {
           return from([
             setParser({ type, maxPage, page: pageIndex, end, }),
-            player.next(),
+            playerNext(),
           ]);
         }
         return from(
           maxPage === 0 || maxPage > parserPageSelector(state.value)
             ? [
-              sections.set({ sections: mergeSections, }),
+              setSections({ sections: mergeSections, }),
               setParser({
                 iframes,
                 key: mergeSections.length,
@@ -253,10 +260,10 @@ export const getSectionsAndPlayEpic = (action, state) =>
                 maxPage,
                 page: pageIndex,
               }),
-              player.proxyPlay({ tab, }),
-              sections.requestAndPlayComplete(),
+              playerProxyPlay({ tab, }),
+              sectionsRequestAndPlayComplete(),
             ]
-            : [ player.stop(), sections.requestAndPlayComplete(), ]
+            : [ playerStop(), sectionsRequestAndPlayComplete(), ]
         );
       }
     )
@@ -305,7 +312,7 @@ export const pageNextEpic = (action, state) =>
       )
     ),
     catchError(() => of(false)),
-    concatMap((check) => of(check ? pageMoveComplete() : player.wank()))
+    concatMap((check) => of(check ? pageMoveComplete() : playerIdle()))
   );
 
 export const pagePrevEpic = (action, state) =>
@@ -330,7 +337,7 @@ export const pagePrevEpic = (action, state) =>
       )
     ),
     catchError(() => of(false)),
-    concatMap((check) => of(check ? pageMoveComplete() : player.wank()))
+    concatMap((check) => of(check ? pageMoveComplete() : playerIdle()))
   );
 
 export const pageAutosetEpic = (action) =>

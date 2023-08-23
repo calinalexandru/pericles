@@ -15,9 +15,8 @@ import React from 'react';
 import { connect, } from 'react-redux';
 
 import { ATTRIBUTES, } from '@pericles/constants';
-import { playerActions, routeIndex, } from '@pericles/store';
+import { playerStop, routeIndex, } from '@pericles/store';
 
-const { player, } = playerActions;
 const useStyles = makeStyles(() => ({
   paper: {
     display: 'flex',
@@ -82,7 +81,7 @@ PDFPreviewErrorPage.defaultProps = {
 };
 
 const restartPlayer = () => (dispatch) => {
-  dispatch(player.stop());
+  dispatch(playerStop());
   dispatch(routeIndex());
 };
 
