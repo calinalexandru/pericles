@@ -8,10 +8,13 @@ import {
   notificationClear,
 } from '@pericles/store';
 
-type NotificationAction = Action<NotificationActionTypes, NotificationState>;
+type NotificationAction = Action<
+  NotificationActionTypes,
+  Partial<NotificationState>
+>;
 
-const notificationSetEpic: Epic<NotificationAction> = (action$) =>
-  action$.pipe(
+const notificationSetEpic: Epic<NotificationAction> = (action) =>
+  action.pipe(
     ofType(
       NotificationActionTypes.INFO,
       NotificationActionTypes.WARNING,

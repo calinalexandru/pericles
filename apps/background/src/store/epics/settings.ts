@@ -7,19 +7,20 @@ import { pluck, map, concatMap, } from 'rxjs/operators';
 import Speech from '@/speech';
 import {
   playerStatusSelector,
-  settingsVoicesSelector,
   SettingsActionTypes,
-  freeVoice,
-  setSettings,
   playerPlay,
   playerStop,
   playerIdle,
+  SettingsState,
 } from '@pericles/store';
-import { isPaused, isPlayingOrReady, getEnglishVoiceKey, } from '@pericles/util';
+import { isPaused, isPlayingOrReady, } from '@pericles/util';
 
 const settingsItems = [ 'volume', 'pitch', 'rate', 'voice', ];
 
-const settingsSetEpic = (action, state) =>
+const settingsSetEpic: Epic<Action<SettingsActionTypes, SettingsState>> = (
+  action,
+  state
+) =>
   action.pipe(
     ofType(SettingsActionTypes.SET, SettingsActionTypes.DEFAULT),
     pluck('payload'),
@@ -52,15 +53,15 @@ const settingsSetEpic = (action, state) =>
     })
   );
 
-const settingsSetFreeVoiceEpic = (action, state) =>
-  action.pipe(
-    ofType(freeVoice.request),
-    map(() => {
-      console.log('settingsSetFreeVoiceEpic');
-      //
-      return getEnglishVoiceKey(settingsVoicesSelector(state.value));
-    }),
-    map((voice) => setSettings({ voice, }))
-  );
+// const settingsSetFreeVoiceEpic: Epic<Action<SettingsActionTypes, SettingsState>> = (action, state) =>
+//   action.pipe(
+//     ofType(freeVoice.request),
+//     map(() => {
+//       console.log('settingsSetFreeVoiceEpic');
+//       //
+//       return getEnglishVoiceKey(settingsVoicesSelector(state.value));
+//     }),
+//     map((voice) => setSettings({ voice, }))
+//   );
 
-export default combineEpics(settingsSetEpic, settingsSetFreeVoiceEpic);
+export default combineEpics(settingsSetEpic);

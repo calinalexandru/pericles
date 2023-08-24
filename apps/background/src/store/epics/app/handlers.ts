@@ -21,7 +21,7 @@ import {
 } from '@pericles/store';
 import { getBrowserAPI, getEnglishVoiceKey, mpToContent, } from '@pericles/util';
 
-export function handleAppInit(state) {
+export function handleAppInit(state): void {
   console.log('app.init');
   try {
     Speech.setVolume(settingsVolumeSelector(state));
@@ -34,7 +34,7 @@ export function handleAppInit(state) {
   i18n.load(MESSAGES);
 }
 
-export function handleAppSet(state, payload = {}) {
+export function handleAppSet(state, payload = {}): void {
   console.log('app.set', payload);
 
   const highlightSettings = pick(
@@ -55,7 +55,7 @@ export function handleAppSet(state, payload = {}) {
   }
 }
 
-export const handleFactoryReset$ = (state) => {
+export const handleFactoryReset$: any = (state) => {
   const {
     player: playerDefaultValues,
     app: appDefaultValues,
@@ -76,7 +76,7 @@ export const handleFactoryReset$ = (state) => {
   );
 };
 
-export const handleAppReload = () => {
+export const handleAppReload: void = () => {
   const { api, } = getBrowserAPI();
   console.log('appReloadEpic', api);
   api.runtime.reload();

@@ -1,14 +1,15 @@
-import { handleActions, } from 'redux-actions';
+import { handleActions, Action, } from 'redux-actions';
 
 import {
   PageActionTypes,
   ParserActionTypes,
+  ParserState,
   initialState,
 } from '@pericles/store';
 
 const { parser: defaultValues, } = initialState;
 
-export default handleActions(
+export default handleActions<ParserState, Action<Partial<ParserState>>>(
   {
     [ParserActionTypes.SET]: (state, { payload, }) => {
       console.log('parser.set', state, payload);

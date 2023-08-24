@@ -1,10 +1,17 @@
-import { handleActions, } from 'redux-actions';
+import { handleActions, Action, } from 'redux-actions';
 
-import { NotificationActionTypes, initialState, } from '@pericles/store';
+import {
+  NotificationActionTypes,
+  NotificationState,
+  initialState,
+} from '@pericles/store';
 
 const { notification: defaultValues, } = initialState;
 
-export default handleActions(
+export default handleActions<
+  NotificationState,
+  Action<Partial<NotificationState>>
+>(
   {
     [NotificationActionTypes.ERROR]: (state, { payload, }) => ({
       type: 'error',

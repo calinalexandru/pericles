@@ -1,10 +1,14 @@
-import { handleActions, } from 'redux-actions';
+import { handleActions, Action, } from 'redux-actions';
 
-import { SettingsActionTypes, initialState, } from '@pericles/store';
+import {
+  SettingsActionTypes,
+  SettingsState,
+  initialState,
+} from '@pericles/store';
 
 const { settings: defaultValues, } = initialState;
 
-export default handleActions(
+export default handleActions<SettingsState, Action<Partial<SettingsState>>>(
   {
     [SettingsActionTypes.SET]: (state, { payload, }) => ({
       ...state,

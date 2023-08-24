@@ -1,17 +1,17 @@
-// /* eslint-disable no-unused-vars */
 import { length, } from 'ramda';
-import { handleActions, } from 'redux-actions';
+import { handleActions, Action, } from 'redux-actions';
 
 import { PLAYER_STATUS, } from '@pericles/constants';
 import {
   PlayerActionTypes,
+  PlayerState,
   SectionsActionTypes,
   initialState,
 } from '@pericles/store';
 
 const { player: defaultValues, } = initialState;
 
-export default handleActions(
+export default handleActions<PlayerState, Action<Partial<PlayerState>>>(
   {
     [PlayerActionTypes.PLAY]: (state) => {
       console.log('player.play.reducer ');

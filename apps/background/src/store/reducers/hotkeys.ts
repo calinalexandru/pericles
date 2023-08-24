@@ -1,10 +1,14 @@
-import { handleActions, } from 'redux-actions';
+import { handleActions, Action, } from 'redux-actions';
 
-import { initialState, HotkeysActionTypes, } from '@pericles/store';
+import {
+  initialState,
+  HotkeysActionTypes,
+  HotkeysState,
+} from '@pericles/store';
 
 const { hotkeys: defaultValues, } = initialState;
 
-export default handleActions(
+export default handleActions<HotkeysState, Action<Partial<HotkeysState>>>(
   {
     [HotkeysActionTypes.SET]: (state, { payload, }) => ({
       ...state,
