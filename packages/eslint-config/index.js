@@ -2,11 +2,11 @@ module.exports = {
   extends: [
     'airbnb',
     'airbnb-typescript',
-    'plugin:@typescript-eslint/recommended',
     // 'plugin:prettier/recommended',
     'prettier',
     'plugin:security/recommended',
     'plugin:sonarjs/recommended',
+    'plugin:@typescript-eslint/recommended',
   ],
   plugins: [
     '@typescript-eslint',
@@ -15,7 +15,6 @@ module.exports = {
     'security',
     'react-perf',
     'sonarjs',
-    '@typescript-eslint',
   ],
   parserOptions: {
     ecmaVersion: 'latest',
@@ -46,21 +45,6 @@ module.exports = {
     },
   },
   rules: {
-    // 'prettier/prettier': [
-    //   'error',
-    //   {
-    //     printWidth: 100,
-    //     tabWidth: 2,
-    //     useTabs: false,
-    //     semi: true,
-    //     singleQuote: true,
-    //     trailingComma: 'es5',
-    //     bracketSpacing: true,
-    //     jsxBracketSameLine: false,
-    //     arrowParens: 'always',
-    //     endOfLine: 'lf',
-    //   },
-    // ],
     'import/order': [
       'error',
       {
@@ -82,24 +66,6 @@ module.exports = {
     // force indentation to 2 spaces
     indent: ['error', 2],
 
-    //
-    // 'prettier/prettier': 'error',
-    // 'prettier/prettier': [
-    //   'error',
-    //   {
-    //     printWidth: 120,
-    //     tabWidth: 2,
-    //     useTabs: false,
-    //     semi: true,
-    //     singleQuote: true,
-    //     trailingComma: 'es5',
-    //     bracketSpacing: true,
-    //     jsxBracketSameLine: false,
-    //     arrowParens: 'always',
-    //     endOfLine: 'lf',
-    //   },
-    // ],
-
     // enforce adding trailing comma
     'comma-dangle': [
       'error',
@@ -111,26 +77,6 @@ module.exports = {
         functions: 'never',
       },
     ],
-
-    // 'import/extensions': [
-    //   'error',
-    //   'ignorePackages',
-    //   {
-    //     js: 'never',
-    //     jsx: 'never',
-    //     ts: 'never',
-    //     tsx: 'never',
-    //   },
-    // ],
-
-    // requires parens around arguments in all cases (arrow functions)
-    'arrow-parens': ['error', 'always'],
-
-    // enforces no braces where they can be omitted
-    'arrow-body-style': ['error', 'as-needed'],
-
-    // force camlecase checking
-    camelcase: ['error', { properties: 'always' }],
 
     // make sure we use standart break line style, currently 'CRLF' for windows
     'linebreak-style': ['error', 'unix'],

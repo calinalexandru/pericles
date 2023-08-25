@@ -11,6 +11,7 @@
     "allowSyntheticDefaultImports": true,
     "strict": false,
     "forceConsistentCasingInFileNames": true,
+    "allowJs": true,
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
@@ -19,6 +20,7 @@
     "jsx": "react-jsx",
     "outDir": "./dist",
     "baseUrl": ".",
+    "incremental": true,
     "paths": {
       "@/*": [
         "src/*"
