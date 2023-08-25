@@ -1,4 +1,3 @@
-// /* eslint-disable no-unused-vars */
 import { combineLatest, fromEventPattern, } from 'rxjs';
 import {
   filter, map, pluck, tap, 
@@ -18,7 +17,7 @@ import { getBrowserAPI, } from '@pericles/util';
 export default () => {
   const { api, } = getBrowserAPI();
 
-  api.tabs.onRemoved.addListener((tabId, removeInfo) => {
+  api.tabs.onRemoved.addListener((tabId: number, removeInfo) => {
     console.log('tab closed listener', tabId, removeInfo);
     store.dispatch(appTabClosed(tabId));
   });

@@ -1,12 +1,14 @@
-import getBrowserAPI from './util/getBrowserAPI';
+import { getBrowserAPI, } from './util/getBrowserAPI';
 
 const { api: core, isFirefox, } = getBrowserAPI();
 
-interface Tab {
-  id: number;
-  active: boolean;
-  [key: string]: any;
-}
+// interface Tab {
+//   id: number;
+//   active: boolean;
+//   [key: string]: any;
+// }
+
+type Tab = chrome.tabs.Tab;
 
 interface PayloadAction {
   type: string;

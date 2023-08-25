@@ -1,8 +1,4 @@
 /* html */
-export { default as getDaysAhead, } from './date/getDaysAhead';
-export { default as getMinutesAhead, } from './date/getMinutesAhead';
-/* date */
-export { default as getTimestamp, } from './date/getTimestamp';
 export { default as canAccessIframe, } from './helpers/canAccessIframe';
 export { default as clickNextGoogleBookPage, } from './helpers/clickNextGoogleBookPage';
 export { default as clickPrevGoogleBookPage, } from './helpers/clickPrevGoogleBookPage';
@@ -116,13 +112,9 @@ export { default as isWikipedia, } from './predicates/isWikipedia';
 
 /* string-work */
 export { default as getInnerText, } from './string-work/getInnerText';
-export { default as findHotkeyEvent, } from './util/findHotkeyEvent';
+
 /* util */
-export { default as getBrowserAPI, } from './util/getBrowserAPI';
-export { default as getLangFromStr, } from './util/getLangFromStr';
-export { default as getMultipleKeysPressed, } from './util/getMultipleKeysPressed';
-export { default as getStorageAPI, } from './util/getStorageAPI';
-export { default as onTwoKeysPressed, } from './util/onTwoKeysPressed';
+export * from './util/getBrowserAPI';
 export { default as getBrowserAPIVoices, } from './voices/getBrowserAPIVoices';
 export { default as getCountry, } from './voices/getCountry';
 export { default as getCountryCodeFromString, } from './voices/getCountryCodeFromString';

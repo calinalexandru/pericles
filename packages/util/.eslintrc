@@ -1,4 +1,6 @@
 {
   "root": true,
-  "extends": ["@pericles/eslint-config"]
+  "extends": [
+    "@pericles/eslint-config"
+  ],
 }

@@ -25,7 +25,6 @@
     "rxjs": "7.5.1"
   },
   "devDependencies": {
-    "@pericles/eslint-config": "workspace:*",
     "@babel/cli": "^7.16.0",
     "@babel/core": "^7.16.0",
     "@babel/plugin-proposal-class-properties": "^7.16.0",
@@ -35,6 +34,8 @@
     "@babel/plugin-transform-runtime": "^7.18.2",
     "@babel/preset-env": "^7.16.5",
     "@jest/globals": "^27.4.4",
+    "@pericles/eslint-config": "workspace:*",
+    "@types/chrome": "^0.0.244",
     "@types/jest": "^27.0.3",
     "babel-jest": "^28.1.0",
     "babel-plugin-module-resolver": "^4.1.0",

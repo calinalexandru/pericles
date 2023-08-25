@@ -1,6 +1,6 @@
 import { join, pipe, } from 'ramda';
 
-import getBrowserAPI from '../util/getBrowserAPI';
+import { getBrowserAPI, } from '../util/getBrowserAPI';
 
 import getCountry from './getCountry';
 import getCountryCodeFromString from './getCountryCodeFromString';

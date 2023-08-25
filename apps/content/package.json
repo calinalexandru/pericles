@@ -56,6 +56,7 @@
     "@babel/preset-react": "^7.16.7",
     "@babel/preset-typescript": "^7.22.5",
     "@pericles/eslint-config": "workspace:*",
+    "@types/chrome": "^0.0.244",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
     "babel-loader": "^8.2.3",
