@@ -19,7 +19,6 @@ import { ATTRIBUTES, PARSER_TYPES, PLAYER_STATUS, } from '@pericles/constants';
 import {
   PageActionTypes,
   ParserActionTypes,
-  SectionsActionTypes,
   appSkipUntilYSelector,
   notificationError,
   pageMoveComplete,
@@ -39,7 +38,7 @@ import {
   playerSectionsSelector,
   playerStop,
   routeErrorPdf,
-  sectionsRequestAndPlayComplete,
+  sectionsRequestAndPlay,
   setParser,
   setPlayer,
   setSections,
@@ -74,7 +73,7 @@ const mergedLanguages = [ 'ja', 'cn', 'ko', ];
 
 export const getSectionsAndPlayEpic = (action, state) =>
   action.pipe(
-    ofType(SectionsActionTypes.REQUEST_AND_PLAY),
+    ofType(sectionsRequestAndPlay.request),
     pluck('payload'),
     tap((data) => {
       console.log('getSectionsAndPlayEpic.init', action, state, data);
@@ -200,7 +199,7 @@ export const getSectionsAndPlayEpic = (action, state) =>
         if (error) {
           return [
             setPlayer({ status: PLAYER_STATUS.ERROR, }),
-            sectionsRequestAndPlayComplete(),
+            sectionsRequestAndPlay.success(),
             routeErrorPdf(),
           ];
         }
@@ -261,9 +260,9 @@ export const getSectionsAndPlayEpic = (action, state) =>
                 page: pageIndex,
               }),
               playerProxyPlay({ tab, }),
-              sectionsRequestAndPlayComplete(),
+              sectionsRequestAndPlay.success(),
             ]
-            : [ playerStop(), sectionsRequestAndPlayComplete(), ]
+            : [ playerStop(), sectionsRequestAndPlay.success(), ]
         );
       }
     )

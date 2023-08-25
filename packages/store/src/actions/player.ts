@@ -2,6 +2,8 @@ import { createAction, } from 'redux-actions';
 
 import { PlayerState, } from '../initialState';
 
+import { createAsyncActions, } from './factories';
+
 export enum PlayerActionTypes {
   SET = 'PLAYER/SET',
   PLAY = 'PLAYER/PLAY',
@@ -36,9 +38,14 @@ export enum PlayerActionTypes {
 
 export enum SectionsActionTypes {
   SET = 'SECTIONS/SET',
-  REQUEST_AND_PLAY = 'SECTIONS/REQUEST_AND_PLAY',
-  REQUEST_AND_PLAY_COMPLETE = 'SECTIONS/REQUEST_AND_PLAY_COMPLETE',
 }
+
+export const sectionsRequestAndPlay = createAsyncActions<any>(
+  'SECTIONS_REQUEST_AND_PLAY'
+);
+export const proxySectionsRequestAndPlay = createAsyncActions<any>(
+  'PROXY_SECTIONS_REQUEST_AND_PLAY'
+);
 
 export const setPlayer = createAction<Partial<PlayerState>>(
   PlayerActionTypes.SET
@@ -72,9 +79,3 @@ export const playerToggle = createAction(PlayerActionTypes.TOGGLE);
 export const playerError = createAction(PlayerActionTypes.ERROR);
 
 export const setSections = createAction<any>(SectionsActionTypes.SET);
-export const sectionsRequestAndPlay = createAction<any>(
-  SectionsActionTypes.REQUEST_AND_PLAY
-);
-export const sectionsRequestAndPlayComplete = createAction(
-  SectionsActionTypes.REQUEST_AND_PLAY_COMPLETE
-);

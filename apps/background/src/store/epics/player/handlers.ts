@@ -10,6 +10,7 @@ import {
   playerReset,
   playerSectionsSelector,
   playerTabSelector,
+  proxySectionsRequestAndPlay,
   resetParser,
   sectionsRequestAndPlay,
 } from '@pericles/store';
@@ -55,7 +56,7 @@ export const playOrRequest$: any = (state, payload, actions) => {
       [
         resetParser(),
         playerReset({ tab: activeTab, }),
-        sectionsRequestAndPlay(payload),
+        sectionsRequestAndPlay.request(payload),
       ],
       activeTab
     );
@@ -71,7 +72,8 @@ export const playOrRequest$: any = (state, payload, actions) => {
       playerKey
     );
 
-    mpToContent([ sectionsRequestAndPlay(payload), ], playingTab);
+    return proxySectionsRequestAndPlay.request(payload);
+    // mpToContent([ sectionsRequestAndPlay(payload), ], playingTab);
   } else if (actions.length === 0) {
     Speech.stop();
     console.log(
@@ -81,14 +83,6 @@ export const playOrRequest$: any = (state, payload, actions) => {
       playerSections
     );
     try {
-      // const a = new SpeechSynthesisUtterance('Firefox is broken');
-      // const b = new SpeechSynthesisUtterance('Broken inside its crazy');
-      // speechSynthesis.speak(a)
-      // a.onend = () => {
-      //   speechSynthesis.speak(b)
-      // }
-      // const voice = settingsVoiceSelector(state.value);
-      // if (!Speech.validate(voice)) Speech.setVoice(voice);
       Speech.play(playerSections[playerKey].text, seek);
     } catch (e) {
       console.error('Player has crashed, rip', e);

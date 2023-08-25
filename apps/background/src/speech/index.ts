@@ -5,51 +5,55 @@ import { DEFAULT_VALUES, } from '@pericles/constants';
 
 import ChromeSynth from './synth/chrome';
 
-const chrome = new ChromeSynth();
+interface StreamParams {
+  event: string;
+  params: any;
+}
+
+interface Settings {
+  voices?: any[];
+  volume?: number;
+  pitch?: number;
+  rate?: number;
+  voice?: string;
+}
 
 export default class Speech {
+
+  public static synth: ChromeSynth = new ChromeSynth();
+
+  public static stream$: Subject<StreamParams> = new Subject<StreamParams>();
+
+  private static volume: number = DEFAULT_VALUES.SETTINGS.VOLUME;
+
+  private static pitch: number = DEFAULT_VALUES.SETTINGS.PITCH;
+
+  private static rate: number = DEFAULT_VALUES.SETTINGS.RATE;
 
   constructor() {
     Speech.attachStreams();
   }
 
-  static attachStreams() {
-    console.log('Speech.attachStreams');
-    Speech.synth.onStart = (params) => {
-      Speech.stream$.next({ event: 'onStart', params, });
-    };
+  private static attachStreams(): void {
+    const events: string[] = [
+      'onStart',
+      'onEnd',
+      'onError',
+      'onBoundary',
+      'onBuffering',
+      'onWordsUpdate',
+    ];
 
-    Speech.synth.onEnd = (params) => {
-      console.log('Speech.synth.onEnd', params);
-      Speech.stream$.next({ event: 'onEnd', params, });
-    };
-
-    Speech.synth.onError = (params) => {
-      Speech.stream$.next({ event: 'onError', params, });
-    };
-
-    Speech.synth.onBoundary = (params) => {
-      Speech.stream$.next({ event: 'onBoundary', params, });
-    };
-
-    Speech.synth.onBuffering = (params) => {
-      Speech.stream$.next({ event: 'onBuffering', params, });
-    };
-
-    Speech.synth.onWordsUpdate = (params) => {
-      Speech.stream$.next({ event: 'onWordsUpdate', params, });
-    };
-
-    // Speech.synth.onPause = () => {
-    //   Speech.stream$.next({ event: 'onPause' });
-    // };
-
-    // Speech.synth.onResume = () => {
-    //   Speech.stream$.next({ event: 'onResume' });
-    // };
+    console.log('Attaching streams...');
+    events.forEach((event) => {
+      this.synth[event] = (params) => {
+        console.log(`SpeechFacade.synth.${event}`, params);
+        this.stream$.next({ event, params, });
+      };
+    });
   }
 
-  static seedValues() {
+  private static seedValues(): void {
     Speech.setVolume(Speech.volume);
     Speech.setPitch(Speech.pitch);
     Speech.setRate(Speech.rate);
@@ -118,7 +122,7 @@ export default class Speech {
     console.log('setVoice', val);
     const newVal = val;
     const oldSynth = Speech.synth;
-    Speech.synth = chrome;
+    Speech.synth = new ChromeSynth();
 
     if (oldSynth !== Speech.synth) oldSynth.cancel();
 
@@ -151,7 +155,7 @@ export default class Speech {
     };
   }
 
-  static setSettingsFromObj(settings) {
+  public static setSettingsFromObj(settings: Settings) {
     console.log('setSettingsFromObj', settings);
     let fn;
     keys(settings).forEach((index) => {
@@ -177,10 +181,5 @@ export default class Speech {
 
 }
 
-Speech.synth = chrome;
-Speech.stream$ = new Subject();
-Speech.volume = DEFAULT_VALUES.SETTINGS.VOLUME;
-Speech.pitch = DEFAULT_VALUES.SETTINGS.PITCH;
-Speech.rate = DEFAULT_VALUES.SETTINGS.RATE;
-
-const a = new Speech();
+// initialize the speechness
+(() => new Speech())();

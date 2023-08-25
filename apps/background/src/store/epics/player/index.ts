@@ -54,6 +54,7 @@ import {
   playerTabSelector,
   playerWait,
   prevPage,
+  proxySectionsRequestAndPlay,
   resetParser,
   routeError,
   routeIndex,
@@ -102,6 +103,20 @@ const proxyPlayEpic: Epic<PlayerAction> = (action, state) =>
     map(playerPlay)
   );
 
+const proxySectionsRequestAndPlayEpic: Epic<PlayerAction> = (action, state) =>
+  action.pipe(
+    ofType(proxySectionsRequestAndPlay.request),
+    pluck('payload'),
+    tap((payload) => {
+      console.log('proxySectionsRequestAndPlayEpic - ', payload);
+      mpToContent(
+        sectionsRequestAndPlay.request(payload),
+        playerTabSelector(state.value)
+      );
+    }),
+    ignoreElements()
+  );
+
 const playEpic: Epic<PlayerAction> = (action, state) =>
   action.pipe(
     ofType(PlayerActionTypes.PLAY),
@@ -119,12 +134,9 @@ const playEpic: Epic<PlayerAction> = (action, state) =>
         ...actions,
         setPlayer({
           buffering: true,
-          // ...(appActiveTabSelector(state) !== -1 && {
-          // tab: appActiveTabSelector(state),
-          // }),
-          // tab: 1879991899,
         }),
       ];
+
       if (userGenerated) out.push(playerHealthCheck());
       console.log('checkAuth.out', out, actions);
       if (!actions.length) {
@@ -277,7 +289,7 @@ const nextMoveEpic: Epic<PlayerAction> = (action, state) =>
     delay(500),
     tap(() => {
       mpToContent(
-        sectionsRequestAndPlay({ userGenerated: true, }),
+        sectionsRequestAndPlay.request({ userGenerated: true, }),
         playerTabSelector(state.value)
       );
     })
@@ -307,7 +319,7 @@ const prevMoveEpic: Epic<PlayerAction> = (action, state) =>
     delay(500),
     tap(() => {
       mpToContent(
-        sectionsRequestAndPlay({ userGenerated: true, }),
+        sectionsRequestAndPlay.request({ userGenerated: true, }),
         playerTabSelector(state.value)
       );
     })
@@ -338,7 +350,7 @@ const endIframeEpic: Epic<PlayerAction> = (action, state) =>
     tap((payload) => {
       console.log('endIframeEpic', payload);
       mpToContent(
-        [ sectionsRequestAndPlay({ ...payload, userGenerated: true, }), ],
+        [ sectionsRequestAndPlay.request({ ...payload, userGenerated: true, }), ],
         playerTabSelector(state.value)
       );
     }),
@@ -489,5 +501,6 @@ export default combineEpics(
   healthCheckEpic,
   toggleEpic,
   softNextEpic,
-  softPrevEpic
+  softPrevEpic,
+  proxySectionsRequestAndPlayEpic
 );
