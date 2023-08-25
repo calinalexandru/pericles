@@ -43,8 +43,13 @@ export enum SectionsActionTypes {
 export const sectionsRequestAndPlay = createAsyncActions<any>(
   'SECTIONS_REQUEST_AND_PLAY'
 );
+
 export const proxySectionsRequestAndPlay = createAsyncActions<any>(
   'PROXY_SECTIONS_REQUEST_AND_PLAY'
+);
+
+export const proxyResetAndRequestPlay = createAsyncActions<any>(
+  'PROXY_RESET_AND_REQUEST_PLAY'
 );
 
 export const setPlayer = createAction<Partial<PlayerState>>(

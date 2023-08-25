@@ -7,18 +7,12 @@ import {
   parserTypeSelector,
   playerCrash,
   playerKeySelector,
-  playerReset,
   playerSectionsSelector,
   playerTabSelector,
+  proxyResetAndRequestPlay,
   proxySectionsRequestAndPlay,
-  resetParser,
-  sectionsRequestAndPlay,
 } from '@pericles/store';
-import {
-  hasSectionsInAdvance,
-  isGoogleDocsSvg,
-  mpToContent,
-} from '@pericles/util';
+import { hasSectionsInAdvance, isGoogleDocsSvg, } from '@pericles/util';
 
 export const playOrRequest$: any = (state, payload, actions) => {
   console.log('play.epic', state, payload);
@@ -42,7 +36,7 @@ export const playOrRequest$: any = (state, payload, actions) => {
     activeTab,
   });
   if (
-    (userGenerated && playingTab !== activeTab) ||
+    userGenerated ||
     (!playerSections.length && isGoogleDocsSvg(parserTypeSelector(state.value)))
   ) {
     Speech.stop();
@@ -52,15 +46,11 @@ export const playOrRequest$: any = (state, payload, actions) => {
       activeTab,
       playerSections,
     });
-    mpToContent(
-      [
-        resetParser(),
-        playerReset({ tab: activeTab, }),
-        sectionsRequestAndPlay.request(payload),
-      ],
-      activeTab
-    );
-  } else if (
+
+    return proxyResetAndRequestPlay.request(payload);
+  }
+
+  if (
     playingTab !== 0 &&
     !parserEndSelector(state.value) &&
     !hasSectionsInAdvance(playerSections, playerKey)
@@ -73,8 +63,8 @@ export const playOrRequest$: any = (state, payload, actions) => {
     );
 
     return proxySectionsRequestAndPlay.request(payload);
-    // mpToContent([ sectionsRequestAndPlay(payload), ], playingTab);
-  } else if (actions.length === 0) {
+  }
+  if (actions.length === 0) {
     Speech.stop();
     console.log(
       'playOrRequest.playing - key, seek',

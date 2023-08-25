@@ -54,6 +54,7 @@ import {
   playerTabSelector,
   playerWait,
   prevPage,
+  proxyResetAndRequestPlay,
   proxySectionsRequestAndPlay,
   resetParser,
   routeError,
@@ -76,6 +77,19 @@ import {
 import { playOrRequest$, } from './handlers';
 
 type PlayerAction = Action<PlayerActionTypes, Partial<PlayerState>>;
+
+// const HEALTH_CHECK_INTERVAL = 1000;
+// const periodicHealthCheckEpic: Epic<PlayerAction> = (action, state) =>
+//   interval(HEALTH_CHECK_INTERVAL).pipe(
+//     mergeMap(() => {
+//       console.log('checking the boy health')
+//       if (!isStopped(playerStatusSelector(state.value))) {
+//         console.log('dispatching medicine')
+//         return of(playerHealthCheck());
+//       }
+//       return of(playerIdle());
+//     })
+//   );
 
 const healthCheckEpic: Epic<PlayerAction> = (action) =>
   action.pipe(
@@ -101,6 +115,24 @@ const proxyPlayEpic: Epic<PlayerAction> = (action, state) =>
     }),
     pluck('payload'),
     map(playerPlay)
+  );
+
+const proxyResetAndRequestPlayEpic: Epic<PlayerAction> = (action, state) =>
+  action.pipe(
+    ofType(proxyResetAndRequestPlay.request),
+    pluck('payload'),
+    tap((payload) => {
+      console.log('proxyResetAndRequestPlayEpic');
+      mpToContent(
+        [
+          resetParser(),
+          playerReset({ tab: appActiveTabSelector(state.value), }),
+          sectionsRequestAndPlay.request(payload),
+        ],
+        appActiveTabSelector(state.value)
+      );
+    }),
+    ignoreElements()
   );
 
 const proxySectionsRequestAndPlayEpic: Epic<PlayerAction> = (action, state) =>
@@ -502,5 +534,6 @@ export default combineEpics(
   toggleEpic,
   softNextEpic,
   softPrevEpic,
+  proxyResetAndRequestPlayEpic,
   proxySectionsRequestAndPlayEpic
 );

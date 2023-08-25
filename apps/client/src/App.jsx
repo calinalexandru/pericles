@@ -7,15 +7,11 @@ import {
   StyledEngineProvider,
   createTheme,
 } from '@mui/material/styles';
-import { string, func, bool, } from 'prop-types';
-import { applySpec, keys, } from 'ramda';
-import React, {
-  Suspense, useEffect, memo, useMemo, 
-} from 'react';
-import { connect, } from 'react-redux';
+import { keys, } from 'ramda';
+import React, { Suspense, useEffect, useMemo, } from 'react';
+import { useDispatch, useSelector, } from 'react-redux';
 
 import LoadingSpinner from '@/primitives/loadingSpinner';
-import { DEFAULT_VALUES, } from '@pericles/constants';
 import {
   notificationTextSelector,
   notificationTypeSelector,
@@ -29,30 +25,58 @@ import {
   playerSoftNext,
   playerSoftPrev,
   playerStop as actionPlayerStop,
+  playerHealthCheck,
+  playerStatusSelector,
 } from '@pericles/store';
+import { isStopped, } from '@pericles/util';
 
 import routes from './routes';
 import { paletteDark, paletteLight, } from './theme';
+
 import './App.css';
 
-function App({
-  appRoute,
-  notificationType,
-  notificationText,
-  onClearNotification,
-  themeMode,
-  language,
-  hotkeys,
-  disableHotkeys,
-  playerToggle,
-  playerStop,
-  playerNext,
-  playerPrev,
-}) {
+const appBoxStyle = {
+  width: '360px',
+  minHeight: '100px',
+  maxHeight: '600px',
+  overflow: 'hidden',
+  bgcolor: 'background.default',
+  color: 'text.primary',
+  transition: 'all .5s linear',
+};
+
+const snackBarProps = {
+  vertical: 'top',
+  horizontal: 'center',
+};
+
+const alertStyle = {
+  width: '100%',
+};
+
+function App() {
   // console.log('App', { appRoute });
   const { i18n, } = useLingui();
   let keysMap = Object.create(null);
+  const dispatch = useDispatch();
+  const appRoute = useSelector(appRouteSelector);
+  const notificationText = useSelector(notificationTextSelector);
+  const notificationType = useSelector(notificationTypeSelector);
+  const themeMode = useSelector(appThemeModeSelector);
+  const language = useSelector(appLanguageSelector);
+  const hotkeys = useSelector(hotkeysSelector);
+  const disableHotkeys = useSelector(hotkeysDisableSelector);
 
+  const spinner = useMemo(() => <LoadingSpinner />, []);
+
+  const onClearNotification = () => {
+    dispatch(notificationClear());
+  };
+
+  const playerToggle = () => dispatch(actionPlayerToggle());
+  const playerNext = () => dispatch(playerSoftNext());
+  const playerPrev = () => dispatch(playerSoftPrev());
+  const playerStop = () => dispatch(actionPlayerStop());
   const hotkeyEvents = {
     play: () => {
       // console.log('hotkeyEvents.toggle');
@@ -71,6 +95,20 @@ function App({
       playerPrev();
     },
   };
+
+  const playerStatus = useSelector(playerStatusSelector);
+
+  // we want to trigger this hook once
+  // with the initial playerStatus found in state
+  // on application mount to decide
+  // if we want to dispatch a heath check
+  useEffect(() => {
+    if (!isStopped(playerStatus)) {
+      dispatch(playerHealthCheck());
+    }
+
+    /* eslint-disable react-hooks/exhaustive-deps */
+  }, [ dispatch, ]);
 
   useEffect(() => {
     // console.log('activating', language);
@@ -127,31 +165,21 @@ function App({
     <StyledEngineProvider injectFirst={true}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Box
-          sx={{
-            width: '360px',
-            minHeight: '100px',
-            maxHeight: '600px',
-            overflow: 'hidden',
-            bgcolor: 'background.default',
-            color: 'text.primary',
-            transition: 'all .5s linear',
-          }}
-        >
+        <Box sx={appBoxStyle}>
           <Snackbar
-            anchorOrigin={{ vertical: 'top', horizontal: 'center', }}
+            anchorOrigin={snackBarProps}
             open={!!notificationText}
             onClose={onClearNotification}
           >
             <Alert
               severity={notificationType}
-              sx={{ width: '100%', }}
+              sx={alertStyle}
               onClose={onClearNotification}
             >
               {notificationText}
             </Alert>
           </Snackbar>
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense fallback={spinner}>
             <CurrentPage />
           </Suspense>
         </Box>
@@ -160,52 +188,4 @@ function App({
   );
 }
 
-App.propTypes = {
-  language: string,
-  appRoute: string,
-  notificationText: string,
-  notificationType: string,
-  onClearNotification: func,
-  themeMode: string,
-  hotkeys: {},
-  disableHotkeys: bool,
-  playerToggle: func,
-  playerNext: func,
-  playerPrev: func,
-  playerStop: func,
-};
-
-App.defaultProps = {
-  language: DEFAULT_VALUES.APP.LANGUAGE,
-  appRoute: DEFAULT_VALUES.APP.ROUTE,
-  themeMode: DEFAULT_VALUES.APP.THEME_MODE,
-  notificationText: DEFAULT_VALUES.NOTIFICATION.TEXT,
-  notificationType: DEFAULT_VALUES.NOTIFICATION.TYPE,
-  onClearNotification: () => {},
-  hotkeys: {},
-  disableHotkeys: DEFAULT_VALUES.HOTKEYS.DISABLE,
-  playerToggle: () => {},
-  playerNext: () => {},
-  playerPrev: () => {},
-  playerStop: () => {},
-};
-
-const mapStateToProps = applySpec({
-  appRoute: appRouteSelector,
-  notificationText: notificationTextSelector,
-  notificationType: notificationTypeSelector,
-  themeMode: appThemeModeSelector,
-  language: appLanguageSelector,
-  hotkeys: hotkeysSelector,
-  disableHotkeys: hotkeysDisableSelector,
-});
-
-const mapDispatchToProps = (dispatch) => ({
-  onClearNotification: () => dispatch(notificationClear()),
-  playerToggle: () => dispatch(actionPlayerToggle()),
-  playerNext: () => dispatch(playerSoftNext()),
-  playerPrev: () => dispatch(playerSoftPrev()),
-  playerStop: () => dispatch(actionPlayerStop()),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(memo(App));
+export default App;
