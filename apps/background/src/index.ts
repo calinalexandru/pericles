@@ -5,7 +5,9 @@ import { wrapStore, } from 'webext-redux';
 
 import core from '@/core';
 import { WEBEXT_PORT, } from '@pericles/constants';
-import { initialState, setApp, store, } from '@pericles/store';
+import {
+  RootState, initialState, setApp, store, 
+} from '@pericles/store';
 import { getBrowserAPI, } from '@pericles/util';
 
 import appEpic from './store/epics/app';
@@ -22,9 +24,9 @@ import settingsReducer from './store/reducers/settings';
 // Since we are in a service worker, this is not persistent
 // and this will be reset to false, as expected, whenever
 // the service worker wakes up from idle.
-let isInitialized = false;
+let isInitialized: boolean = false;
 
-const init = (preloadedState) => {
+const init = (preloadedState: RootState) => {
   console.log('preloadedState', preloadedState);
   const observableMiddleware = createEpicMiddleware();
   store.initialize(
@@ -54,7 +56,7 @@ const init = (preloadedState) => {
 
   getBrowserAPI().api.tabs.query(
     { active: true, currentWindow: true, },
-    (tabs) => {
+    (tabs: any) => {
       const activeTab = tabs[0];
       const activeTabId = activeTab.id;
 
@@ -65,15 +67,35 @@ const init = (preloadedState) => {
   );
 };
 
+type OnMessageType = {
+  addListener: any;
+  dispatch: any;
+  hasListeners: any;
+  removeListener: any;
+};
+
+type PortType = {
+  name: string;
+  disconnect: any;
+  onDisconnect: void;
+  onMessage: OnMessageType;
+  postMessage: void;
+  sender: any;
+};
+
+type MessageType = {
+  type: string;
+};
+
 // Listens for incomming connections from content
 // scripts, or from the popup. This will be triggered
 // whenever the extension "wakes up" from idle.
-getBrowserAPI().api.runtime.onConnect.addListener((port) => {
+getBrowserAPI().api.runtime.onConnect.addListener((port: PortType) => {
   if ([ 'POPUP', 'CONTENT', ].includes(port.name)) {
     console.log('Connection established:', port.name);
 
     // Listen for messages on this port.
-    port.onMessage.addListener((msg) => {
+    port.onMessage.addListener((msg: MessageType) => {
       if ([ 'CONTENT_READY', 'POPUP_READY', ].includes(msg.type)) {
         getBrowserAPI().api.storage.local.get('state', (storage) => {
           console.log('Fetching state:', { storage, isInitialized, store, });

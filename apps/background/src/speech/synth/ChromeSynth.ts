@@ -1,10 +1,15 @@
 import { getBrowserAPI, } from '@pericles/util';
 
+import BaseSynth from './BaseSynth';
+import ISynth from './ISynth';
 import Utterance from './utterance';
 
-export default class ChromeSynth {
+export default class ChromeSynth extends BaseSynth implements ISynth {
+
+  private static voices = [];
 
   constructor() {
+    super();
     this.synth = getBrowserAPI().api.tts;
     this.onStart = () => {};
     this.onEnd = () => {};
@@ -14,27 +19,10 @@ export default class ChromeSynth {
     this.onPause = () => {};
     this.onResume = () => {};
     this.currentMsgKey = 0;
-    this.volume = 1;
-    this.pitch = 1;
-    this.rate = 1;
-    this.voice = 0;
-    this.voices = [];
-    this.msgArr = [];
     this.msg = {};
     this.text = '';
-    this.boundaries = 0; // [];
-    this.serviceKey = '';
-    this.serviceRegion = '';
     this.resumeTimer = 0;
     this.isCanceled = false;
-  }
-
-  clearMessages() {
-    this.msgArr = [];
-  }
-
-  setBoundaries(boundaries) {
-    this.boundaries = boundaries;
   }
 
   clearResumeInfinity() {
@@ -49,10 +37,8 @@ export default class ChromeSynth {
     }, 5000);
   }
 
-  async speak(text, key = 0, boundaries = []) {
+  async speak(text: string): any {
     this.isCanceled = false;
-    console.log('speak', text, key);
-    this.setBoundaries(boundaries);
     this.text = text;
     const voiceObj = await this.getVoiceByKey(this.voice);
 
@@ -90,22 +76,6 @@ export default class ChromeSynth {
     getBrowserAPI().api.tts.speak(ttsText, restTtsOptions);
   }
 
-  setVoice(val) {
-    this.voice = val;
-  }
-
-  setVolume(val) {
-    this.volume = val;
-  }
-
-  setPitch(val) {
-    this.pitch = val;
-  }
-
-  setRate(val) {
-    this.rate = val;
-  }
-
   async getVoiceByKey(voiceKey) {
     return new Promise((resolve, reject) => {
       try {
@@ -126,7 +96,7 @@ export default class ChromeSynth {
   continue() {
     console.log('Speech.chrome.continue');
     this.cancel();
-    this.speak(this.text, this.currentMsgKey + 1, this.boundaries);
+    this.speak(this.text, this.currentMsgKey + 1);
   }
 
   cancel() {
@@ -141,32 +111,10 @@ export default class ChromeSynth {
     // this.onPause();
   }
 
-  resume() {
+  resume(): number {
     console.log('synth.chrome.resume', this.msgArr);
     this.synth.resume();
     // this.onResume();
   }
 
-  setServiceRegion(region) {
-    this.serviceRegion = region;
-  }
-
-  setServiceKey(key) {
-    this.serviceKey = key;
-  }
-
-  isReplayStarved() {
-    return true;
-  }
-
-  getSeekerTime() {
-    return 0;
-  }
-
-  seek() {
-    //
-  }
-
 }
-
-ChromeSynth.voices = [];

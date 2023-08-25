@@ -134,6 +134,7 @@ module.exports = {
 
     'no-shadow': 'off',
     '@typescript-eslint/no-shadow': ['error'],
+    'no-undef': ['error'],
 
     // allow ShortCircuit
     'no-unused-expressions': [

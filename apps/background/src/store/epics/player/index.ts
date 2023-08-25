@@ -455,7 +455,7 @@ const demandPlayEpic: Epic<PlayerAction> = (action, state) =>
     tap(() => {
       console.log('player.demand');
       try {
-        Speech.play(appSelectedTextSelector(state.value), 0, true);
+        Speech.play(appSelectedTextSelector(state.value));
       } catch (e) {
         console.error('Please enter text', e);
       }

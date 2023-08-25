@@ -3,7 +3,7 @@ import { Subject, } from 'rxjs';
 
 import { DEFAULT_VALUES, } from '@pericles/constants';
 
-import ChromeSynth from './synth/chrome';
+import ChromeSynth from './synth/ChromeSynth';
 
 interface StreamParams {
   event: string;
@@ -57,17 +57,15 @@ export default class Speech {
     Speech.setVolume(Speech.volume);
     Speech.setPitch(Speech.pitch);
     Speech.setRate(Speech.rate);
-    Speech.setServiceKey(Speech.serviceKey);
-    Speech.setServiceRegion(Speech.serviceRegion);
   }
 
-  static play(text, seek = 0, demand = false) {
+  static play(text) {
     if (!text) {
       throw new Error('Speech: text is empty');
       // TODO:: change editor state
     }
     // console.log('play');
-    Speech.synth.speak(text, seek, demand);
+    Speech.synth.speak(text);
   }
 
   static validate(voice) {
@@ -130,16 +128,6 @@ export default class Speech {
     Speech.seedValues();
 
     Speech.synth.setVoice(newVal);
-  }
-
-  static setServiceRegion(region) {
-    Speech.serviceRegion = region;
-    Speech.synth.setServiceRegion(region);
-  }
-
-  static setServiceKey(key) {
-    Speech.serviceKey = key;
-    Speech.synth.setServiceKey(key);
   }
 
   static getSettingByIndex(name) {

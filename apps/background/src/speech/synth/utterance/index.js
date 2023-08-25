@@ -10,8 +10,6 @@ export default class Utterance {
     text,
     onEnd,
     onBoundary,
-    onPause,
-    onResume,
     onError,
   }) {
     return {

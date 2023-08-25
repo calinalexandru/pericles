@@ -73,7 +73,7 @@ export const playOrRequest$: any = (state, payload, actions) => {
       playerSections
     );
     try {
-      Speech.play(playerSections[playerKey].text, seek);
+      Speech.play(playerSections[playerKey].text);
     } catch (e) {
       console.error('Player has crashed, rip', e);
       return playerCrash();
