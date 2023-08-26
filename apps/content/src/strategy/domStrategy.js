@@ -63,7 +63,7 @@ export default class DomStrategy {
       : getLastNode(this.parserKey ? this.parserKey - 1 : 0);
     if (isGoogleBook(this.type)) {
       pageIndex = getGoogleBookPage(window);
-      ({ maxPage, out, } = getGoogleBookSections(pageIndex));
+      ({ maxPage, out, } = getGoogleBookSections());
     } else if (isGoogleDocsSvg(this.type)) {
       pageIndex = getGoogleDocsPageByQuery();
       ({ maxPage, out, } = getGoogleDocsSectionsSvg(pageIndex));

@@ -98,6 +98,7 @@ function App() {
 
   const playerStatus = useSelector(playerStatusSelector);
 
+  // TODO:: not sure about this
   // we want to trigger this hook once
   // with the initial playerStatus found in state
   // on application mount to decide
