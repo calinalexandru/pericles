@@ -3,7 +3,11 @@ import { sort, } from 'ramda';
 import alterNodeWord from './alterNodeWord';
 
 const sortFunc = (a, b) => b - a;
-export default function wrapWordTag(node, charIndex, jp = false) {
+export default function wrapWordTag(
+  node: Text,
+  charIndex: number = 0,
+  jp: boolean = false
+): number {
   if (!node || !node.nodeValue) return charIndex;
   const { nodeValue, } = node;
   const leftTrimmedNodeValue = nodeValue.trimLeft();

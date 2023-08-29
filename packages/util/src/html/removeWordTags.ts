@@ -1,6 +1,6 @@
 import { ATTRIBUTES, } from '@pericles/constants';
 
-export default function removeWordTags(els) {
+export default function removeWordTags(els: Element[]): void {
   els.forEach((section) => {
     const allWords = Array.from(
       section.querySelectorAll(`${ATTRIBUTES.TAGS.WORD}`)

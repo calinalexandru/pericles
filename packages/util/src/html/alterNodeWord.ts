@@ -1,9 +1,9 @@
 import { ATTRIBUTES, } from '@pericles/constants';
 
 export default function alterNodeWord(
-  node: Element,
+  node: Element | Text,
   charIndex: number,
-  charAudioIndex: number
+  charAudioIndex?: number
 ): void {
   if (!node) return;
   const myEl = document.createElement(ATTRIBUTES.TAGS.WORD);

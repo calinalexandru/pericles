@@ -9,7 +9,7 @@
  * U+201D Right Double Quotation Mark ”
  * U+201E Double Low-9 Quotation Mark „
  */
-export default function trimQuotes(str) {
+export default function trimQuotes(str: string): string {
   return str.replace(
     /(^[\u2018|\u2019|\u201A|\u201C|\u201D|\u201E|\u0022|\u0027]+|[\u2018|\u2019|\u201A|\u201C|\u201D|\u201E|\u0022|\u0027]+$)/gm,
     ''

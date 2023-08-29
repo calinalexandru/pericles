@@ -2,11 +2,25 @@ import getInnerText from '../string-work/getInnerText';
 
 import alterNodeWord from './alterNodeWord';
 
+type WordList = {
+  text: string;
+  index: number;
+  audio: number;
+  wordLength: number;
+};
+
 export default function wrapWordTagAzure({
   node,
   wordIndex: charIndex,
   wordList,
-}) {
+}: {
+  node: Text;
+  wordIndex: number;
+  wordList: WordList[];
+}): {
+  wordList: WordList[];
+  wordIndex: number;
+} {
   if (!node || !node.nodeValue || !wordList.length)
     return { wordList, wordIndex: charIndex, };
 
@@ -15,7 +29,7 @@ export default function wrapWordTagAzure({
   let newNode = node;
   let oldNode = node;
   let splitIndex = 0;
-  let out = {};
+  let out: any = {};
   const word = wordList[0];
   splitIndex = newNode.nodeValue.indexOf(word.text) + word.wordLength;
 
@@ -36,6 +50,9 @@ export default function wrapWordTagAzure({
       newCharIndex = out.wordIndex;
     }
   }
+
+  console.log('wrapWordTagAzure', wordListSliced);
+
   return {
     wordList: wordListSliced,
     wordIndex: newCharIndex,

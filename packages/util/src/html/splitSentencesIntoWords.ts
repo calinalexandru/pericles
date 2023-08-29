@@ -4,7 +4,10 @@ import getSelfIframes from './getSelfIframes';
 import sectionQuerySelector from './sectionQuerySelector';
 import wrapWordTag from './wrapWordTag';
 
-export default function splitSentencesIntoWords(sectionsIds, jp = false) {
+export default function splitSentencesIntoWords(
+  sectionsIds: number[],
+  jp: boolean = false
+): void {
   if (!sectionsIds?.length) return;
   const query = sectionsIds.map((id) => sectionQuerySelector(id)).join(',');
   const sectionsInFrames = getSelfIframes().reduce(

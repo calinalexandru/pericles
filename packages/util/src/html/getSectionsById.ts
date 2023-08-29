@@ -1,7 +1,7 @@
 import getSelfIframes from './getSelfIframes';
 import sectionQuerySelector from './sectionQuerySelector';
 
-export default function getSectionsById(id: string): HTMLElement[] {
+export default function getSectionsById(id: number): HTMLElement[] {
   const find = Array.from(
     document.querySelectorAll<HTMLElement>(sectionQuerySelector(id))
   );

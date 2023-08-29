@@ -1,6 +1,6 @@
 import getSelfIframes from './getSelfIframes';
 
-export default function removeClassFromAll(cls) {
+export default function removeClassFromAll(cls: string): void {
   Array.from(document.querySelectorAll(`.${cls}`)).forEach((el) => {
     el.classList.remove(cls);
   });

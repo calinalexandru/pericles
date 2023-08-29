@@ -1,12 +1,11 @@
 /**
- * removes whatever
  * 1. remove nbsp & zwnj
  * 2. remove dashes
  * 3. remove other chars
  * @param {*} str
  * @returns
  */
-export default function removeHTMLSpaces(str) {
+export default function removeHTMLSpaces(str: string): string {
   return str
     .trim()
     .replace(/(&nbsp;)+|(&zwnj;)+/gi, '')

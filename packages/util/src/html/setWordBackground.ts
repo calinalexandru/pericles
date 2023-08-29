@@ -2,14 +2,14 @@ import { ATTRIBUTES, } from '@pericles/constants';
 
 import getSelfIframes from './getSelfIframes';
 
-export default function setWordBackground(color) {
+export default function setWordBackground(color: string): void {
   try {
     document
-      .querySelector(':root')
+      .querySelector<HTMLElement>(':root')
       .style.setProperty(ATTRIBUTES.ATTRS.WORD_BACKGROUND, color);
     getSelfIframes().forEach((iframe) => {
       iframe.document
-        .querySelector(':root')
+        .querySelector<HTMLElement>(':root')
         .style.setProperty(ATTRIBUTES.ATTRS.WORD_BACKGROUND, color);
     });
   } catch (e) {
