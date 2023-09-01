@@ -1,4 +1,8 @@
-export default function getEnglishVoiceKey(voices) {
+type VoiceType = {
+  text: string;
+};
+
+export default function getEnglishVoiceKey(voices: VoiceType[]): number {
   if (!voices) return 0;
   // console.log('getEnglishVoiceKey', voices);
   let index = -1;

@@ -1,3 +1,12 @@
+export type CountryType = {
+  tags: string[];
+  flag: string;
+};
+
+export type CountryTypeMap = {
+  [key: string]: CountryType;
+};
+
 export const COUNTRIES = {
   af: {
     tags: [ 'afghanistan', ],
@@ -999,7 +1008,7 @@ export const COUNTRIES = {
     tags: [ 'zimbabwe', ],
     flag: 'zwe.svg',
   },
-} as const;
+} as CountryTypeMap;
 
 // import countriesJSON from './countriesArr';
 

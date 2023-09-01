@@ -1,3 +1,13 @@
+export type IsoLangType = {
+  name: string;
+  nativeName: string;
+  flag?: string;
+};
+
+export type IsoLangTypesMap = {
+  [key: string]: IsoLangType;
+};
+
 export const ISO_LANGS = {
   ab: {
     name: 'Abkhaz',
@@ -758,4 +768,4 @@ export const ISO_LANGS = {
     name: 'Zhuang, Chuang',
     nativeName: 'Saɯ cueŋƅ, Saw cuengh',
   },
-} as const;
+} as IsoLangTypesMap;
