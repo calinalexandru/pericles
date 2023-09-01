@@ -5,6 +5,21 @@ import { SectionHighlightStylesTypes, } from './sectionHighlightStyles';
 import { TabsTypes, } from './tabs';
 import { WordTrackerStylesTypes, } from './wordTrackerStyles';
 
+export type PlayerSectionsType = {
+  text: string;
+  pos: {
+    top: number;
+    width: number;
+    height: number;
+  };
+};
+
+export type ParserIframesType = {
+  [key: string]: {
+    parsing: boolean;
+  };
+};
+
 export type ParserTypes = typeof PARSER_TYPES[keyof typeof PARSER_TYPES];
 export type PlayerStatusTypes =
   typeof PLAYER_STATUS[keyof typeof PLAYER_STATUS];
@@ -25,7 +40,7 @@ export type Variables = {
     KEY: number;
     END: boolean;
     TYPE: ParserTypes;
-    IFRAMES: Record<string, any>;
+    IFRAMES: ParserIframesType;
     PAGE: number;
     MAX_PAGE: number;
   };
@@ -77,7 +92,7 @@ export type Variables = {
   };
 
   PLAYER: {
-    SECTIONS: string[];
+    SECTIONS: PlayerSectionsType[];
     KEY: number;
     STATUS: PlayerStatusTypes;
     TAB: number;

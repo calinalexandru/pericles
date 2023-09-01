@@ -376,7 +376,9 @@ const endIframeEpic: Epic<PlayerAction> = (action, state) =>
     ofType(PlayerActionTypes.END),
     filter(() => {
       const someIframes = parserIframesSelector(state.value);
-      return !Object.values(someIframes).every((val) => isIframeParsing(val));
+      return !Object.keys(someIframes).every((val) =>
+        isIframeParsing(val, someIframes)
+      );
     }),
     pluck('payload'),
     tap((payload) => {

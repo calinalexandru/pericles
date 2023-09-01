@@ -68,19 +68,14 @@ export { default as isGrammarlyAppHost, } from './location/isGrammarlyAppHost';
 export { default as isPdfPage, } from './location/isPdfPage';
 /* mp */
 export { default as mpToContent, } from './mp';
-/* navigator */
-export { default as detectBrowserLocale, } from './navigator/detectBrowserLocale';
 /* nlp */
 export { default as getSentencesFromText, } from './nlp/getSentencesFromText';
-export { default as splitTextByThreshold, } from './nlp/splitTextByThreshold';
 /* predicates */
 export { default as hasSectionsInAdvance, } from './predicates/hasSectionsInAdvance';
 export { default as isElementNode, } from './predicates/isElementNode';
-export { default as isEmail, } from './predicates/isEmail';
 export { default as isError, } from './predicates/isError';
 export { default as isGoogleBook, } from './predicates/isGoogleBook';
 export { default as isGoogleDocs, } from './predicates/isGoogleDocs';
-export { default as isGoogleDocsParagraph, } from './predicates/isGoogleDocsParagraph';
 export { default as isGoogleDocsSvg, } from './predicates/isGoogleDocsSvg';
 export { default as isGoogleForm, } from './predicates/isGoogleForm';
 export { default as isGoogleUtility, } from './predicates/isGoogleUtility';

@@ -7,6 +7,7 @@ import miniPlayerInject from '@/util/miniPlayerInject';
 import { store, } from '@pericles/store';
 
 export const InlinePlayer = (): void => {
+  console.log('InlinePlayer.initialize');
   store.current.ready().then(() => {
     reactDom.render(
       <Provider store={store.current}>

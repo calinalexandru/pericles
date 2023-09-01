@@ -13,3 +13,4 @@ export * from './attributes';
 export * from './wordTrackerStyles';
 export * from './sectionHighlightStyles';
 export * from './misc';
+export * from './types';

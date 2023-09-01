@@ -26,7 +26,7 @@ import settingsReducer from './store/reducers/settings';
 // the service worker wakes up from idle.
 let isInitialized: boolean = false;
 
-const init = (preloadedState: RootState) => {
+const init = async (preloadedState: RootState) => {
   console.log('preloadedState', preloadedState);
   const observableMiddleware = createEpicMiddleware();
   store.initialize(
@@ -54,17 +54,19 @@ const init = (preloadedState: RootState) => {
     console.log('store updated', store.getState());
   });
 
-  getBrowserAPI().api.tabs.query(
-    { active: true, currentWindow: true, },
-    (tabs: any) => {
-      const activeTab = tabs[0];
-      const activeTabId = activeTab.id;
+  return new Promise((resolve) => {
+    getBrowserAPI().api.tabs.query(
+      { active: true, currentWindow: true, },
+      (tabs: any) => {
+        const activeTab = tabs[0];
+        const activeTabId = activeTab.id;
 
-      // Dispatch the tab ID to your state here
-      console.log('dispatch tabId', activeTabId);
-      store.dispatch(setApp({ activeTab: activeTabId, }));
-    }
-  );
+        console.log('dispatch tabId', activeTabId);
+        store.dispatch(setApp({ activeTab: activeTabId, }));
+        resolve();
+      }
+    );
+  });
 };
 
 type OnMessageType = {
@@ -97,10 +99,10 @@ getBrowserAPI().api.runtime.onConnect.addListener((port: PortType) => {
     // Listen for messages on this port.
     port.onMessage.addListener((msg: MessageType) => {
       if ([ 'CONTENT_READY', 'POPUP_READY', ].includes(msg.type)) {
-        getBrowserAPI().api.storage.local.get('state', (storage) => {
+        getBrowserAPI().api.storage.local.get('state', async (storage) => {
           console.log('Fetching state:', { storage, isInitialized, store, });
           if (!isInitialized) {
-            init(storage.state || initialState);
+            await init(storage.state || initialState);
             isInitialized = true;
           }
           port.postMessage({ type: 'STORE_INITIALIZED', });
