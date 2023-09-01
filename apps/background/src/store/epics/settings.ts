@@ -45,7 +45,7 @@ const settingsSetEpic: Epic<Action<SettingsActionTypes, SettingsState>> = (
         if (Speech.isReplayStarved(keys(pick(settingsItems, payload)))) {
           console.log('Speech.isReplayStarved -> settingsSetEpic.seek', seek);
           Speech.stop();
-          return of(playerPlay({ userGenerated: true, seek, }));
+          return of(playerPlay({ userGenerated: false, seek, }));
         }
       }
 
