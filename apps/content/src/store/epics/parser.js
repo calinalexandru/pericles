@@ -42,7 +42,6 @@ import {
   setParser,
   setPlayer,
   setSections,
-  settingsNeuralVoicesSelector,
   settingsVoiceSelector,
 } from '@pericles/store';
 import {
@@ -118,9 +117,7 @@ export const getSectionsAndPlayEpic = (action, state) =>
       const parserKey = parserKeySelector(state.value);
       const voiceProp = settingsVoiceSelector(state.value);
       const skipUntilY = appSkipUntilYSelector(state.value);
-      const voices = isPremiumVoice(voiceProp)
-        ? settingsNeuralVoicesSelector(state.value)
-        : settingsVoiceSelector(state.value);
+      const voices = settingsVoiceSelector(state.value);
       const newVoiceProp = isPremiumVoice(voiceProp)
         ? getPremiumVoiceId(voiceProp)
         : voiceProp;

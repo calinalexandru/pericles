@@ -56,7 +56,6 @@ export { default as settingsPitchSelector, } from './selectors/settings/settings
 export { default as settingsRateSelector, } from './selectors/settings/settingsRateSelector';
 export { default as settingsVoiceSelector, } from './selectors/settings/settingsVoiceSelector';
 export { default as settingsVoicesSelector, } from './selectors/settings/settingsVoicesSelector';
-export { default as settingsNeuralVoicesSelector, } from './selectors/settings/settingsNeuralVoicesSelector';
 
 export * from './actions/notification';
 export * from './actions/player';
