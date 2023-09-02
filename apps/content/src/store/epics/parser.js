@@ -129,11 +129,14 @@ export const getSectionsAndPlayEpic = (action, state) =>
         userGenerated,
         skipUntilY,
         parserKey,
+        parserIframes,
         fromCursor,
         working,
       });
 
       const { out, maxPage, pageIndex, blocked, } = domStrategy.getSections();
+
+      // console.log('domStrategy.getSections', {out, maxPage, pageIndex, blocked,})
 
       if (!out.length)
         return {

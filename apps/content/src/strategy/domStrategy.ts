@@ -1,4 +1,8 @@
-import { PARSER_TYPES, } from '@pericles/constants';
+import {
+  PARSER_TYPES,
+  ParserIframesType,
+  ParserTypes,
+} from '@pericles/constants';
 import {
   getElementFromPoint,
   getGoogleBookPage,
@@ -20,36 +24,44 @@ import {
 
 export default class DomStrategy {
 
-  type = PARSER_TYPES.DEFAULT;
+  type: ParserTypes = PARSER_TYPES.DEFAULT;
 
-  iframes = {};
+  userGenerated: boolean = false;
 
-  userGenerated = false;
+  working: boolean = false;
 
-  working = false;
+  fromCursor: boolean = false;
 
-  fromCursor = false;
+  skipUntilY: number = 0;
 
-  skipUntilY = 0;
+  parserKey: number = 0;
 
-  parserKey = 0;
+  parserIframes: ParserIframesType;
 
   constructor({
     parserType = PARSER_TYPES.DEFAULT,
     working,
     userGenerated,
-    iframes,
+    parserIframes,
     parserKey,
     skipUntilY,
     fromCursor,
+  }: {
+    parserType?: ParserTypes;
+    working?: boolean;
+    userGenerated?: boolean;
+    parserIframes?: ParserIframesType;
+    parserKey?: number;
+    skipUntilY?: number;
+    fromCursor?: boolean;
   }) {
     this.type = parserType;
     this.working = working;
-    this.iframes = iframes;
     this.userGenerated = userGenerated;
     this.parserKey = parserKey;
     this.skipUntilY = skipUntilY;
     this.fromCursor = fromCursor;
+    this.parserIframes = parserIframes;
   }
 
   getSections() {

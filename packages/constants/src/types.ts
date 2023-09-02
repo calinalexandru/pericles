@@ -16,6 +16,7 @@ export type PlayerSectionsType = {
 
 export type ParserIframesType = {
   [key: string]: {
+    top: number;
     parsing: boolean;
   };
 };

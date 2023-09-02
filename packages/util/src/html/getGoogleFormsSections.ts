@@ -13,7 +13,7 @@ type AccType = {
 
 export default function getGoogleFormsSections(): {
   out: AccType[];
-  maxPage: boolean;
+  maxPage: number;
   } {
   return {
     out: Array.from(
@@ -38,6 +38,6 @@ export default function getGoogleFormsSections(): {
       }
       return acc;
     }, []),
-    maxPage: true,
+    maxPage: 1,
   };
 }
