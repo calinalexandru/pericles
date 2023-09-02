@@ -16,12 +16,12 @@ import hotkeys from './hotkeys';
 import { InlinePlayer, } from './InlinePlayer';
 
 let initialized = false;
-export default () => {
+export default (): void => {
   console.log('function initz', initialized, { store, });
   const port = getBrowserAPI().api.runtime.connect({ name: 'CONTENT', });
   port.postMessage({ type: 'CONTENT_READY', });
 
-  const init = () => {
+  const init = (): void => {
     console.log('init content');
     initialized = true;
     const rootEpic = combineEpics(parserEpic, appEpic);
@@ -38,11 +38,10 @@ export default () => {
     if (window === window.top) {
       hotkeys();
     }
-    setTimeout(async () => {
+
+    setTimeout(() => {
       store.dispatch(appNewContent({ iframe: window !== window.top, }));
     }, 50);
-
-    console.log('content.store', store);
 
     store.subscribe(() => {
       const state = store.getState();
@@ -55,9 +54,8 @@ export default () => {
 
   // Listens for when the store gets initialized
   port.onMessage.addListener((msg) => {
-    console.log('port msg', msg);
     if (msg.type === 'STORE_INITIALIZED' && !initialized) {
-      console.log('store initialized boss');
+      console.log('store initialized - content');
       init();
     }
   });

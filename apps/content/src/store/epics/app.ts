@@ -47,10 +47,10 @@ const appNewContentEpic = (action) =>
   action.pipe(
     ofType(AppActionTypes.NEW_CONTENT),
     pluck('payload'),
-    filter((payload = {}) => {
+    filter((payload: any = {}) => {
       console.log('appnewContentEpic', payload);
 
-      return !payload.iframe;
+      return !payload?.iframe;
     }),
     map(highlightReloadSettings)
   );
@@ -77,8 +77,9 @@ const highlightSectionEpic = (action$, state) =>
     filter(() => appSectionTrackerSelector(state.value) === true),
     tap(() => {
       const highlightStyle = appHighlightStyleSelector(state.value);
-      if (appWordTrackerStyleSelector === WORD_TRACKER_STYLES.FADE)
-        removeClassFromAll(ATTRIBUTES.ATTRS.PREV_WORD_TRACKER);
+      const wordHighlightStyle = appWordTrackerStyleSelector(state.value);
+      if (wordHighlightStyle === WORD_TRACKER_STYLES.FADE)
+        removeClassFromAll(wordHighlightStyle);
       removeClassFromAll(highlightStyle);
       if (parserTypeSelector(state.value) === PARSER_TYPES.GOOGLE_DOC_SVG) {
         const activeRectSections = getRectSectionsById(
@@ -103,7 +104,7 @@ const highlightWordEpic = (action$, state) =>
     ofType(HighlightActionTypes.WORD),
     filter(() => appWordTrackerSelector(state.value) === true),
     pluck('payload'),
-    tap((data) => {
+    tap((data: any) => {
       const { charIndex, charLength, } = data;
       const parserKey = playerKeySelector(state.value);
       const wordList = getSectionWords(parserKey);
@@ -154,7 +155,7 @@ const autoscrollRunEpic = (action$, state) =>
     ofType(AutoscrollActionTypes.SET),
     debounceTime(500),
     pluck('payload', 'section'),
-    tap((section) => {
+    tap((section: any) => {
       const parserType = parserTypeSelector(state.value);
       const { top = 0, } =
         playerSectionsSelector(state.value)?.[section]?.pos || {};
@@ -190,7 +191,7 @@ const highlightClearWordsEpic = (action, state) =>
     tap(() => {
       // console.log('highlight.clearWords');
       removeClassFromAll(appWordTrackerStyleSelector(state.value));
-      removeClassFromAll(ATTRIBUTES.ATTRS.PREV_WORD_TRACK_STYLE_FADE);
+      removeClassFromAll(ATTRIBUTES.ATTRS.PREV_WORD_TRACKER);
     }),
     map(highlightClearWordsComplete)
   );

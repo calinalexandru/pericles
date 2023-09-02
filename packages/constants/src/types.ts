@@ -35,7 +35,7 @@ export type Range = {
   STEP: number;
 };
 
-export type ThemeModeTypes = 'light' | 'dark'
+export type ThemeModeTypes = 'light' | 'dark';
 
 export type Variables = {
   PARSER: {

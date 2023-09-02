@@ -2,7 +2,7 @@ import { ATTRIBUTES, } from '@pericles/constants';
 
 import getSelfIframes from './getSelfIframes';
 
-export default function getSectionWords(id: string): HTMLElement[] {
+export default function getSectionWords(id: number): HTMLElement[] {
   const findWords = Array.from(
     document.querySelectorAll<Element>(
       `${ATTRIBUTES.TAGS.SECTION}[${ATTRIBUTES.ATTRS.SECTION}="${id}"] ${ATTRIBUTES.TAGS.WORD}`

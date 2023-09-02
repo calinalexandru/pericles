@@ -4,7 +4,6 @@ import { RootState, } from '../../initialState';
 
 import appSelector from './appSelector';
 
-export default createSelector(
-  appSelector,
-  app => app.skipDeadSections
-) as (state: RootState) => boolean;
+export default createSelector(appSelector, (app) => app.skipDeadSections) as (
+  state: RootState
+) => boolean;

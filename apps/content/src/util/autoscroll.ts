@@ -1,10 +1,12 @@
-import { ATTRIBUTES, PARSER_TYPES, } from '@pericles/constants';
+import { ATTRIBUTES, PARSER_TYPES, ParserTypes, } from '@pericles/constants';
 import { compareValuesWithMargin, getViewportByDocType, } from '@pericles/util';
 
 export default class Autoscroll {
 
-  static to(y, parserType = PARSER_TYPES.DEFAULT) {
-    const viewport = getViewportByDocType(window, parserType);
+  static lastY: number = 0;
+
+  static to(y: number, parserType: ParserTypes = PARSER_TYPES.DEFAULT) {
+    const viewport: any = getViewportByDocType(window, parserType);
     if (!y || !viewport) {
       console.log('Autoscroll is 0 or viewport null', { y, viewport, });
       return;
@@ -51,5 +53,3 @@ export default class Autoscroll {
   }
 
 }
-
-Autoscroll.lastY = 0;

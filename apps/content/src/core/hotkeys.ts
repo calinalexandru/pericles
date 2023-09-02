@@ -1,4 +1,3 @@
-// /* eslint-disable no-unused-vars */
 import { keys, } from 'ramda';
 import { fromEvent, combineLatest, } from 'rxjs';
 import { tap, ignoreElements, } from 'rxjs/operators';
@@ -14,8 +13,8 @@ import {
   playerSoftPrev,
 } from '@pericles/store';
 
-const userIsTyping = (e) => {
-  const { target, } = e;
+const userIsTyping = (e: KeyboardEvent) => {
+  const target = e.target as HTMLElement;
   const tagName = target.tagName.toLocaleLowerCase();
   const inputTags = [ 'input', 'textarea', ];
   const output =
@@ -47,8 +46,11 @@ export default () => {
       store.dispatch(playerSoftPrev());
     },
   };
-  let keysMap = Object.create(null);
-  const onKeyPress$ = fromEvent(document, 'keydown').pipe(
+
+  let keysMap: { [key: string]: { key: string; code: string } } =
+    Object.create(null);
+
+  const onKeyPress$ = fromEvent<KeyboardEvent>(document, 'keydown').pipe(
     tap((e) => {
       if (userIsTyping(e)) return;
       console.log('onKeyPress$', e);
@@ -56,12 +58,15 @@ export default () => {
       const state = store.getState();
       const hotkeys = hotkeysSelector(state);
       const activeHotkeys = keys(keysMap)
-        .filter((k) => keysMap[k] !== false)
+        .filter((k) => keysMap[k] !== null)
         .map((k) => keysMap[k].code)
         .sort();
       console.log('activeHotkeys', activeHotkeys);
+      // console.log('keysMap', keysMap)
       const curEvent = Object.keys(hotkeyEvents).find((evt) => {
-        const candidates = hotkeys[evt].map((key) => key.code).sort();
+        const candidates = hotkeys[evt]
+          .map((key: { code: string }) => key.code)
+          .sort();
         console.log('candidates', candidates);
         return JSON.stringify(activeHotkeys) === JSON.stringify(candidates);
       });
