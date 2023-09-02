@@ -35,6 +35,8 @@ export type Range = {
   STEP: number;
 };
 
+export type ThemeModeTypes = 'light' | 'dark'
+
 export type Variables = {
   PARSER: {
     KEY: number;
@@ -53,7 +55,7 @@ export type Variables = {
   };
 
   APP: {
-    THEME_MODE: 'light' | 'dark';
+    THEME_MODE: ThemeModeTypes;
     WORD_TRACKER: boolean;
     WORD_TRACKER_STYLE: WordTrackerStylesTypes;
     WORD_TRACKER_COLOR: string;
