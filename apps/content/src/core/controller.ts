@@ -16,12 +16,14 @@ import { isGoogleBook, } from '@pericles/util';
 export default () => {
   const contextMenuOpen$ = fromEvent<MouseEvent>(document, 'contextmenu').pipe(
     tap((e) => {
-      const textSelected = window.getSelection().toString();
-      store.dispatch(
-        setApp({
-          [VARIABLES.APP.SELECTED_TEXT]: textSelected,
-        })
-      );
+      const textSelected = window.getSelection()?.toString?.() || '';
+      if (textSelected.length) {
+        store.dispatch(
+          setApp({
+            [VARIABLES.APP.SELECTED_TEXT]: textSelected,
+          })
+        );
+      }
       store.dispatch(setApp({ skipUntilY: e.pageY, }));
     }),
     ignoreElements()
@@ -29,7 +31,8 @@ export default () => {
 
   const wordClick$ = fromEvent<MouseEvent>(document, 'click').pipe(
     map((e) => {
-      let wordEl = e.target as HTMLElement;
+      if (!e.target) return null;
+      let wordEl: HTMLElement | null = e.target as HTMLElement;
       if (wordEl.tagName !== ATTRIBUTES.TAGS.WORD)
         wordEl =
           wordEl.querySelector(ATTRIBUTES.TAGS.WORD) ||
@@ -37,7 +40,7 @@ export default () => {
 
       if (!wordEl) return null;
       const wordAudio = Number(
-        wordEl.getAttribute(ATTRIBUTES.ATTRS.WORD_AUDIO)
+        wordEl.getAttribute(ATTRIBUTES.ATTRS.WORD_AUDIO) || 0
       );
       if (wordAudio < 0) return null;
       console.log('wordAudio', wordAudio);
@@ -49,7 +52,8 @@ export default () => {
 
   const sectionClick$ = fromEvent<MouseEvent>(document, 'click').pipe(
     map((e) => {
-      let sectionEl = e.target as HTMLElement;
+      if (!e.target) return null;
+      let sectionEl: HTMLElement | null = e.target as HTMLElement;
       if (sectionEl.tagName !== ATTRIBUTES.TAGS.SECTION)
         sectionEl = sectionEl.closest(ATTRIBUTES.TAGS.SECTION);
       console.log('sectionEl', sectionEl);
@@ -65,7 +69,7 @@ export default () => {
         setPlayer({ key: sectionId, status: PLAYER_STATUS.LOADING, })
       );
       setTimeout(() => {
-        store.dispatch(playerPlay());
+        store.dispatch(playerPlay({ userGenerated: false, fromCursor: false, }));
       }, 300);
 
       return true;
@@ -76,6 +80,7 @@ export default () => {
   const googleBookNext$ = fromEvent<MouseEvent>(document, 'click').pipe(
     map((e) => {
       const state = store.getState();
+      if (state === null) return;
       const target = e.target as HTMLElement;
       if (!isGoogleBook(parserTypeSelector(state))) return true;
       const nextPageLabel = target.getAttribute('aria-label');
@@ -94,6 +99,7 @@ export default () => {
   const googleBookPrev$ = fromEvent<MouseEvent>(document, 'click').pipe(
     map((e) => {
       const state = store.getState();
+      if (state === null) return;
       const target = e.target as HTMLElement;
       if (!isGoogleBook(parserTypeSelector(state))) return true;
       const prevPageLabel = target.getAttribute('aria-label');

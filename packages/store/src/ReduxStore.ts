@@ -39,7 +39,7 @@ class ReduxStore {
     this._store.dispatch(action);
   }
 
-  getState(): RootState {
+  getState(): RootState | null {
     if (!this._store) {
       console.warn('Store is not initialized yet');
       return null;

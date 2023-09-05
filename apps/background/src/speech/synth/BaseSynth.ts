@@ -1,5 +1,15 @@
 export default abstract class BaseSynth {
 
+  public msgArr: string[];
+
+  public volume: number;
+
+  public pitch: number;
+
+  public rate: number;
+
+  public voice: number;
+
   constructor() {
     this.msgArr = [];
     this.volume = 1;
@@ -12,23 +22,23 @@ export default abstract class BaseSynth {
     this.msgArr = [];
   }
 
-  setVoice(val) {
+  setVoice(val: number) {
     this.voice = val;
   }
 
-  setVolume(val) {
+  setVolume(val: number) {
     this.volume = val;
   }
 
-  setPitch(val) {
+  setPitch(val: number) {
     this.pitch = val;
   }
 
-  setRate(val) {
+  setRate(val: number) {
     this.rate = val;
   }
 
-  isReplayStarved() {
+  isReplayStarved(settings: any) {
     return true;
   }
 
@@ -36,7 +46,7 @@ export default abstract class BaseSynth {
     return 0;
   }
 
-  seek() {
+  seek(time: number) {
     //
   }
 

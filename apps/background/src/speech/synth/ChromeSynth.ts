@@ -6,7 +6,33 @@ import Utterance from './utterance';
 
 export default class ChromeSynth extends BaseSynth implements ISynth {
 
-  private static voices = [];
+  private resumeTimer: any;
+
+  private msg: any;
+
+  private synth: any;
+
+  private text: string;
+
+  private currentMsgKey: number;
+
+  private onEnd: any;
+
+  private onResume: any;
+
+  private onPause: any;
+
+  private onWordsUpdate: any;
+
+  private onStart: any;
+
+  private onBoundary: any;
+
+  private onBuffering: any;
+
+  private isCanceled: boolean;
+
+  private static voices: any;
 
   constructor() {
     super();
@@ -37,7 +63,7 @@ export default class ChromeSynth extends BaseSynth implements ISynth {
     }, 5000);
   }
 
-  async speak(text: string): any {
+  async speak(text: string): Promise<any> {
     this.isCanceled = false;
     this.text = text;
     const voiceObj = await this.getVoiceByKey(this.voice);
@@ -50,18 +76,18 @@ export default class ChromeSynth extends BaseSynth implements ISynth {
       pitch: this.pitch,
       rate: this.rate,
       text: this.text,
-      onStart: (e) => {
+      onStart: (e: any) => {
         if (this.isCanceled) return;
         this.clearResumeInfinity();
         this.activateResumeInfinity();
         this.onBuffering({ buffering: false, });
         this.onStart(e);
       },
-      onBoundary: (params) => {
+      onBoundary: (params: any) => {
         if (this.isCanceled) return;
         this.onBoundary(params);
       },
-      onEnd: (e) => {
+      onEnd: (e: any) => {
         if (this.isCanceled) return;
         this.clearResumeInfinity();
         this.onEnd(e);
@@ -76,10 +102,10 @@ export default class ChromeSynth extends BaseSynth implements ISynth {
     getBrowserAPI().api.tts.speak(ttsText, restTtsOptions);
   }
 
-  async getVoiceByKey(voiceKey) {
+  async getVoiceByKey(voiceKey: number) {
     return new Promise((resolve, reject) => {
       try {
-        this.synth.getVoices((voices) => {
+        this.synth.getVoices((voices: any) => {
           resolve(voices[voiceKey]);
         });
       } catch (e) {
@@ -88,7 +114,7 @@ export default class ChromeSynth extends BaseSynth implements ISynth {
     });
   }
 
-  static setVoices(voices) {
+  static setVoices(voices: any) {
     console.log('voices', voices);
     ChromeSynth.voices = voices;
   }
@@ -96,7 +122,7 @@ export default class ChromeSynth extends BaseSynth implements ISynth {
   continue() {
     console.log('Speech.chrome.continue');
     this.cancel();
-    this.speak(this.text, this.currentMsgKey + 1);
+    this.speak(this.text);
   }
 
   cancel() {
@@ -106,14 +132,16 @@ export default class ChromeSynth extends BaseSynth implements ISynth {
   }
 
   pause() {
-    console.log('synth.chrome.pause', this.msgArr);
+    console.log('synth.chrome.pause', this.text);
     this.synth.pause();
+    this.clearResumeInfinity();
     // this.onPause();
   }
 
-  resume(): number {
-    console.log('synth.chrome.resume', this.msgArr);
+  resume() {
+    console.log('synth.chrome.resume', this.text);
     this.synth.resume();
+    this.activateResumeInfinity();
     // this.onResume();
   }
 

@@ -1,10 +1,11 @@
 import { i18n, } from '@lingui/core';
-import { isEmpty, pick, } from 'ramda';
+import { StateObservable, } from 'redux-observable';
 import { of, } from 'rxjs';
 
 import Speech from '@/speech';
 import { MESSAGES, VARIABLES, } from '@pericles/constants';
 import {
+  RootState,
   appReload,
   highlightReloadSettings,
   initialState,
@@ -21,7 +22,7 @@ import {
 } from '@pericles/store';
 import { getBrowserAPI, getEnglishVoiceKey, mpToContent, } from '@pericles/util';
 
-export function handleAppInit(state): void {
+export function handleAppInit(state: RootState): void {
   console.log('app.init');
   try {
     Speech.setVolume(settingsVolumeSelector(state));
@@ -34,28 +35,34 @@ export function handleAppInit(state): void {
   i18n.load(MESSAGES);
 }
 
-export function handleAppSet(state, payload = {}): void {
+export function handleAppSet(
+  state: StateObservable<RootState>,
+  payload: any = {}
+): void {
   console.log('app.set', payload);
 
-  const highlightSettings = pick(
-    [ VARIABLES.APP.HIGHLIGHT_COLOR, VARIABLES.APP.WORD_TRACKER_COLOR, ],
-    payload
-  );
-  if (!isEmpty(highlightSettings)) {
+  const highlightSettingsKeys = [
+    VARIABLES.APP.HIGHLIGHT_COLOR,
+    VARIABLES.APP.WORD_TRACKER_COLOR,
+  ];
+  const highlightSettings = Object.keys(payload)
+    .filter((key) => highlightSettingsKeys.includes(key))
+    .reduce((obj, key) => {
+      obj[key] = payload[key];
+      return obj;
+    }, {} as { [key: string]: string });
+
+  if (Object.keys(highlightSettings).length > 0) {
     console.log('app.set -> highlight.reloadSettings');
     mpToContent(highlightReloadSettings());
   }
 
-  if (!isEmpty(pick([ VARIABLES.APP.SERVICE_REGION, ], payload))) {
-    Speech.setServiceRegion(payload.serviceRegion);
-  }
-
-  if (!isEmpty(pick([ VARIABLES.APP.LANGUAGE, ], payload))) {
+  if (VARIABLES.APP.LANGUAGE in payload) {
     i18n.activate(payload[VARIABLES.APP.LANGUAGE]);
   }
 }
 
-export const handleFactoryReset$: any = (state) => {
+export const handleFactoryReset$: any = (state: RootState) => {
   const {
     player: playerDefaultValues,
     app: appDefaultValues,
@@ -76,7 +83,7 @@ export const handleFactoryReset$: any = (state) => {
   );
 };
 
-export const handleAppReload: void = () => {
+export const handleAppReload = (): void => {
   const { api, } = getBrowserAPI();
   console.log('appReloadEpic', api);
   api.runtime.reload();

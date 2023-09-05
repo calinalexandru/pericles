@@ -38,9 +38,9 @@ export default () => {
     (handler) => api.tabs.onActivated.addListener(handler),
     (handler) => api.tabs.onActivated.removeListener(handler)
   ).pipe(
-    map((tabs) => tabs),
+    map((tabs: any) => tabs),
     pluck('tabId'),
-    tap((tabId) => {
+    tap((tabId: number) => {
       console.log('set tab ID', tabId);
       store.dispatch(setApp({ activeTab: tabId, }));
     })
@@ -50,7 +50,7 @@ export default () => {
     (handler) => api.contextMenus.onClicked.addListener(handler),
     (handler) => api.contextMenus.onClicked.removeListener(handler)
   ).pipe(
-    map(([ info, ]) => info),
+    map(([ info, ]: any) => info),
     pluck('menuItemId'),
     filter((item) => item === ATTRIBUTES.CONTEXT_MENU.READ_SELECTION),
     tap(() => {
@@ -64,7 +64,7 @@ export default () => {
     (handler) => api.contextMenus.onClicked.addListener(handler),
     (handler) => api.contextMenus.onClicked.removeListener(handler)
   ).pipe(
-    map(([ info, ]) => info),
+    map(([ info, ]: any) => info),
     pluck('menuItemId'),
     filter((item) => item === ATTRIBUTES.CONTEXT_MENU.READ_FROM_HERE),
     tap(() => {

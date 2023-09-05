@@ -20,7 +20,7 @@ export default function getSelfIframes(): AccType[] {
       iframe.getAttribute('id') !== ATTRIBUTES.ATTRS.CONTENT_IFRAME &&
       canAccessIframe(iframe)
     ) {
-      localWindow = iframe.contentDocument;
+      localWindow = iframe.contentWindow;
       localDocument = getIframeDocument(iframe);
       if (localWindow && localDocument)
         acc.push({ iframe, window: localWindow, document: localDocument, });
@@ -28,5 +28,5 @@ export default function getSelfIframes(): AccType[] {
       localDocument = null;
     }
     return acc;
-  }, []);
+  }, [] as AccType[]);
 }

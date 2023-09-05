@@ -1,19 +1,14 @@
 /* eslint-disable no-bitwise */
+import { SectionType, } from '@pericles/constants';
+
 import isMinText from '../predicates/isMinText';
 import getInnerText from '../string-work/getInnerText';
 
 import alterDom from './alterDom';
 import removeHTMLSpaces from './removeHTMLSpaces';
 
-type AccType = {
-  node: Element;
-  text: string;
-  pos: any;
-  encoded: string;
-};
-
 export default function getGoogleBookSections(): {
-  out: AccType[];
+  out: SectionType[];
   maxPage: number;
   } {
   const maxPage: number = Number(
@@ -22,9 +17,11 @@ export default function getGoogleBookSections(): {
       ?.lastChild?.textContent?.replace('/', '')
       ?.trim() || 0
   );
-  const allPages = Array.from(document.querySelectorAll('.-gb-loaded'));
+  const allPages = Array.from(
+    document.querySelectorAll<HTMLElement>('.-gb-loaded')
+  );
   return {
-    out: allPages.reduce((acc: AccType[], section: HTMLElement) => {
+    out: allPages.reduce((acc: SectionType[], section: HTMLElement) => {
       if (section?.getBoundingClientRect?.()?.width <= 0) return acc;
       let paragraphs = Array.from(
         section.querySelectorAll(
@@ -38,7 +35,9 @@ export default function getGoogleBookSections(): {
       const text = paragraphs.map((para) => para.textContent).join(' ');
       if (isMinText(text)) {
         paragraphs.forEach((para) => {
-          const paraText = removeHTMLSpaces(getInnerText(para.textContent));
+          const paraText = removeHTMLSpaces(
+            getInnerText(para.textContent || '')
+          );
           if (paraText.length) {
             alterDom(para, acc.length);
             const {
@@ -56,7 +55,7 @@ export default function getGoogleBookSections(): {
         });
       }
       return acc;
-    }, []),
+    }, [] as SectionType[]),
     maxPage,
   };
 }

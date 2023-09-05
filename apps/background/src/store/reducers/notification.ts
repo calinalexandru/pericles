@@ -1,4 +1,4 @@
-import { handleActions, Action, } from 'redux-actions';
+import { handleActions, } from 'redux-actions';
 
 import {
   NotificationActionTypes,
@@ -8,26 +8,23 @@ import {
 
 const { notification: defaultValues, } = initialState;
 
-export default handleActions<
-  NotificationState,
-  Action<Partial<NotificationState>>
->(
+export default handleActions<NotificationState, Partial<NotificationState>>(
   {
     [NotificationActionTypes.ERROR]: (state, { payload, }) => ({
       type: 'error',
-      ...payload,
+      text: payload.text || '',
     }),
     [NotificationActionTypes.INFO]: (state, { payload, }) => ({
       type: 'info',
-      ...payload,
+      text: payload.text || '',
     }),
     [NotificationActionTypes.SUCCESS]: (state, { payload, }) => ({
       type: 'success',
-      ...payload,
+      text: payload.text || '',
     }),
     [NotificationActionTypes.WARNING]: (state, { payload, }) => ({
       type: 'warning',
-      ...payload,
+      text: payload.text || '',
     }),
     [NotificationActionTypes.CLEAR]: () => ({
       ...defaultValues,

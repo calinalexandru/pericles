@@ -1,4 +1,4 @@
-import { handleActions, Action, } from 'redux-actions';
+import { handleActions, } from 'redux-actions';
 
 import {
   PageActionTypes,
@@ -9,7 +9,7 @@ import {
 
 const { parser: defaultValues, } = initialState;
 
-export default handleActions<ParserState, Action<Partial<ParserState>>>(
+export default handleActions<ParserState, Partial<ParserState>>(
   {
     [ParserActionTypes.SET]: (state, { payload, }) => {
       console.log('parser.set', state, payload);
@@ -21,11 +21,11 @@ export default handleActions<ParserState, Action<Partial<ParserState>>>(
     [ParserActionTypes.RESET]: () => ({
       ...defaultValues,
     }),
-    [PageActionTypes.SET]: (state, { payload, }) => {
+    [PageActionTypes.SET]: (state, { payload, }: { payload: any }) => {
       console.log('page.set', state, payload);
       return {
         ...state,
-        page: payload.value,
+        page: payload,
       };
     },
   },

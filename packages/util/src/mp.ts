@@ -25,22 +25,22 @@ function sendMessageToTab(tab: Tab, message: PayloadAction): Promise<any> {
   const messagePayload: MessagePayload = { message, activeTab: tab, };
   console.log('messagePayload', messagePayload);
 
-  if (isFirefox) {
-    return core.tabs
-      .sendMessage(tab.id, messagePayload)
-      .then((response: any) => {
-        console.log('Sent Message Response', response);
-        return response;
-      })
-      .catch((error) =>
-        Promise.reject(
-          new Error(JSON.stringify({ message: error, response: false, }))
-        )
-      );
-  }
+  // if (isFirefox) {
+  //   return core.tabs
+  //     .sendMessage(tab.id, messagePayload)
+  //     .then((response: any) => {
+  //       console.log('Sent Message Response', response);
+  //       return response;
+  //     })
+  //     .catch((error: Error) =>
+  //       Promise.reject(
+  //         new Error(JSON.stringify({ message: error, response: false, }))
+  //       )
+  //     );
+  // }
 
   return new Promise((resolve, reject) => {
-    core.tabs.sendMessage(tab.id, messagePayload, (response) => {
+    core.tabs.sendMessage(tab.id || 0, messagePayload, (response) => {
       if (core.runtime.lastError) {
         reject(
           new Error(

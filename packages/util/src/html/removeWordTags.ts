@@ -6,7 +6,7 @@ export default function removeWordTags(els: Element[]): void {
       section.querySelectorAll(`${ATTRIBUTES.TAGS.WORD}`)
     );
     allWords.forEach((word) => {
-      word.replaceWith(document.createTextNode(word.textContent));
+      word.replaceWith(document.createTextNode(word.textContent || ''));
     });
     section.normalize();
   });

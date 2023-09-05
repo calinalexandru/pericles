@@ -14,7 +14,7 @@ export default function getIframesForStore(
   window: Window
 ): GetIframesForStoreOut {
   if (!window) return {};
-  let name;
+  let name: string;
   return Array.from(window.document.querySelectorAll('iframe')).reduce(
     (acc, frame) => {
       if (
@@ -23,15 +23,15 @@ export default function getIframesForStore(
       ) {
         return acc;
       }
-      name = getHostnameFromUrl(frame.getAttribute('src'));
+      name = getHostnameFromUrl(frame.getAttribute('src') || '');
       if (!name || name === window.location.hostname) return acc;
       acc[name] = {
         parsing: false,
         top: ~~frame?.getBoundingClientRect?.()?.top,
       };
-      name = null;
+      name = '';
       return acc;
     },
-    {}
+    {} as any
   );
 }

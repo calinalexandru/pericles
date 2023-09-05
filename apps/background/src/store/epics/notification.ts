@@ -1,19 +1,9 @@
-import { Action, } from 'redux';
-import { combineEpics, ofType, Epic, } from 'redux-observable';
+import { Epic, combineEpics, ofType, } from 'redux-observable';
 import { delay, map, } from 'rxjs/operators';
 
-import {
-  NotificationActionTypes,
-  NotificationState,
-  notificationClear,
-} from '@pericles/store';
+import { NotificationActionTypes, notificationClear, } from '@pericles/store';
 
-type NotificationAction = Action<
-  NotificationActionTypes,
-  Partial<NotificationState>
->;
-
-const notificationSetEpic: Epic<NotificationAction> = (action) =>
+const notificationSetEpic: Epic<any> = (action) =>
   action.pipe(
     ofType(
       NotificationActionTypes.INFO,

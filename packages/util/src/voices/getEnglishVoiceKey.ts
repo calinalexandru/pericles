@@ -1,6 +1,4 @@
-type VoiceType = {
-  text: string;
-};
+import { VoiceType, } from '@pericles/constants';
 
 export default function getEnglishVoiceKey(voices: VoiceType[]): number {
   if (!voices) return 0;

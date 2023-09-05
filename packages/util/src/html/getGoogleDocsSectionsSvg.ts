@@ -1,4 +1,6 @@
 /* eslint-disable no-bitwise */
+import { SectionType, } from '@pericles/constants';
+
 import getGoogleDocsEditor from '../google-docs/getGoogleDocsEditor';
 import isMinText from '../predicates/isMinText';
 
@@ -6,15 +8,8 @@ import alterRect from './alterRect';
 import getGoogleDocsHeaderHeight from './getGoogleDocsHeaderHeight';
 import getGoogleDocsPageHeight from './getGoogleDocsPageHeight';
 
-type AccType = {
-  node: Element;
-  text: string;
-  pos: any;
-  encoded: string;
-};
-
 export default function getGoogleDocsSectionsSvg(page: number): {
-  out: AccType[];
+  out: SectionType[];
   maxPage: number;
 } {
   console.log('getGoogleDocsSectionsSvg.page', page);
@@ -27,11 +22,11 @@ export default function getGoogleDocsSectionsSvg(page: number): {
       Array.from(
         document.querySelectorAll<HTMLElement>(
           'div.kix-canvas-tile-content.kix-canvas-tile-selection'
-        )
+        ) || []
       )
         .find((el) => Number(el.style.zIndex) === page)
-        ?.previousElementSibling?.querySelectorAll('svg g')
-    ).reduce((acc: AccType[], section) => {
+        ?.previousElementSibling?.querySelectorAll('svg g') || []
+    ).reduce((acc: SectionType[], section) => {
       const rects = Array.from(section.querySelectorAll('rect'));
       const text = rects
         .map((rect) => rect.getAttribute('aria-label'))
@@ -57,7 +52,7 @@ export default function getGoogleDocsSectionsSvg(page: number): {
         });
       }
       return acc;
-    }, []),
+    }, [] as SectionType[]),
     maxPage,
   };
 }

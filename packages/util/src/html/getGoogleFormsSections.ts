@@ -1,18 +1,13 @@
+import { SectionType, } from '@pericles/constants';
+
 import isMinText from '../predicates/isMinText';
 import getInnerText from '../string-work/getInnerText';
 
 import alterDom from './alterDom';
 import removeHTMLSpaces from './removeHTMLSpaces';
 
-type AccType = {
-  node: Element;
-  text: string;
-  pos: any;
-  encoded: string;
-};
-
 export default function getGoogleFormsSections(): {
-  out: AccType[];
+  out: SectionType[];
   maxPage: number;
   } {
   return {
@@ -21,7 +16,7 @@ export default function getGoogleFormsSections(): {
         'div[dir=auto], div[role=heading], label.docssharedWizToggleLabeledContainer'
       )
     ).reduce((acc, section) => {
-      const text = removeHTMLSpaces(getInnerText(section.textContent));
+      const text = removeHTMLSpaces(getInnerText(section.textContent || ''));
       if (isMinText(text)) {
         alterDom(section, acc.length);
         const {
@@ -37,7 +32,7 @@ export default function getGoogleFormsSections(): {
         });
       }
       return acc;
-    }, []),
+    }, [] as SectionType[]),
     maxPage: 1,
   };
 }

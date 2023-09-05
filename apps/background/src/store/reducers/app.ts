@@ -1,3 +1,4 @@
+import { Action, } from 'redux';
 import { handleActions, } from 'redux-actions';
 
 import { ROUTES, } from '@pericles/constants';

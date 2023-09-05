@@ -1,4 +1,4 @@
-import { combineEpics, ofType, } from 'redux-observable';
+import { Epic, combineEpics, ofType, } from 'redux-observable';
 import {
   debounceTime,
   filter,
@@ -43,7 +43,7 @@ import {
   setWordBackground,
 } from '@pericles/util';
 
-const appNewContentEpic = (action) =>
+const appNewContentEpic: Epic<any> = (action) =>
   action.pipe(
     ofType(AppActionTypes.NEW_CONTENT),
     pluck('payload'),
@@ -55,7 +55,7 @@ const appNewContentEpic = (action) =>
     map(highlightReloadSettings)
   );
 
-const appReloadTabEpic = (action) =>
+const appReloadTabEpic: Epic<any> = (action) =>
   action.pipe(
     ofType(AppActionTypes.RELOAD_TAB),
     tap(() => {
@@ -65,7 +65,7 @@ const appReloadTabEpic = (action) =>
     ignoreElements()
   );
 
-const highlightSectionEpic = (action$, state) =>
+const highlightSectionEpic: Epic<any> = (action$, state) =>
   action$.pipe(
     ofType(HighlightActionTypes.SECTION),
     tap(() => {
@@ -99,7 +99,7 @@ const highlightSectionEpic = (action$, state) =>
     map(highlightSectionComplete)
   );
 
-const highlightWordEpic = (action$, state) =>
+const highlightWordEpic: Epic<any> = (action$, state) =>
   action$.pipe(
     ofType(HighlightActionTypes.WORD),
     filter(() => appWordTrackerSelector(state.value) === true),
@@ -150,7 +150,7 @@ const highlightWordEpic = (action$, state) =>
     ignoreElements()
   );
 
-const autoscrollRunEpic = (action$, state) =>
+const autoscrollRunEpic: Epic<any> = (action$, state) =>
   action$.pipe(
     ofType(AutoscrollActionTypes.SET),
     debounceTime(500),
@@ -160,12 +160,13 @@ const autoscrollRunEpic = (action$, state) =>
       const { top = 0, } =
         playerSectionsSelector(state.value)?.[section]?.pos || {};
       console.log('autoscroll.set', { top, });
-      if (appAutoscrollSelector(state.value)) Autoscroll.to(top, parserType);
+      if (appAutoscrollSelector(state.value) && top)
+        Autoscroll.to(top, parserType);
     }),
     ignoreElements()
   );
 
-const autoscrollClearEpic = (action$) =>
+const autoscrollClearEpic: Epic<any> = (action$) =>
   action$.pipe(
     ofType(AutoscrollActionTypes.CLEAR),
     tap(() => {
@@ -174,7 +175,7 @@ const autoscrollClearEpic = (action$) =>
     ignoreElements()
   );
 
-const highlightReloadSettingsEpic = (action, state) =>
+const highlightReloadSettingsEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(HighlightActionTypes.RELOAD_SETTINGS),
     tap(() => {
@@ -185,7 +186,7 @@ const highlightReloadSettingsEpic = (action, state) =>
     ignoreElements()
   );
 
-const highlightClearWordsEpic = (action, state) =>
+const highlightClearWordsEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(HighlightActionTypes.CLEAR_WORDS),
     tap(() => {
@@ -196,7 +197,7 @@ const highlightClearWordsEpic = (action, state) =>
     map(highlightClearWordsComplete)
   );
 
-const highlightClearSectionsEpic = (action, state) =>
+const highlightClearSectionsEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(HighlightActionTypes.CLEAR_SECTIONS),
     tap(() => {

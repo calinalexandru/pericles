@@ -12,9 +12,13 @@ const { api, } = getBrowserAPI();
 const isValidAction = (action: MaybeAction) => action?.type && action?.payload;
 
 export default (): void => {
-  const onMessage$: Observable<any> = fromEventPattern(
-    (handler: any) => api.runtime.onMessage.addListener(handler),
-    (handler: any) => api.runtime.onMessage.removeListener(handler)
+  const onMessage$: Observable<MaybeAction> = fromEventPattern<
+    [MessageRequest]
+  >(
+    (handler: (message: MessageRequest) => void) =>
+      api.runtime.onMessage.addListener(handler),
+    (handler: (message: MessageRequest) => void) =>
+      api.runtime.onMessage.removeListener(handler)
   ).pipe(
     map(([ request, ]: [MessageRequest]) => {
       console.log('api/action/request', request);
@@ -29,7 +33,7 @@ export default (): void => {
     })
   );
 
-  onMessage$.subscribe((action: MaybeAction) => {
+  onMessage$.subscribe((action) => {
     console.log('subscribe.api/action', action);
     if (isValidAction(action)) {
       const validatedAction: Action = action as unknown as Action;

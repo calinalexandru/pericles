@@ -1,5 +1,4 @@
-import { length, } from 'ramda';
-import { handleActions, Action, } from 'redux-actions';
+import { handleActions, } from 'redux-actions';
 
 import { PLAYER_STATUS, } from '@pericles/constants';
 import {
@@ -11,7 +10,7 @@ import {
 
 const { player: defaultValues, } = initialState;
 
-export default handleActions<PlayerState, Action<Partial<PlayerState>>>(
+export default handleActions<PlayerState, Partial<PlayerState>>(
   {
     [PlayerActionTypes.PLAY]: (state) => {
       console.log('player.play.reducer ');
@@ -53,7 +52,7 @@ export default handleActions<PlayerState, Action<Partial<PlayerState>>>(
     }),
     [PlayerActionTypes.NEXT]: (state) => {
       const curKey = state.key;
-      const sectionsLen = length(state.sections) - 1;
+      const sectionsLen = state.sections.length - 1;
       const key = sectionsLen <= curKey ? sectionsLen : curKey + 1;
       console.log('player.next.key', key);
       return {
@@ -92,7 +91,7 @@ export default handleActions<PlayerState, Action<Partial<PlayerState>>>(
       ...state,
       ...payload,
     }),
-    [PlayerActionTypes.RESET]: (_, { payload = {}, } = {}) => ({
+    [PlayerActionTypes.RESET]: (_, { payload, }) => ({
       ...defaultValues,
       ...payload,
     }),

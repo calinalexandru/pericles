@@ -1,7 +1,6 @@
-import { keys, } from 'ramda';
 import { Subject, } from 'rxjs';
 
-import { DEFAULT_VALUES, } from '@pericles/constants';
+import { DEFAULT_VALUES, SettingKeys, } from '@pericles/constants';
 
 import ChromeSynth from './synth/ChromeSynth';
 
@@ -46,7 +45,7 @@ export default class Speech {
 
     console.log('Attaching streams...');
     events.forEach((event) => {
-      this.synth[event] = (params) => {
+      (this.synth as any)[event] = (params: any) => {
         console.log(`SpeechFacade.synth.${event}`, params);
         this.stream$.next({ event, params, });
       };
@@ -59,7 +58,7 @@ export default class Speech {
     Speech.setRate(Speech.rate);
   }
 
-  static play(text) {
+  static play(text: string) {
     if (!text) {
       throw new Error('Speech: text is empty');
       // TODO:: change editor state
@@ -68,11 +67,11 @@ export default class Speech {
     Speech.synth.speak(text);
   }
 
-  static validate(voice) {
+  static validate(voice: number) {
     return voice === Speech.synth.voice;
   }
 
-  static crash(code) {
+  static crash(code: any) {
     Speech.stream$.next({ event: 'onError', params: { code, }, });
   }
 
@@ -97,7 +96,7 @@ export default class Speech {
     Speech.synth.resume();
   }
 
-  static setVolume(val) {
+  static setVolume(val: number) {
     Speech.volume = val;
     try {
       Speech.synth.setVolume(val);
@@ -106,17 +105,17 @@ export default class Speech {
     }
   }
 
-  static setPitch(val) {
+  static setPitch(val: number) {
     Speech.pitch = val;
     Speech.synth.setPitch(val);
   }
 
-  static setRate(val) {
+  static setRate(val: number) {
     Speech.rate = val;
     Speech.synth.setRate(val);
   }
 
-  static setVoice(val) {
+  static setVoice(val: number) {
     console.log('setVoice', val);
     const newVal = val;
     const oldSynth = Speech.synth;
@@ -130,7 +129,7 @@ export default class Speech {
     Speech.synth.setVoice(newVal);
   }
 
-  static getSettingByIndex(name) {
+  static getSettingByIndex(name: SettingKeys) {
     return Speech.getSettingsMap()[name];
   }
 
@@ -143,28 +142,25 @@ export default class Speech {
     };
   }
 
-  public static setSettingsFromObj(settings: Settings) {
+  public static setSettingsFromObj(settings: any) {
     console.log('setSettingsFromObj', settings);
-    let fn;
-    keys(settings).forEach((index) => {
-      fn = Speech.getSettingByIndex(index);
-      if (fn) {
-        fn(settings[index]);
+    let fn: any;
+    Object.keys(settings).forEach((index: string) => {
+      const key = index as SettingKeys;
+      fn = Speech.getSettingByIndex(key);
+      if (fn && settings[key] !== undefined) {
+        fn(settings[key] as any);
       }
     });
   }
 
-  static isReplayStarved(settings) {
+  static isReplayStarved(settings: any) {
     console.log('Speech.isReplayStarved', settings);
     return Speech.synth.isReplayStarved(settings);
   }
 
   static getSeekerTime() {
     return Speech.synth.getSeekerTime();
-  }
-
-  static seek(time) {
-    return Speech.synth.seek(time);
   }
 
 }

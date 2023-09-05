@@ -1,10 +1,10 @@
 export default async function clickPrevGoogleBookPage(): Promise<
   boolean | Error
   > {
-  let t;
+  let t: any;
   return new Promise((resolve, reject) => {
     try {
-      const nextButton: HTMLElement = document.querySelector(
+      const nextButton: HTMLElement | null = document.querySelector(
         'button[aria-label="Previous Page"]'
       );
       if (nextButton) {

@@ -37,6 +37,7 @@
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.4",
     "@pericles/eslint-config": "workspace:*",
+    "@types/redux-actions": "^2.6.2",
     "babel-plugin-ramda": "^2.0.0",
     "cross-env": "^7.0.3",
     "eslint": "^7.32.0",

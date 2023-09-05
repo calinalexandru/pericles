@@ -1,4 +1,4 @@
-import { handleActions, Action, } from 'redux-actions';
+import { handleActions, } from 'redux-actions';
 
 import {
   SettingsActionTypes,
@@ -8,7 +8,7 @@ import {
 
 const { settings: defaultValues, } = initialState;
 
-export default handleActions<SettingsState, Action<Partial<SettingsState>>>(
+export default handleActions<SettingsState, Partial<SettingsState>>(
   {
     [SettingsActionTypes.SET]: (state, { payload, }) => ({
       ...state,

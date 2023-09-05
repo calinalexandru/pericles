@@ -1,7 +1,7 @@
 import { store, setSettings, appInit, } from '@pericles/store';
 import { getBrowserAPIVoices, } from '@pericles/util';
 
-export default async () => {
+export default () => {
   // hook for system voices
   getBrowserAPIVoices()
     .then((voices) => {

@@ -29,7 +29,6 @@ const config = {
           {
             loader: 'ts-loader',
             options: {
-              transpileOnly: true,
               compilerOptions: {
                 skipLibCheck: true,
               },

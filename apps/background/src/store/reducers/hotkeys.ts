@@ -1,4 +1,4 @@
-import { handleActions, Action, } from 'redux-actions';
+import { handleActions, } from 'redux-actions';
 
 import {
   initialState,
@@ -8,7 +8,7 @@ import {
 
 const { hotkeys: defaultValues, } = initialState;
 
-export default handleActions<HotkeysState, Action<Partial<HotkeysState>>>(
+export default handleActions<HotkeysState, Partial<HotkeysState>>(
   {
     [HotkeysActionTypes.SET]: (state, { payload, }) => ({
       ...state,

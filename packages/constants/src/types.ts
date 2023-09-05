@@ -5,8 +5,14 @@ import { SectionHighlightStylesTypes, } from './sectionHighlightStyles';
 import { TabsTypes, } from './tabs';
 import { WordTrackerStylesTypes, } from './wordTrackerStyles';
 
+export type SettingKeys = 'volume' | 'pitch' | 'rate' | 'voice';
+export type Settings = {
+  [K in SettingKeys]?: number;
+};
+
 export type SectionType = {
-  node?: HTMLElement;
+  node?: Element | HTMLElement | Text;
+  encoded?: string;
   text: string;
   pos: { top: number; width: number; height: number };
 };
@@ -28,6 +34,11 @@ export type ParserIframesType = {
 };
 
 export type ParserTypes = typeof PARSER_TYPES[keyof typeof PARSER_TYPES];
+
+export type VoiceType = {
+  text: string;
+};
+
 export type PlayerStatusTypes =
   typeof PLAYER_STATUS[keyof typeof PLAYER_STATUS];
 
@@ -97,7 +108,7 @@ export type Variables = {
     PITCH: number;
     VOICE: number;
     NEURAL_VOICES: string[];
-    VOICES: string[];
+    VOICES: VoiceType[];
   };
 
   PLAYER: {

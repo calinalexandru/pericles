@@ -70,6 +70,12 @@ importers:
       '@pericles/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
+      '@types/chrome':
+        specifier: ^0.0.244
+        version: 0.0.244
+      '@types/redux-actions':
+        specifier: ^2.6.2
+        version: 2.6.2
       asn1.js:
         specifier: ^5.4.1
         version: 5.4.1
@@ -402,6 +408,12 @@ importers:
       '@types/react-dom':
         specifier: ^18.2.7
         version: 18.2.7
+      '@types/react-redux':
+        specifier: ^7.1.26
+        version: 7.1.26
+      '@types/redux-actions':
+        specifier: ^2.6.2
+        version: 2.6.2
       babel-loader:
         specifier: ^8.2.3
         version: 8.2.3(@babel/core@7.16.7)(webpack@5.51.1)
@@ -623,6 +635,9 @@ importers:
       '@pericles/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
+      '@types/redux-actions':
+        specifier: ^2.6.2
+        version: 2.6.2
       babel-plugin-ramda:
         specifier: ^2.0.0
         version: 2.0.0
@@ -3351,7 +3366,6 @@ packages:
     dependencies:
       '@types/react': 18.2.20
       hoist-non-react-statics: 3.3.2
-    dev: false
 
   /@types/html-minifier-terser@5.1.2:
     resolution: {integrity: sha512-h4lTMgMJctJybDp8CQrxTUiiYmedihHWkjnF/8Pxseu2S6Nlfcy8kwboQ8yejh456rP2yWoEVm1sS/FVsfM48w==}
@@ -3416,14 +3430,13 @@ packages:
       '@types/react': 18.2.20
     dev: false
 
-  /@types/react-redux@7.1.25:
-    resolution: {integrity: sha512-bAGh4e+w5D8dajd6InASVIyCo4pZLJ66oLb80F9OBLO1gKESbZcRCJpTT6uLXX+HAB57zw1WTdwJdAsewuTweg==}
+  /@types/react-redux@7.1.26:
+    resolution: {integrity: sha512-UKPo7Cm7rswYU6PH6CmTNCRv5NYF3HrgKuHEYTK8g/3czYLrUux50gQ2pkxc9c7ZpQZi+PNhgmI8oNIRoiVIxg==}
     dependencies:
       '@types/hoist-non-react-statics': 3.3.1
       '@types/react': 18.2.20
       hoist-non-react-statics: 3.3.2
       redux: 4.1.2
-    dev: false
 
   /@types/react-transition-group@4.4.6:
     resolution: {integrity: sha512-VnCdSxfcm08KjsJVQcfBmhEQAPnLB8G08hAxn39azX1qYBQ/5RVQuoHuKIcfKOdncuaUvEpFKFzEvbtIMsfVew==}
@@ -3437,6 +3450,10 @@ packages:
       '@types/prop-types': 15.7.5
       '@types/scheduler': 0.16.3
       csstype: 3.1.2
+
+  /@types/redux-actions@2.6.2:
+    resolution: {integrity: sha512-TvcINy8rWFANcpc3EiEQX9Yv3owM3d3KIrqr2ryUIOhYIYzXA/bhDZeGSSSuai62iVR2qMZUgz9tQ5kr0Kl+Tg==}
+    dev: true
 
   /@types/scheduler@0.16.3:
     resolution: {integrity: sha512-5cJ8CB4yAx7BH1oMvdU0Jh9lrEXyPkar6F9G/ERswkCuvP4KQZfZkSjcMbAICCpQTN4OuZn8tz0HiKv9TGZgrQ==}
@@ -6927,7 +6944,6 @@ packages:
     resolution: {integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==}
     dependencies:
       react-is: 16.13.1
-    dev: false
 
   /html-encoding-sniffer@2.0.1:
     resolution: {integrity: sha512-D5JbOMBIR/TVZkubHT+OyT2705QvogUW4IBn6nHd756OwieSF9aDYFj4dv6HHEVGYbHaLETa3WggZYWWMyy3ZQ==}
@@ -9491,7 +9507,7 @@ packages:
         optional: true
     dependencies:
       '@babel/runtime': 7.18.3
-      '@types/react-redux': 7.1.25
+      '@types/react-redux': 7.1.26
       hoist-non-react-statics: 3.3.2
       loose-envify: 1.4.0
       prop-types: 15.8.1
@@ -9616,7 +9632,6 @@ packages:
     resolution: {integrity: sha512-SH8PglcebESbd/shgf6mii6EIoRM0zrQyjcuQ+ojmfxjTtE0z9Y8pa62iA/OJ58qjP6j27uyW4kUF4jl/jd6sw==}
     dependencies:
       '@babel/runtime': 7.18.3
-    dev: false
 
   /regenerate-unicode-properties@10.1.0:
     resolution: {integrity: sha512-d1VudCLoIGitcU/hEg2QqvyGZQmdC0Lf8BqdOMXGFSvJP4bNV1+XqbPQeHHLD51Jh4QJJ225dlIFvY4Ly6MXmQ==}

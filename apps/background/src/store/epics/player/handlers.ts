@@ -1,7 +1,8 @@
-import { pathOr, } from 'ramda';
+import { StateObservable, } from 'redux-observable';
 
 import Speech from '@/speech';
 import {
+  RootState,
   appActiveTabSelector,
   parserEndSelector,
   parserTypeSelector,
@@ -14,12 +15,15 @@ import {
 } from '@pericles/store';
 import { hasSectionsInAdvance, isGoogleDocsSvg, } from '@pericles/util';
 
-export const playOrRequest$: any = (state, payload, actions) => {
+export const playOrRequest$: any = (
+  state: StateObservable<RootState>,
+  payload: any,
+  actions: any
+) => {
   console.log('play.epic', state, payload);
 
-  const userGenerated = pathOr(false, [ 'userGenerated', ], payload);
-  const seek = pathOr(0, [ 'seek', ], payload);
-  const playerKeyPayload = Number(pathOr(-1, [ 'key', ], payload));
+  const userGenerated = payload?.userGenerated || false;
+  const playerKeyPayload = payload?.key || -1;
   const playerSections = playerSectionsSelector(state.value);
   const playerKey =
     playerKeyPayload !== -1 ? playerKeyPayload : playerKeySelector(state.value);
@@ -30,7 +34,6 @@ export const playOrRequest$: any = (state, payload, actions) => {
     playerSections,
     playerKey,
     playerKeyPayload,
-    seek,
     userGenerated,
     playingTab,
     activeTab,
@@ -66,17 +69,12 @@ export const playOrRequest$: any = (state, payload, actions) => {
   }
   if (actions.length === 0) {
     Speech.stop();
-    console.log(
-      'playOrRequest.playing - key, seek',
-      seek,
-      playerKey,
-      playerSections
-    );
+    console.log('playOrRequest.playing - key, seek', playerKey, playerSections);
     try {
       Speech.play(playerSections[playerKey].text);
     } catch (e) {
       console.error('Player has crashed, rip', e);
-      return playerCrash();
+      return playerCrash({ message: 'Player has crashed', });
     }
   } else {
     console.log('Speech is switching to free, do nothing');

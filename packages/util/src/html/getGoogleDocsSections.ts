@@ -1,19 +1,14 @@
 /* eslint-disable no-bitwise */
+import { SectionType, } from '@pericles/constants';
+
 import isMinText from '../predicates/isMinText';
 import getInnerText from '../string-work/getInnerText';
 
 import alterDom from './alterDom';
 import removeHTMLSpaces from './removeHTMLSpaces';
 
-type AccType = {
-  node: Element;
-  text: string;
-  pos: any;
-  encoded: string;
-};
-
 export default function getGoogleDocsSections(page: number): {
-  out: AccType[];
+  out: SectionType[];
   maxPage: number;
 } {
   const pages = document.querySelectorAll('.kix-page');
@@ -21,14 +16,14 @@ export default function getGoogleDocsSections(page: number): {
   if (!curPage) return { out: [], maxPage: pages.length, };
   return {
     out: Array.from(curPage.querySelectorAll('.kix-paragraphrenderer')).reduce(
-      (acc: AccType[], section) => {
-        const text = removeHTMLSpaces(getInnerText(section.textContent));
+      (acc: SectionType[], section) => {
+        const text = removeHTMLSpaces(getInnerText(section.textContent || ''));
         if (isMinText(text)) {
           Array.from(
             section.querySelectorAll('.kix-wordhtmlgenerator-word-node')
           )
             .filter((item) =>
-              isMinText(removeHTMLSpaces(getInnerText(item.textContent)))
+              isMinText(removeHTMLSpaces(getInnerText(item.textContent || '')))
             )
             .forEach((paragraph) => {
               alterDom(paragraph, acc.length);
@@ -47,7 +42,7 @@ export default function getGoogleDocsSections(page: number): {
         }
         return acc;
       },
-      []
+      [] as SectionType[]
     ),
     maxPage: pages.length,
   };

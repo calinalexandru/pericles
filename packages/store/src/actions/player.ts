@@ -55,7 +55,10 @@ export const proxyResetAndRequestPlay = createAsyncActions<any>(
 export const setPlayer = createAction<Partial<PlayerState>>(
   PlayerActionTypes.SET
 );
-export const playerPlay = createAction<any>(PlayerActionTypes.PLAY);
+export const playerPlay = createAction<{
+  userGenerated: boolean;
+  fromCursor: boolean;
+}>(PlayerActionTypes.PLAY);
 export const playerProxyPlay = createAction<any>(PlayerActionTypes.PROXY_PLAY);
 export const playerPause = createAction(PlayerActionTypes.PAUSE);
 export const playerResume = createAction(PlayerActionTypes.RESUME);
@@ -65,7 +68,9 @@ export const playerStop = createAction(PlayerActionTypes.STOP);
 export const playerSoftHalt = createAction(PlayerActionTypes.SOFT_HALT);
 export const playerHalt = createAction(PlayerActionTypes.HALT);
 export const playerSoftNext = createAction(PlayerActionTypes.SOFT_NEXT);
-export const playerNext = createAction<any>(PlayerActionTypes.NEXT);
+export const playerNext = createAction<{ auto: boolean }>(
+  PlayerActionTypes.NEXT
+);
 export const playerNextAuto = createAction(PlayerActionTypes.NEXT_AUTO);
 export const playerNextMove = createAction(PlayerActionTypes.NEXT_MOVE);
 export const playerNextSlow = createAction(PlayerActionTypes.NEXT_SLOW);
@@ -74,9 +79,13 @@ export const playerSoftPrev = createAction(PlayerActionTypes.SOFT_PREV);
 export const playerPrevMove = createAction(PlayerActionTypes.PREV_MOVE);
 export const playerPrevSlow = createAction(PlayerActionTypes.PREV_SLOW);
 export const playerWait = createAction(PlayerActionTypes.WAIT);
-export const playerReset = createAction<any>(PlayerActionTypes.RESET);
+export const playerReset = createAction<{ tab: number }>(
+  PlayerActionTypes.RESET
+);
 export const playerIdle = createAction(PlayerActionTypes.IDLE);
-export const playerCrash = createAction<any>(PlayerActionTypes.CRASH);
+export const playerCrash = createAction<{ message: string }>(
+  PlayerActionTypes.CRASH
+);
 export const playerEnd = createAction<any>(PlayerActionTypes.END);
 export const playerTimeout = createAction(PlayerActionTypes.TIMEOUT);
 export const playerHealthCheck = createAction(PlayerActionTypes.HEALTH_CHECK);

@@ -1,6 +1,4 @@
-import { pathOr, } from 'ramda';
-import { Action, } from 'redux-actions';
-import { combineEpics, ofType, } from 'redux-observable';
+import { Epic, combineEpics, ofType, } from 'redux-observable';
 import { from, of, } from 'rxjs';
 import {
   catchError,
@@ -18,11 +16,15 @@ import {
 } from 'rxjs/operators';
 
 import Speech from '@/speech';
-import { ATTRIBUTES, PARSER_TYPES, VARIABLES, } from '@pericles/constants';
+import {
+  ATTRIBUTES,
+  PARSER_TYPES,
+  ParserTypes,
+  VARIABLES,
+} from '@pericles/constants';
 import {
   PageActionTypes,
   PlayerActionTypes,
-  PlayerState,
   appActiveTabSelector,
   appSelectedTextSelector,
   appSkipDeadSectionsSelector,
@@ -76,8 +78,6 @@ import {
 
 import { playOrRequest$, } from './handlers';
 
-type PlayerAction = Action<PlayerActionTypes, Partial<PlayerState>>;
-
 // const HEALTH_CHECK_INTERVAL = 1000;
 // const periodicHealthCheckEpic: Epic<PlayerAction> = (action, state) =>
 //   interval(HEALTH_CHECK_INTERVAL).pipe(
@@ -91,7 +91,7 @@ type PlayerAction = Action<PlayerActionTypes, Partial<PlayerState>>;
 //     })
 //   );
 
-const healthCheckEpic: Epic<PlayerAction> = (action) =>
+const healthCheckEpic: Epic<any> = (action) =>
   action.pipe(
     ofType(PlayerActionTypes.HEALTH_CHECK),
     switchMap(() =>
@@ -99,7 +99,7 @@ const healthCheckEpic: Epic<PlayerAction> = (action) =>
         ofType(PlayerActionTypes.SET, PlayerActionTypes.ERROR),
         first(),
         pluck('payload', VARIABLES.PLAYER.STATUS),
-        filter((status) => isPlaying(status) || isError(status)),
+        filter((status: number) => isPlaying(status) || isError(status)),
         timeout(ATTRIBUTES.MISC.PLAY_TIMEOUT),
         catchError(() => of('timeout'))
       )
@@ -107,7 +107,7 @@ const healthCheckEpic: Epic<PlayerAction> = (action) =>
     map((result) => (result === 'timeout' ? routeError() : playerIdle()))
   );
 
-const proxyPlayEpic: Epic<PlayerAction> = (action, state) =>
+const proxyPlayEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(PlayerActionTypes.PROXY_PLAY),
     tap(() => {
@@ -117,7 +117,7 @@ const proxyPlayEpic: Epic<PlayerAction> = (action, state) =>
     map(playerPlay)
   );
 
-const proxyResetAndRequestPlayEpic: Epic<PlayerAction> = (action, state) =>
+const proxyResetAndRequestPlayEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(proxyResetAndRequestPlay.request),
     pluck('payload'),
@@ -125,7 +125,7 @@ const proxyResetAndRequestPlayEpic: Epic<PlayerAction> = (action, state) =>
       console.log('proxyResetAndRequestPlayEpic');
       mpToContent(
         [
-          resetParser(),
+          resetParser({ revertHtml: false, }),
           playerReset({ tab: appActiveTabSelector(state.value), }),
           sectionsRequestAndPlay.request(payload),
         ],
@@ -135,7 +135,7 @@ const proxyResetAndRequestPlayEpic: Epic<PlayerAction> = (action, state) =>
     ignoreElements()
   );
 
-const proxySectionsRequestAndPlayEpic: Epic<PlayerAction> = (action, state) =>
+const proxySectionsRequestAndPlayEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(proxySectionsRequestAndPlay.request),
     pluck('payload'),
@@ -149,18 +149,18 @@ const proxySectionsRequestAndPlayEpic: Epic<PlayerAction> = (action, state) =>
     ignoreElements()
   );
 
-const playEpic: Epic<PlayerAction> = (action, state) =>
+const playEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(PlayerActionTypes.PLAY),
     tap(() => {
       console.log('player.play', action, state);
     }),
     pluck('payload'),
-    concatMap((payload) => {
+    concatMap((payload: any = {}) => {
       console.log('checkAuth', { ...state.value, }, { ...payload, });
-      const userGenerated = pathOr(false, [ 'userGenerated', ], payload);
+      const userGenerated: boolean = payload?.userGenerated || false;
       // let text;
-      const actions = [];
+      const actions: any = [];
 
       const out = [
         ...actions,
@@ -182,7 +182,7 @@ const playEpic: Epic<PlayerAction> = (action, state) =>
     })
   );
 
-const timeoutEpic: Epic<PlayerAction> = (action) =>
+const timeoutEpic: Epic<any> = (action) =>
   action.pipe(
     ofType(PlayerActionTypes.TIMEOUT),
     tap(() => {
@@ -191,7 +191,7 @@ const timeoutEpic: Epic<PlayerAction> = (action) =>
     map(routeSkip)
   );
 
-const pauseEpic: Epic<PlayerAction> = (action) =>
+const pauseEpic: Epic<any> = (action) =>
   action.pipe(
     ofType(PlayerActionTypes.PAUSE),
     tap(() => {
@@ -201,7 +201,7 @@ const pauseEpic: Epic<PlayerAction> = (action) =>
     ignoreElements()
   );
 
-const toggleEpic: Epic<PlayerAction> = (action, state) =>
+const toggleEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(PlayerActionTypes.TOGGLE),
     filter(() => !isStopped(playerStatusSelector(state.value))),
@@ -212,7 +212,7 @@ const toggleEpic: Epic<PlayerAction> = (action, state) =>
     )
   );
 
-const resumeEpic: Epic<PlayerAction> = (action, state) =>
+const resumeEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(PlayerActionTypes.RESUME),
     concatMap(() => {
@@ -233,7 +233,7 @@ const resumeEpic: Epic<PlayerAction> = (action, state) =>
     })
   );
 
-const stopEpic: Epic<PlayerAction> = (action, state) =>
+const stopEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(PlayerActionTypes.STOP),
     tap(() => {
@@ -248,7 +248,7 @@ const stopEpic: Epic<PlayerAction> = (action, state) =>
     ignoreElements()
   );
 
-const haltEpic: Epic<PlayerAction> = (action) =>
+const haltEpic: Epic<any> = (action) =>
   action.pipe(
     ofType(PlayerActionTypes.HALT),
     tap(() => {
@@ -257,7 +257,7 @@ const haltEpic: Epic<PlayerAction> = (action) =>
     map(resetParser)
   );
 
-const softHaltEpic: Epic<PlayerAction> = (action) =>
+const softHaltEpic: Epic<any> = (action) =>
   action.pipe(
     ofType(PlayerActionTypes.SOFT_HALT),
     tap(() => {
@@ -266,7 +266,7 @@ const softHaltEpic: Epic<PlayerAction> = (action) =>
     ignoreElements()
   );
 
-const waitEpic: Epic<PlayerAction> = (action) =>
+const waitEpic: Epic<any> = (action) =>
   action.pipe(
     ofType(PlayerActionTypes.WAIT),
     tap(() => {
@@ -276,12 +276,12 @@ const waitEpic: Epic<PlayerAction> = (action) =>
     ignoreElements()
   );
 
-const nextEpic: Epic<PlayerAction> = (action, state) =>
+const nextEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(PlayerActionTypes.NEXT),
     pluck('payload'),
     filter(
-      (payload = {}) =>
+      (payload: any = {}) =>
         (!isGoogleBook(parserTypeSelector(state.value)) || payload.auto) &&
         !isStopped(playerStatusSelector(state.value))
     ),
@@ -292,23 +292,23 @@ const nextEpic: Epic<PlayerAction> = (action, state) =>
         playerTabSelector(state.value)
       );
     }),
-    concatMap((payload = {}) =>
+    concatMap((payload: any = {}) =>
       from([ playerWait(), payload.auto ? playerNextAuto() : playerNextSlow(), ])
     )
   );
 
-const nextPageEpic: Epic<PlayerAction> = (action, state) =>
+const nextPageEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(PlayerActionTypes.NEXT),
     pluck('payload'),
     filter(
-      (payload = {}) =>
+      (payload: any = {}) =>
         !payload.auto && isGoogleBook(parserTypeSelector(state.value))
     ),
     concatMap(() => from([ playerStop(), playerNextMove(), ]))
   );
 
-const nextMoveEpic: Epic<PlayerAction> = (action, state) =>
+const nextMoveEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(PlayerActionTypes.NEXT_MOVE),
     tap((payload) => {
@@ -327,18 +327,18 @@ const nextMoveEpic: Epic<PlayerAction> = (action, state) =>
     })
   );
 
-const prevPageEpic: Epic<PlayerAction> = (action, state) =>
+const prevPageEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(PlayerActionTypes.PREV),
     pluck('payload'),
     filter(
-      (payload = {}) =>
+      (payload: any = {}) =>
         !payload.auto && isGoogleBook(parserTypeSelector(state.value))
     ),
     concatMap(() => from([ playerStop(), playerPrevMove(), ]))
   );
 
-const prevMoveEpic: Epic<PlayerAction> = (action, state) =>
+const prevMoveEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(PlayerActionTypes.PREV_MOVE),
     tap((payload) => {
@@ -357,21 +357,21 @@ const prevMoveEpic: Epic<PlayerAction> = (action, state) =>
     })
   );
 
-const softNextEpic: Epic<PlayerAction> = (action, state) =>
+const softNextEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(PlayerActionTypes.SOFT_NEXT),
     filter(() => !isStopped(playerStatusSelector(state.value))),
     map(playerNext)
   );
 
-const softPrevEpic: Epic<PlayerAction> = (action, state) =>
+const softPrevEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(PlayerActionTypes.SOFT_PREV),
     filter(() => !isStopped(playerStatusSelector(state.value))),
     map(playerPrev)
   );
 
-const endIframeEpic: Epic<PlayerAction> = (action, state) =>
+const endIframeEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(PlayerActionTypes.END),
     filter(() => {
@@ -381,7 +381,7 @@ const endIframeEpic: Epic<PlayerAction> = (action, state) =>
       );
     }),
     pluck('payload'),
-    tap((payload) => {
+    tap((payload: any = {}) => {
       console.log('endIframeEpic', payload);
       mpToContent(
         [ sectionsRequestAndPlay.request({ ...payload, userGenerated: true, }), ],
@@ -391,14 +391,17 @@ const endIframeEpic: Epic<PlayerAction> = (action, state) =>
     ignoreElements()
   );
 
-const endEpic: Epic<PlayerAction> = (action, state) =>
+const endEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(PlayerActionTypes.END),
     filter(
       () =>
-        [ PARSER_TYPES.GOOGLE_DOC, PARSER_TYPES.GOOGLE_DOC_SVG, ].includes(
-          parserTypeSelector(state.value)
-        ) &&
+        (
+          [
+            PARSER_TYPES.GOOGLE_DOC,
+            PARSER_TYPES.GOOGLE_DOC_SVG,
+          ] as ParserTypes[]
+        ).includes(parserTypeSelector(state.value)) &&
         parserMaxPageSelector(state.value) > parserPageSelector(state.value)
     ),
     tap(() => {
@@ -407,7 +410,7 @@ const endEpic: Epic<PlayerAction> = (action, state) =>
       mpToContent(
         [
           resetParser({ revertHtml: true, }),
-          playerReset({ tab: appActiveTabSelector(state), }),
+          playerReset({ tab: appActiveTabSelector(state.value), }),
           setParser({
             type: parserTypeSelector(state.value),
             page: nextPage,
@@ -422,17 +425,17 @@ const endEpic: Epic<PlayerAction> = (action, state) =>
       action.pipe(ofType(PageActionTypes.MOVE_COMPLETE), first())
     ),
     delay(500),
-    concatMap(() => of(playerPlay()))
+    concatMap(() => of(playerPlay({ userGenerated: false, fromCursor: false, })))
   );
 
-const endPageEpic: Epic<PlayerAction> = (action, state) =>
+const endPageEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(PlayerActionTypes.END),
     filter(() => isGoogleBook(parserTypeSelector(state.value))),
     concatMap(() => from([ playerStop(), playerNextMove(), ]))
   );
 
-const nextAutoEpic: Epic<PlayerAction> = (action) =>
+const nextAutoEpic: Epic<any> = (action) =>
   action.pipe(
     ofType(PlayerActionTypes.NEXT_AUTO),
     tap(() => {
@@ -441,7 +444,7 @@ const nextAutoEpic: Epic<PlayerAction> = (action) =>
     map(playerPlay)
   );
 
-const nextEpicThrottled: Epic<PlayerAction> = (action) =>
+const nextEpicThrottled: Epic<any> = (action) =>
   action.pipe(
     ofType(PlayerActionTypes.NEXT_SLOW),
     debounceTime(ATTRIBUTES.MISC.PLAYER_THROTTLE_TIME),
@@ -451,7 +454,7 @@ const nextEpicThrottled: Epic<PlayerAction> = (action) =>
     map(playerPlay)
   );
 
-const demandPlayEpic: Epic<PlayerAction> = (action, state) =>
+const demandPlayEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(PlayerActionTypes.DEMAND),
     tap(() => {
@@ -465,13 +468,13 @@ const demandPlayEpic: Epic<PlayerAction> = (action, state) =>
     ignoreElements()
   );
 
-const prevEpic: Epic<PlayerAction> = (action, state) =>
+const prevEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(PlayerActionTypes.PREV),
     pluck('payload'),
     filter(
-      (payload = {}) =>
-        (!isGoogleBook(parserTypeSelector(state.value)) || payload.auto) &&
+      (payload: any = {}) =>
+        (!isGoogleBook(parserTypeSelector(state.value)) || payload?.auto) &&
         !isStopped(playerStatusSelector(state.value))
     ),
     tap(() => {
@@ -484,7 +487,7 @@ const prevEpic: Epic<PlayerAction> = (action, state) =>
     concatMap(() => of(playerWait(), playerPrevSlow()))
   );
 
-const prevEpicThrottled: Epic<PlayerAction> = (action) =>
+const prevEpicThrottled: Epic<any> = (action) =>
   action.pipe(
     ofType(PlayerActionTypes.PREV_SLOW),
     debounceTime(ATTRIBUTES.MISC.PLAYER_THROTTLE_TIME),
@@ -494,7 +497,7 @@ const prevEpicThrottled: Epic<PlayerAction> = (action) =>
     map(playerPlay)
   );
 
-const crashEpic: Epic<PlayerAction> = (action, state) =>
+const crashEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(PlayerActionTypes.CRASH),
     tap(() => {
@@ -503,7 +506,7 @@ const crashEpic: Epic<PlayerAction> = (action, state) =>
     pluck('payload', 'message'),
     concatMap((text) =>
       appSkipDeadSectionsSelector(state.value)
-        ? of(routeIndex(), playerNext())
+        ? of(routeIndex(), playerNext({ auto: false, }))
         : of(notificationWarning({ text, }), routeSkip())
     )
   );

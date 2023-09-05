@@ -21,15 +21,9 @@ export enum PageActionTypes {
 }
 
 export const setPage = createAction<Partial<ParserState>>(PageActionTypes.SET);
-export const nextPage = createAction<Partial<ParserState>>(
-  PageActionTypes.NEXT
-);
-export const prevPage = createAction<Partial<ParserState>>(
-  PageActionTypes.PREV
-);
-export const pageMove = createAction<Partial<ParserState>>(
-  PageActionTypes.MOVE
-);
+export const nextPage = createAction(PageActionTypes.NEXT);
+export const prevPage = createAction(PageActionTypes.PREV);
+export const pageMove = createAction<{ index: number }>(PageActionTypes.MOVE);
 export const pageMoveComplete = createAction(PageActionTypes.MOVE_COMPLETE);
 export const pageAutoset = createAction(PageActionTypes.AUTOSET);
 
@@ -37,7 +31,9 @@ export const setParser = createAction<Partial<ParserState>>(
   ParserActionTypes.SET
 );
 
-export const resetParser = createAction<any>(ParserActionTypes.RESET);
+export const resetParser = createAction<{ revertHtml: boolean }>(
+  ParserActionTypes.RESET
+);
 
 export const parserResetComplete = createAction(
   ParserActionTypes.RESET_COMPLETE

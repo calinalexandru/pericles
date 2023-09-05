@@ -1,5 +1,5 @@
 export default interface ISynth {
-  play(text: string): void;
+  speak(text: string): Promise<any>;
   resume(): void;
   pause(): void;
 }

@@ -23,10 +23,12 @@ export default function getOpenBookSections(page: number): {
     out: Array.from(curPage.querySelectorAll('.textLayer')).reduce(
       (acc: AccType[], section) => {
         let text = '';
-        if (isMinText(removeHTMLSpaces(getInnerText(section.textContent)))) {
+        if (
+          isMinText(removeHTMLSpaces(getInnerText(section.textContent || '')))
+        ) {
           const itemsSorted = Array.from(section.querySelectorAll('span'))
             .filter((item) =>
-              isMinText(removeHTMLSpaces(getInnerText(item.textContent)))
+              isMinText(removeHTMLSpaces(getInnerText(item.textContent || '')))
             )
             .sort(
               (a, b) =>
@@ -36,7 +38,7 @@ export default function getOpenBookSections(page: number): {
           console.log('itemsSorted', itemsSorted);
           itemsSorted.forEach((paragraph) => {
             text += `${removeHTMLSpaces(
-              getInnerText(paragraph.textContent)
+              getInnerText(paragraph.textContent || '')
             )} \n`;
             alterDom(paragraph, acc.length);
           });

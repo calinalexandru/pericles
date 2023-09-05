@@ -1,4 +1,3 @@
-import { keys, } from 'ramda';
 import { fromEvent, combineLatest, } from 'rxjs';
 import { tap, ignoreElements, } from 'rxjs/operators';
 
@@ -24,10 +23,10 @@ const userIsTyping = (e: KeyboardEvent) => {
 };
 
 export default () => {
-  const hotkeyEvents = {
+  const hotkeyEvents: any = {
     start: () => {
       console.log('hotkeyEvents.start');
-      store.dispatch(playerPlay({ userGenerated: true, }));
+      store.dispatch(playerPlay({ userGenerated: true, fromCursor: false, }));
     },
     play: () => {
       console.log('hotkeyEvents.toggle');
@@ -56,10 +55,11 @@ export default () => {
       console.log('onKeyPress$', e);
       keysMap[e.code] = { key: e.key, code: e.code, };
       const state = store.getState();
-      const hotkeys = hotkeysSelector(state);
-      const activeHotkeys = keys(keysMap)
-        .filter((k) => keysMap[k] !== null)
-        .map((k) => keysMap[k].code)
+      if (state === null) return;
+      const hotkeys: any = hotkeysSelector(state);
+      const activeHotkeys = Object.keys(keysMap)
+        .filter((k: string) => keysMap[k] !== null)
+        .map((k: string) => keysMap[k].code)
         .sort();
       console.log('activeHotkeys', activeHotkeys);
       // console.log('keysMap', keysMap)

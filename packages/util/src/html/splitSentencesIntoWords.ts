@@ -10,23 +10,27 @@ export default function splitSentencesIntoWords(
 ): void {
   if (!sectionsIds?.length) return;
   const query = sectionsIds.map((id) => sectionQuerySelector(id)).join(',');
-  const sectionsInFrames = getSelfIframes().reduce(
+  const sectionsInFrames: HTMLElement[] = getSelfIframes().reduce(
     (acc, iframe) => [
       ...acc,
-      ...Array.from(iframe.document.querySelectorAll(query)),
+      ...Array.from(iframe.document.querySelectorAll<HTMLElement>(query)),
     ],
-    []
+    [] as HTMLElement[]
   );
-  const sections = document.querySelectorAll(query);
-  let oldKey;
-  let wordIndex;
-  let newKey;
-  [ ...sections, ...sectionsInFrames, ].forEach((section) => {
-    newKey = section.getAttribute(ATTRIBUTES.ATTRS.SECTION);
+  const sections = document.querySelectorAll<HTMLElement>(query);
+  let oldKey: number;
+  let wordIndex: number;
+  let newKey: number;
+  [ ...sections, ...sectionsInFrames, ].forEach((section: HTMLElement) => {
+    newKey = Number(section.getAttribute(ATTRIBUTES.ATTRS.SECTION)) || 0;
     if (oldKey !== newKey) {
       wordIndex = 0;
     }
-    wordIndex = wrapWordTag(section.childNodes[0], wordIndex, jp);
+    wordIndex = wrapWordTag(
+      section.childNodes[0] as unknown as Text,
+      wordIndex,
+      jp
+    );
     oldKey = newKey;
   });
 }

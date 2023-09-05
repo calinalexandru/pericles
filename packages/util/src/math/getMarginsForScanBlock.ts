@@ -8,7 +8,10 @@ export default function getMarginsForScanBlock({
   size: number;
   offset?: number;
   start?: number;
-}): any {
+}): {
+  x: number;
+  y: number;
+}[] {
   const x = ~~(size / 2);
   const slice = ~~(size / 8);
   const block = ~~(size / 16);

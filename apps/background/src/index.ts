@@ -1,7 +1,7 @@
 import { createStore, applyMiddleware, combineReducers, } from 'redux';
 import { combineEpics, createEpicMiddleware, } from 'redux-observable';
 import thunk from 'redux-thunk';
-import { wrapStore, } from 'webext-redux';
+import { Store, wrapStore, } from 'webext-redux';
 
 import core from '@/core';
 import { WEBEXT_PORT, } from '@pericles/constants';
@@ -26,7 +26,7 @@ import settingsReducer from './store/reducers/settings';
 // the service worker wakes up from idle.
 let isInitialized: boolean = false;
 
-const init = async (preloadedState: RootState) => {
+const init = async (preloadedState: RootState): Promise<void> => {
   console.log('preloadedState', preloadedState);
   const observableMiddleware = createEpicMiddleware();
   store.initialize(
@@ -41,9 +41,9 @@ const init = async (preloadedState: RootState) => {
       }),
       preloadedState,
       applyMiddleware(observableMiddleware, thunk)
-    )
+    ) as any
   );
-  wrapStore(store.current, { portName: WEBEXT_PORT, });
+  wrapStore(store.current as Store, { portName: WEBEXT_PORT, });
   observableMiddleware.run(
     combineEpics(playerEpic, appEpic, settingsEpic, notificationEpic)
   );
@@ -54,35 +54,23 @@ const init = async (preloadedState: RootState) => {
     console.log('store updated', store.getState());
   });
 
-  return new Promise((resolve) => {
-    getBrowserAPI().api.tabs.query(
-      { active: true, currentWindow: true, },
-      (tabs: any) => {
-        const activeTab = tabs[0];
-        const activeTabId = activeTab.id;
+  return new Promise((resolve, reject) => {
+    try {
+      getBrowserAPI().api.tabs.query(
+        { active: true, currentWindow: true, },
+        (tabs: any) => {
+          const activeTab = tabs[0];
+          const activeTabId = activeTab.id;
 
-        console.log('dispatch tabId', activeTabId);
-        store.dispatch(setApp({ activeTab: activeTabId, }));
-        resolve();
-      }
-    );
+          console.log('dispatch tabId', activeTabId);
+          store.dispatch(setApp({ activeTab: activeTabId, }));
+          resolve();
+        }
+      );
+    } catch (e: any) {
+      reject(e as Error);
+    }
   });
-};
-
-type OnMessageType = {
-  addListener: any;
-  dispatch: any;
-  hasListeners: any;
-  removeListener: any;
-};
-
-type PortType = {
-  name: string;
-  disconnect: any;
-  onDisconnect: void;
-  onMessage: OnMessageType;
-  postMessage: void;
-  sender: any;
 };
 
 type MessageType = {
@@ -92,7 +80,7 @@ type MessageType = {
 // Listens for incomming connections from content
 // scripts, or from the popup. This will be triggered
 // whenever the extension "wakes up" from idle.
-getBrowserAPI().api.runtime.onConnect.addListener((port: PortType) => {
+getBrowserAPI().api.runtime.onConnect.addListener((port) => {
   if ([ 'POPUP', 'CONTENT', ].includes(port.name)) {
     console.log('Connection established:', port.name);
 

@@ -7,10 +7,10 @@ export default function findNextSibling(
   el: Node | Element,
   withParents: boolean = false,
   accessIframe: boolean = true
-): any {
+): { next: HTMLElement; parents: HTMLElement[] } | HTMLElement | null {
   console.log('findNextSibling', { el, withParents, accessIframe, });
   let nextSibling: any = el;
-  const parents = [];
+  const parents: HTMLElement[] = [];
   if (
     nextSibling.tagName === 'IFRAME' &&
     accessIframe &&

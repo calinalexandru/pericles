@@ -6,20 +6,23 @@ import getMarginsForScanBlock from '../math/getMarginsForScanBlock';
 import getLastNode from './getLastNode';
 import getSelfIframes from './getSelfIframes';
 
-const comparator = (expr1, expr2) => {
+const comparator = (expr1: boolean, expr2: boolean) => {
   if (expr1 && !expr2) return -1;
   if (!expr1 && expr2) return 1;
   return 0;
 };
 
-const getUniqueFiltered = (margins, document) => [
+const getUniqueFiltered = (
+  margins: { x: number; y: number }[],
+  document: Document
+): HTMLElement[] => [
   ...new Set(
     margins.reduce((acc, { x, y, }) => {
       const find = document.elementFromPoint(x, y);
-      if (find) acc.push(find);
+      if (find) acc.push(find as HTMLElement);
 
       return acc;
-    }, [])
+    }, [] as HTMLElement[])
   ),
 ];
 
@@ -41,7 +44,7 @@ export default function getElementFromPoint(offset: number): HTMLElement {
       start: scrollY,
     });
     return [ ...acc, ...getUniqueFiltered(marginsIframe, iframe.document), ];
-  }, []);
+  }, [] as HTMLElement[]);
   const sortedElems1 = [ ...elems, ...elemsInIframes, ].sort(
     (a, b) =>
       comparator(

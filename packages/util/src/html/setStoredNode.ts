@@ -1,5 +1,5 @@
 import { ATTRIBUTES, } from '@pericles/constants';
 
-export default function setStoredNode(node: Node): void {
-  window[ATTRIBUTES.WINDOW.NODE_BUFFER] = node;
+export default function setStoredNode(node: Node | null): void {
+  (window as any)[ATTRIBUTES.WINDOW.NODE_BUFFER] = node;
 }

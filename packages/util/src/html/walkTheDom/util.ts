@@ -30,8 +30,14 @@ type Position = {
   height: number;
 };
 
-const getPosition = (node: HTMLElement, relativeToParent = false): Position => {
-  const element = relativeToParent ? node.parentElement : node;
+const getPosition = (
+  node: Element | HTMLElement | Text,
+  relativeToParent = false
+): Position => {
+  const element: Element =
+    relativeToParent && node?.parentElement
+      ? (node.parentElement as Element)
+      : (node as Element);
   const {
     top = 0,
     width = 0,
@@ -63,24 +69,24 @@ export const pushAndClearBuffer = (
 ): SectionType[] => {
   //   console.log('pushAndClearBuffer', { buffer, lastKey, });
   if (getWindowSentenceBuffer()?.text?.length) {
-    if (isMinText(getWindowSentenceBuffer()?.text)) {
+    if (isMinText(getWindowSentenceBuffer()?.text || '')) {
       const { text, top, width, height, } = getWindowSentenceBuffer();
       buffer.push({ text, pos: { top, width, height, }, } as SectionType);
     } else {
-      const nodesInFrame = getSelfIframes().reduce(
+      const nodesInFrame: HTMLElement[] = getSelfIframes().reduce(
         (acc, iframe) => [
           ...acc,
           ...Array.from(
-            iframe.document.querySelectorAll(
+            iframe.document.querySelectorAll<HTMLElement>(
               sectionQuerySelector(lastKey + buffer.length)
             )
           ),
         ],
-        []
+        [] as HTMLElement[]
       );
       removeHelperTags(
         Array.from(
-          document.querySelectorAll(
+          document.querySelectorAll<HTMLElement>(
             sectionQuerySelector(lastKey + buffer.length)
           )
         )
@@ -106,31 +112,56 @@ export const determineVisibility = (
       fromY: playFromCursor,
     });
 
-export const pushNode = (text: string, node: HTMLElement): void => {
+export const pushNode = (text: string, node: HTMLElement | Text): void => {
   const pos = getPosition(node, true);
   const outer = { text, ...pos, };
   appendWindowSentenceBuffer(outer);
 };
 
-export const processTextNode = (node, buffer, lastKey) => {
+export const processTextNode = (
+  node: Text,
+  buffer: SectionType[],
+  lastKey: number
+): {
+  nextNode: HTMLElement | null;
+  nextAfterIframe: HTMLElement | null;
+} => {
   let nextNode;
   let parents;
-  let firstParagraph: any = {};
   let nextAfterIframe;
+  let firstParagraph: any;
 
-  if (isMaxText(removeHTMLSpaces(getInnerText(node.nodeValue)))) {
-    [ firstParagraph = {}, ] = getSentencesFromText(node.nodeValue) || [];
+  if (
+    node.nodeValue &&
+    isMaxText(removeHTMLSpaces(getInnerText(node.nodeValue)))
+  ) {
+    const sentences = getSentencesFromText(node.nodeValue) || [];
+    firstParagraph = sentences[0] || {};
     parents = [];
+
+    // Ensure nodeValue is defined and is a string
+    const nodeValueLength = node.nodeValue.length;
+
+    // Ensure firstParagraph.text is defined and is a string
+    const firstParagraphLength = firstParagraph.text
+      ? firstParagraph.text.length
+      : 0;
+
     nextNode = node.splitText(
-      firstParagraph && node.nodeValue.length >= firstParagraph.text.length
-        ? firstParagraph.text.length
-        : Math.floor(node.nodeValue.length / 2)
+      firstParagraph && nodeValueLength >= firstParagraphLength
+        ? firstParagraphLength
+        : Math.floor(nodeValueLength / 2)
     );
   } else {
-    ({ nextNode, parents, nextAfterIframe, } = findNextSibling(node, true));
+    ({
+      next: nextNode,
+      parents,
+      nextAfterIframe,
+    } = findNextSibling(node, true));
+    console.log('processTextNode.nextNode', nextNode);
   }
 
-  const nodeText = getInnerText(node.nodeValue);
+  const nodeText = getInnerText(node.nodeValue || '');
   pushNode(nodeText, node);
   alterNode(node, lastKey + buffer.length);
 
@@ -142,11 +173,11 @@ export const processTextNode = (node, buffer, lastKey) => {
 };
 
 export const processElementNode = (
-  node,
-  buffer,
-  lastKey,
-  playFromCursor,
-  userGenerated
+  node: HTMLElement,
+  buffer: SectionType[],
+  lastKey: number,
+  playFromCursor: number,
+  userGenerated: boolean
 ) => {
   let nextAfterIframe;
   let nextNode;
@@ -159,7 +190,7 @@ export const processElementNode = (
   const isValidElement =
     isValidTag(node) &&
     isMinText(
-      removeHTMLSpaces(getInnerText(node.innerText || node.textContent))
+      removeHTMLSpaces(getInnerText(node.innerText || node.textContent || ''))
     );
 
   const isTypePara =
@@ -167,12 +198,16 @@ export const processElementNode = (
     (isParagraph(node) ||
       isHeading(node) ||
       (!hasChildNodes(node) &&
-        isMinText(getInnerText(node.innerText || node.textContent))));
+        isMinText(getInnerText(node.innerText || node.textContent || ''))));
 
   if (isValidElement && isTypePara) {
     pushAndClearBuffer(buffer, lastKey);
     alterDom(node, lastKey + buffer.length);
-    pushSection(buffer, node, getInnerText(node.innerText || node.textContent));
+    pushSection(
+      buffer,
+      node,
+      getInnerText(node.innerText || node.textContent || '')
+    );
     ({ next: nextNode, nextAfterIframe, } = findNextSibling(node, true));
   } else {
     const nextSiblingResult = findNextSibling(node, true);

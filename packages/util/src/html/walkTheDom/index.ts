@@ -40,6 +40,15 @@ export default function walkTheDOM({
   callStackCounter = 0,
   blocked = false,
 }: WalkTheDOMParams): WalkTheDOMResult {
+  console.log('walkTheDOM', {
+    node,
+    buffer,
+    lastKey,
+    userGenerated,
+    playFromCursor,
+    callStackCounter,
+    blocked,
+  });
   let nextNode: HTMLElement | null;
   let nextAfterIframe: HTMLElement | null;
 
@@ -49,17 +58,22 @@ export default function walkTheDOM({
 
   if (
     isTextNode(node) &&
-    isMinText(removeHTMLSpaces(getInnerText(node.nodeValue))) &&
+    isMinText(removeHTMLSpaces(getInnerText(node.nodeValue || ''))) &&
     determineVisibility(node, playFromCursor, userGenerated)
   ) {
-    ({ nextNode, nextAfterIframe, } = processTextNode(node, buffer, lastKey));
+    ({ nextNode, nextAfterIframe, } = processTextNode(
+      node as unknown as Text,
+      buffer,
+      lastKey
+    ));
+    console.log('walkTheDom.node', nextNode);
   } else {
     ({ nextNode, nextAfterIframe, } = processElementNode(
       node,
       buffer,
       lastKey,
-      userGenerated,
-      playFromCursor
+      playFromCursor,
+      userGenerated
     ));
   }
 

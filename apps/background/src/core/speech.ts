@@ -1,5 +1,4 @@
 // /* eslint-disable no-unused-vars */
-import { values, } from 'ramda';
 import { tap, } from 'rxjs/operators';
 
 import Speech from '@/speech';
@@ -28,13 +27,14 @@ import {
   mpToContent,
 } from '@pericles/util';
 
-export default () => {
+export default (): void => {
   console.log('initialize speech');
   Speech.stream$
     .pipe(
       tap((out) => {
         console.log('Speech.stream$.subscribe.out', out);
         const state = store.getState();
+        if (state === null) return;
         const playingTab = playerTabSelector(state);
         const parserIframes = parserIframesSelector(state);
         const { event, params, } = out;
@@ -80,8 +80,8 @@ export default () => {
               newIframes = {
                 ...parserIframes,
                 ...{
-                  [availableIframeKey]: {
-                    ...parserIframes[availableIframeKey],
+                  [availableIframeKey as string]: {
+                    ...parserIframes[availableIframeKey as string],
                     parsing: true,
                   },
                 },
@@ -106,8 +106,10 @@ export default () => {
           break;
         case 'onError':
           console.log('onError');
-          if (values(ERROR_CODES.WEBSOCKET).includes(errorCode)) {
-            store.dispatch(playerCrash());
+          if (Object.values(ERROR_CODES.WEBSOCKET).includes(errorCode)) {
+            store.dispatch(
+              playerCrash({ message: 'websocket caused player crash', })
+            );
           } else if (errorCode === ERROR_CODES.PLAYER.TIMEOUT) {
             store.dispatch(playerTimeout());
           } else if (errorCode === ERROR_CODES.PLAYER.TEXT_EXCEED) {
@@ -115,7 +117,7 @@ export default () => {
               playerCrash({ message: 'Your text is too big for me, senapi', })
             );
           } else {
-            store.dispatch(playerCrash());
+            store.dispatch(playerCrash({ message: 'generic player crash', }));
           }
           break;
         default:

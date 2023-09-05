@@ -4,11 +4,17 @@ export default function appendWindowSentenceBuffer({
   top,
   width,
   height,
-  ...rest
+  text,
+}: {
+  top: number;
+  width: number;
+  height: number;
+  text: string;
 }): void {
-  const { text = '', } = window[ATTRIBUTES.WINDOW.SENTENCE_BUFFER] || {};
-  window[ATTRIBUTES.WINDOW.SENTENCE_BUFFER] = {
-    text: text + rest.text,
+  const { text: bufferText = '', } =
+    (window as any)[ATTRIBUTES.WINDOW.SENTENCE_BUFFER] || {};
+  (window as any)[ATTRIBUTES.WINDOW.SENTENCE_BUFFER] = {
+    text: bufferText + text,
     top,
     width,
     height,

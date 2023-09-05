@@ -1,6 +1,6 @@
 import { ATTRIBUTES, } from '@pericles/constants';
 
-export default function alterNode(node: Element, key: number): void {
+export default function alterNode(node: Element | Text, key: number): void {
   if (!node) return;
   const myEl = document.createElement(ATTRIBUTES.TAGS.SECTION);
   myEl.setAttribute(ATTRIBUTES.ATTRS.SECTION, String(key));

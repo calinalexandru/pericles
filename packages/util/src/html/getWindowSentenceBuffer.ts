@@ -7,7 +7,7 @@ export default function getWindowSentenceBuffer(): {
   height?: number;
   } {
   return (
-    window[ATTRIBUTES.WINDOW.SENTENCE_BUFFER] || {
+    (window as any)[ATTRIBUTES.WINDOW.SENTENCE_BUFFER] || {
       text: '',
       top: 0,
       width: 0,

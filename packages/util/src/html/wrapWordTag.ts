@@ -1,8 +1,7 @@
-import { sort, } from 'ramda';
-
 import alterNodeWord from './alterNodeWord';
 
-const sortFunc = (a, b) => b - a;
+const sortFunc = (a: number, b: number) => b - a;
+
 export default function wrapWordTag(
   node: Text,
   charIndex: number = 0,
@@ -14,30 +13,29 @@ export default function wrapWordTag(
   const leftTrim = nodeValue.length - leftTrimmedNodeValue.length;
   const chars = leftTrimmedNodeValue.split('');
   let squareBracket = false;
-  const splitIndexMap = jp
-    ? sort(
-      sortFunc,
-      chars.map((ch, key) => key + 1)
-    )
-    : sort(
-      sortFunc,
-      chars
-        .map((char, key) => {
-          if (char === '[') squareBracket = true;
-          if (char === ']') squareBracket = false;
-          const next = chars[key + 1];
-          const prev = chars[key - 1];
-          return next &&
-              !squareBracket &&
-              char === ' ' &&
-              next !== ' ' &&
-              prev !== ' '
-            ? key
-            : null;
-        })
-        .filter((char) => char > 0)
-    );
-  splitIndexMap.forEach((splitIndex) => {
+
+  const splitIndexArr = chars
+    .map((char, key) => {
+      if (char === '[') squareBracket = true;
+      if (char === ']') squareBracket = false;
+      const next = chars[key + 1];
+      const prev = chars[key - 1];
+      return next &&
+        !squareBracket &&
+        char === ' ' &&
+        next !== ' ' &&
+        prev !== ' '
+        ? key
+        : null;
+    })
+    .filter((char: any) => char > 0);
+
+  const splitIndexMap: any = jp
+    ? chars.map((ch, key) => key + 1)
+    : splitIndexArr;
+  splitIndexMap.sort(sortFunc);
+
+  splitIndexMap.forEach((splitIndex: number) => {
     alterNodeWord(
       node.splitText(leftTrim + splitIndex),
       charIndex + splitIndex + 1

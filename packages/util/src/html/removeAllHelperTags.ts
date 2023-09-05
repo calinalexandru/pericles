@@ -8,24 +8,24 @@ export default function removeAllHelperTags(): void {
     (acc, iframe) => [
       ...acc,
       ...Array.from(
-        iframe.document.querySelectorAll(`${ATTRIBUTES.TAGS.WORD}`)
+        iframe.document.querySelectorAll<HTMLElement>(`${ATTRIBUTES.TAGS.WORD}`)
       ),
     ],
-    []
+    [] as HTMLElement[]
   );
   const allWords = Array.from(
     document.querySelectorAll(`${ATTRIBUTES.TAGS.WORD}`)
   );
   [ ...allWords, ...allWordsInIframes, ].forEach((word) => {
-    word.replaceWith(document.createTextNode(word.textContent));
+    word.replaceWith(document.createTextNode(word.textContent || ''));
   });
 
   const allSections = Array.from(
     document.querySelectorAll(`${ATTRIBUTES.TAGS.SECTION}`)
   );
   allSections.forEach((section) => {
-    section.parentNode.insertBefore(
-      document.createTextNode(section.textContent),
+    section?.parentNode?.insertBefore?.(
+      document.createTextNode(section.textContent || ''),
       section
     );
     section.remove();

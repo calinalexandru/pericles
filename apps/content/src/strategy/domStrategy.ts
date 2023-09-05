@@ -56,12 +56,12 @@ export default class DomStrategy {
     fromCursor?: boolean;
   }) {
     this.type = parserType;
-    this.working = working;
-    this.userGenerated = userGenerated;
-    this.parserKey = parserKey;
-    this.skipUntilY = skipUntilY;
-    this.fromCursor = fromCursor;
-    this.parserIframes = parserIframes;
+    this.working = working || false;
+    this.userGenerated = userGenerated || false;
+    this.parserKey = parserKey || 0;
+    this.skipUntilY = skipUntilY || 0;
+    this.fromCursor = fromCursor || false;
+    this.parserIframes = parserIframes || {};
   }
 
   getSections() {
