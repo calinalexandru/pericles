@@ -5,6 +5,12 @@ import { SectionHighlightStylesTypes, } from './sectionHighlightStyles';
 import { TabsTypes, } from './tabs';
 import { WordTrackerStylesTypes, } from './wordTrackerStyles';
 
+export type SectionType = {
+  node?: HTMLElement;
+  text: string;
+  pos: { top: number; width: number; height: number };
+};
+
 export type PlayerSectionsType = {
   text: string;
   pos: {

@@ -54,7 +54,7 @@ export { default as setWindowSentenceBuffer, } from './html/setWindowSentenceBuf
 export { default as setWordBackground, } from './html/setWordBackground';
 export { default as splitSentencesIntoWords, } from './html/splitSentencesIntoWords';
 export { default as trimQuotes, } from './html/trimQuotes';
-export { default as walkTheDOM, } from './html/walkTheDOM';
+export { default as walkTheDOM, } from './html/walkTheDom';
 export { default as wrapWordTag, } from './html/wrapWordTag';
 export { default as wrapWordTagAzure, } from './html/wrapWordTagAzure';
 /* location */
