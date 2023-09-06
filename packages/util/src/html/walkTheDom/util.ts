@@ -127,7 +127,7 @@ export const processTextNode = (
   nextAfterIframe: HTMLElement | null;
 } => {
   let nextNode;
-  let parents;
+  let parents: HTMLElement[] = [];
   let nextAfterIframe;
   let firstParagraph: any;
 
@@ -153,12 +153,10 @@ export const processTextNode = (
         : Math.floor(nodeValueLength / 2)
     );
   } else {
-    ({
-      next: nextNode,
-      parents,
-      nextAfterIframe,
-    } = findNextSibling(node, true));
-    console.log('processTextNode.nextNode', nextNode);
+    const result = findNextSibling(node, true);
+    if (result !== null && 'next' in result && 'parents' in result) {
+      ({ next: nextNode, parents, nextAfterIframe, } = result);
+    }
   }
 
   const nodeText = getInnerText(node.nodeValue || '');
@@ -169,7 +167,10 @@ export const processTextNode = (
     pushAndClearBuffer(buffer, lastKey);
   }
 
-  return { nextNode, nextAfterIframe, };
+  return {
+    nextNode: nextNode as HTMLElement,
+    nextAfterIframe: nextAfterIframe as HTMLElement,
+  };
 };
 
 export const processElementNode = (
@@ -208,11 +209,14 @@ export const processElementNode = (
       node,
       getInnerText(node.innerText || node.textContent || '')
     );
-    ({ next: nextNode, nextAfterIframe, } = findNextSibling(node, true));
+    const result = findNextSibling(node, true);
+    if (result !== null && 'next' in result) {
+      ({ next: nextNode, nextAfterIframe, } = result);
+    }
   } else {
     const nextSiblingResult = findNextSibling(node, true);
 
-    const result =
+    const result: any =
       (isWikipedia() && isSkippableByDesign(node)) ||
       !isValidElement ||
       !isVisibleNodeOrText

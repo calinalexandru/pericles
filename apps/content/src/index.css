@@ -37,11 +37,15 @@ img._pericles_action_icon:hover {
   opacity: 1 !important;
 }
 
+html *:not(:defined) ps-section,
+html *:not(:defined) ps-word,
 ps-section,
 ps-word {
+  text-indent: initial;
   display: inline;
   margin: 0;
   padding: 0;
+  position: static !important;
 }
 
 ps-word[data-audio-index]:hover {

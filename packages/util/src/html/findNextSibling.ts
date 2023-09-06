@@ -4,14 +4,22 @@ import canAccessIframe from '../helpers/canAccessIframe';
 import getIframeDocument from '../helpers/getIframeDocument';
 
 export default function findNextSibling(
-  el: Node | Element,
+  el: Node | Element | Text | HTMLElement,
   withParents: boolean = false,
   accessIframe: boolean = true
-): { next: HTMLElement; parents: HTMLElement[] } | HTMLElement | null {
+):
+  | {
+      next: HTMLElement | null;
+      parents: HTMLElement[];
+      nextAfterIframe?: HTMLElement | null;
+    }
+  | HTMLElement
+  | null {
   console.log('findNextSibling', { el, withParents, accessIframe, });
   let nextSibling: any = el;
   const parents: HTMLElement[] = [];
   if (
+    typeof nextSibling?.getAttribute === 'function' &&
     nextSibling.tagName === 'IFRAME' &&
     accessIframe &&
     nextSibling.getAttribute('id') !== ATTRIBUTES.ATTRS.CONTENT_IFRAME
@@ -22,11 +30,15 @@ export default function findNextSibling(
       if (nextIframeSibling) {
         return withParents
           ? {
-            next: nextIframeSibling,
-            nextAfterIframe: findNextSibling(nextSibling, false, false),
+            next: nextIframeSibling as HTMLElement,
+            nextAfterIframe: findNextSibling(
+              nextSibling,
+              false,
+              false
+            ) as HTMLElement,
             parents,
           }
-          : nextIframeSibling;
+          : (nextIframeSibling as HTMLElement);
       }
     } else {
       nextSibling = findNextSibling(nextSibling, false, false);
@@ -43,6 +55,6 @@ export default function findNextSibling(
     parents.push(nextSibling);
   }
   return withParents
-    ? { next: nextSibling && nextSibling.nextSibling, parents, }
-    : nextSibling && nextSibling.nextSibling;
+    ? { next: (nextSibling as HTMLElement) && nextSibling.nextSibling, parents, }
+    : ((nextSibling && nextSibling.nextSibling) as HTMLElement);
 }

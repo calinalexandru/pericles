@@ -25,5 +25,7 @@ export default function getLastNode(parserKey: number = 0): HTMLElement {
     lastSection = iframeSections[iframeSections.length - 1];
   }
 
-  return lastSection ? findNextSibling(lastSection) : getFirstNode();
+  return (
+    lastSection ? findNextSibling(lastSection) : getFirstNode()
+  ) as HTMLElement;
 }

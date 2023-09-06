@@ -1,4 +1,10 @@
-const elementsList = [
+type ElementDescriptor = {
+  tagName: string;
+  attr: string;
+  value: string[];
+};
+
+const elementsList: ElementDescriptor[] = [
   { tagName: 'table', attr: 'class', value: [ 'infobox', ], },
   { tagName: 'table', attr: 'class', value: [ 'vertical-navbox', ], },
   { tagName: 'div', attr: 'role', value: [ 'navigation', ], },
@@ -10,11 +16,17 @@ const elementsList = [
   { tagName: 'div', attr: 'id', value: [ 'toc', ], },
 ];
 
-export default function isSkippableByDesign(el: HTMLElement): boolean {
-  return elementsList.reduce(
-    (acc, cur) =>
-      (el.getAttribute(cur.attr) || '').indexOf(cur.value.join(',')) !== -1 ||
-      acc,
-    false
+function isHTMLElement(node: HTMLElement | Text): node is HTMLElement {
+  return node instanceof HTMLElement;
+}
+
+export default function isSkippableByDesign(el: HTMLElement | Text): boolean {
+  if (!isHTMLElement(el)) {
+    return false;
+  }
+
+  return elementsList.some(
+    (item) =>
+      (el.getAttribute(item.attr) || '').indexOf(item.value.join(',')) !== -1
   );
 }
