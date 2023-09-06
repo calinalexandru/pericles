@@ -2,7 +2,7 @@ import { getBrowserAPI, } from '@pericles/util';
 
 import BaseSynth from './BaseSynth';
 import ISynth from './ISynth';
-import Utterance from './utterance';
+import Utterance from './Utterance';
 
 export default class ChromeSynth extends BaseSynth implements ISynth {
 
