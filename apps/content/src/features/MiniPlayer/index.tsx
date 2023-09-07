@@ -5,7 +5,11 @@ import NextSvg from '@/assets/next.svg';
 import PauseSvg from '@/assets/pause.svg';
 import PlaySvg from '@/assets/play.svg';
 import SpinnerSvg from '@/assets/spinner.svg';
-import { ATTRIBUTES, PLAYER_STATUS, } from '@pericles/constants';
+import {
+  ATTRIBUTES,
+  PLAYER_STATUS,
+  PlayerStatusTypes,
+} from '@pericles/constants';
 import {
   appMiniPlayerSelector,
   parserTypeSelector,
@@ -33,7 +37,7 @@ export default function MiniPlayer() {
   console.log('MiniPlayer', { parserType, sections, status, });
   const dispatch = useDispatch();
   const onNext = () => {
-    dispatch(playerNext());
+    dispatch(playerNext({ auto: false, }));
   };
   const onPause = () => {
     dispatch(playerPause());
@@ -42,17 +46,16 @@ export default function MiniPlayer() {
     dispatch(playerResume());
   };
   const isPlaying = PLAYER_STATUS.PLAYING === status;
-  const isLoading = [ PLAYER_STATUS.LOADING, PLAYER_STATUS.WAITING, ].includes(
-    status
-  );
+  const isLoading = (
+    [ PLAYER_STATUS.LOADING, PLAYER_STATUS.WAITING, ] as PlayerStatusTypes[]
+  ).includes(status);
 
   useEffect(() => {
     if (status === PLAYER_STATUS.STOPPED) {
       const iframe = document.getElementById(ATTRIBUTES.ATTRS.CONTENT_IFRAME);
-      iframe.style.top = `-99px`;
+      if (iframe !== null) iframe.style.top = `-99px`;
       return;
     }
-    if (currentSection === false) return;
     let section;
     if (isGoogleDocsSvg(parserType))
       section = getRectSectionById(currentSection);
@@ -73,6 +76,8 @@ export default function MiniPlayer() {
       (section?.getBoundingClientRect && section.getBoundingClientRect()) ?? {};
     const iframe = document.getElementById(ATTRIBUTES.ATTRS.CONTENT_IFRAME);
 
+    if (iframe === null) return;
+
     iframe.style.top = `${window.scrollY + adjustY + y}px`;
     iframe.style.left = `${window.scrollX + adjustX + x}px`;
   }, [ currentSection, parserType, sections, status, ]);
@@ -87,7 +92,6 @@ export default function MiniPlayer() {
         enabled && (
           <>
             <Button
-              type="button"
               onClick={() => {
                 if (isPlaying) {
                   console.log('onPause');
@@ -103,13 +107,7 @@ export default function MiniPlayer() {
                 src={isPlaying ? PauseSvg : PlaySvg}
               />
             </Button>
-            <Button
-              type="button"
-              onClick={() => {
-                console.log('onNextingtons');
-                onNext();
-              }}
-            >
+            <Button onClick={onNext}>
               <Icon
                 alt="Next"
                 src={NextSvg} />

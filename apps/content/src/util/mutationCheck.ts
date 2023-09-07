@@ -1,29 +1,40 @@
-export default function mutationCheck(targetNode, timeout) {
+export default function mutationCheck(
+  targetNode: HTMLElement | Window,
+  timeout: number
+): Promise<boolean> {
   console.log('mutationCheck.starting', { targetNode, timeout, });
-  let t;
-  let observer;
+
+  let t: number;
+  let observer: MutationObserver | undefined;
+
   return new Promise((resolve, reject) => {
-    const config = { childList: true, subtree: true, };
+    const config: MutationObserverInit = { childList: true, subtree: true, };
+
     if (!targetNode) resolve(false);
 
     const work = () => {
       resolve(true);
-      observer.disconnect();
+      if (observer) {
+        observer.disconnect();
+      }
       console.log('mutationCheck.finished');
     };
-    const callback = (mutationList) => {
+
+    const callback = (mutationList: MutationRecord[]) => {
       mutationList.forEach(() => {
         clearTimeout(t);
         t = setTimeout(work, timeout);
       });
     };
+
     try {
       observer = new MutationObserver(callback);
-      observer.observe(targetNode, config);
+      observer.observe(targetNode as Node, config);
     } catch (e) {
       clearTimeout(t);
-      reject();
+      reject(e);
     }
+
     t = setTimeout(work, timeout);
   });
 }
