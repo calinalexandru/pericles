@@ -1,4 +1,4 @@
-import { PARSER_TYPES, } from '@pericles/constants';
+import { PARSER_TYPES, ParserTypes, } from '@pericles/constants';
 
 import isGoogleBookDocument from './isGoogleBookDocument';
 import isGoogleDocsDocument from './isGoogleDocsDocument';
@@ -6,7 +6,7 @@ import isGoogleFormsDocumentSvg from './isGoogleDocsDocumentSvg';
 import isGoogleFormsDocument from './isGoogleFormsDocument';
 import isGrammarlyAppHost from './isGrammarlyAppHost';
 
-export default function getParserType(window: Window) {
+export default function getParserType(window: Window): ParserTypes {
   return (
     (isGrammarlyAppHost(window) && PARSER_TYPES.GRAMMARLY_APP) ||
     (isGoogleBookDocument(window) && PARSER_TYPES.GOOGLE_BOOK) ||

@@ -1,6 +1,4 @@
-import { t, } from '@lingui/macro';
-import { keys, pathOr, } from 'ramda';
-import { combineEpics, ofType, } from 'redux-observable';
+import { Epic, combineEpics, ofType, } from 'redux-observable';
 import { from, of, } from 'rxjs';
 import {
   catchError,
@@ -15,7 +13,12 @@ import {
 
 import DomStrategy from '@/strategy/domStrategy';
 import mutationCheck from '@/util/mutationCheck';
-import { ATTRIBUTES, PARSER_TYPES, PLAYER_STATUS, } from '@pericles/constants';
+import {
+  ATTRIBUTES,
+  PARSER_TYPES,
+  PLAYER_STATUS,
+  ParserTypes,
+} from '@pericles/constants';
 import {
   PageActionTypes,
   ParserActionTypes,
@@ -65,12 +68,13 @@ import {
   removeWordTags,
   scrollToGoogleDocsPage,
   splitSentencesIntoWords,
+  t,
   wrapWordTagAzure,
 } from '@pericles/util';
 
 const mergedLanguages = [ 'ja', 'cn', 'ko', ];
 
-export const getSectionsAndPlayEpic = (action, state) =>
+export const getSectionsAndPlayEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(sectionsRequestAndPlay.request),
     pluck('payload'),
@@ -110,14 +114,14 @@ export const getSectionsAndPlayEpic = (action, state) =>
         (Object.keys(parserIframes).length && parserIframes) ||
         (!isGoogleUtility(parserType) && getIframesForStore(window)) ||
         {};
-      const userGenerated = pathOr(false, [ 'userGenerated', ], payload);
-      const fromCursor = pathOr(false, [ 'fromCursor', ], payload);
-      const working = pathOr(false, [ 'working', ], payload);
-      const tab = pathOr(0, [ 'tab', ], payload);
+      const userGenerated = payload?.userGenerated || false;
+      const fromCursor = payload.fromCursor || false;
+      const working = payload.working || false;
+      const tab = payload.tab || 0;
       const parserKey = parserKeySelector(state.value);
       const voiceProp = settingsVoiceSelector(state.value);
       const skipUntilY = appSkipUntilYSelector(state.value);
-      const voices = settingsVoiceSelector(state.value);
+      const voices: any = settingsVoiceSelector(state.value);
       const newVoiceProp = isPremiumVoice(voiceProp)
         ? getPremiumVoiceId(voiceProp)
         : voiceProp;
@@ -154,22 +158,26 @@ export const getSectionsAndPlayEpic = (action, state) =>
 
       const sectionsArr = out.map((data) => data.text);
       splitSentencesIntoWords(
-        keys(sectionsArr).map((key) => Number(parserKey) + Number(key)),
+        Object.keys(sectionsArr).map(
+          (key: string) => Number(parserKey) + Number(key)
+        ),
         jpLang
       );
 
       return {
-        sections: out.map(({ text, pos, }) => ({ text, pos, })),
+        sections: out.map(({ text, pos, }) => ({ text, ...(pos && { pos, }), })),
         fromCursor,
         iframes,
         isIframe,
         end:
-          [
-            PARSER_TYPES.GOOGLE_DOC,
-            PARSER_TYPES.GOOGLE_DOC_SVG,
-            PARSER_TYPES.GOOGLE_BOOK,
-            PARSER_TYPES.GOOGLE_FORM,
-          ].includes(parserType) ||
+          (
+            [
+              PARSER_TYPES.GOOGLE_DOC,
+              PARSER_TYPES.GOOGLE_DOC_SVG,
+              PARSER_TYPES.GOOGLE_BOOK,
+              PARSER_TYPES.GOOGLE_FORM,
+            ] as ParserTypes[]
+          ).includes(parserType) ||
           sectionsArr.length < ATTRIBUTES.MISC.MIN_SECTIONS ||
           blocked,
         maxPage,
@@ -187,8 +195,8 @@ export const getSectionsAndPlayEpic = (action, state) =>
         message,
         skip,
         end,
-        maxPage,
-        type,
+        maxPage = 0,
+        type = PARSER_TYPES.DEFAULT,
         pageIndex,
         iframes,
         isIframe,
@@ -205,14 +213,15 @@ export const getSectionsAndPlayEpic = (action, state) =>
         }
         if (skip) {
           if (!isIframe && !sectionsArr.length && end) {
-            const availableIframeKey = findAvailableIframe(iframes);
+            const availableIframeKey: string | boolean =
+              findAvailableIframe(iframes);
             let newIframes = iframes;
-            if (availableIframeKey) {
+            if (availableIframeKey !== false) {
               newIframes = {
                 ...iframes,
                 ...{
-                  [availableIframeKey]: {
-                    ...iframes[availableIframeKey],
+                  [availableIframeKey as string]: {
+                    ...iframes[availableIframeKey as string],
                     parsing: true,
                   },
                 },
@@ -244,7 +253,7 @@ export const getSectionsAndPlayEpic = (action, state) =>
         if (!mergeSections.length && isGoogleBook(type)) {
           return from([
             setParser({ type, maxPage, page: pageIndex, end, }),
-            playerNext(),
+            playerNext({ auto: false, }),
           ]);
         }
         return from(
@@ -268,7 +277,7 @@ export const getSectionsAndPlayEpic = (action, state) =>
     )
   );
 
-export const pageMoveEpic = (action, state) =>
+export const pageMoveEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(PageActionTypes.MOVE),
     pluck('payload'),
@@ -278,9 +287,12 @@ export const pageMoveEpic = (action, state) =>
       const parserType = parserTypeSelector(state.value);
       if (
         !isIframe &&
-        [ PARSER_TYPES.GOOGLE_DOC, PARSER_TYPES.GOOGLE_DOC_SVG, ].includes(
-          parserType
-        )
+        (
+          [
+            PARSER_TYPES.GOOGLE_DOC,
+            PARSER_TYPES.GOOGLE_DOC_SVG,
+          ] as ParserTypes[]
+        ).includes(parserType)
       ) {
         scrollToGoogleDocsPage(payload.index);
       }
@@ -289,7 +301,7 @@ export const pageMoveEpic = (action, state) =>
     map(pageMoveComplete)
   );
 
-export const pageNextEpic = (action, state) =>
+export const pageNextEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(PageActionTypes.NEXT),
     pluck('payload'),
@@ -314,7 +326,7 @@ export const pageNextEpic = (action, state) =>
     concatMap((check) => of(check ? pageMoveComplete() : playerIdle()))
   );
 
-export const pagePrevEpic = (action, state) =>
+export const pagePrevEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(PageActionTypes.PREV),
     pluck('payload'),
@@ -339,7 +351,7 @@ export const pagePrevEpic = (action, state) =>
     concatMap((check) => of(check ? pageMoveComplete() : playerIdle()))
   );
 
-export const pageAutosetEpic = (action) =>
+export const pageAutosetEpic: Epic<any> = (action) =>
   action.pipe(
     ofType(PageActionTypes.AUTOSET),
     pluck('payload'),
@@ -352,7 +364,7 @@ export const pageAutosetEpic = (action) =>
     })
   );
 
-export const wordsUpdateEpic = (action, state) =>
+export const wordsUpdateEpic: Epic<any> = (action, state) =>
   action.pipe(
     ofType(ParserActionTypes.WORDS_UPDATE),
     pluck('payload', 'wordList'),
@@ -367,7 +379,7 @@ export const wordsUpdateEpic = (action, state) =>
     })
   );
 
-export const wordsUpdateWorkerEpic = (action) =>
+export const wordsUpdateWorkerEpic: Epic<any> = (action) =>
   action.pipe(
     ofType(ParserActionTypes.WORDS_UPDATE_WORKER),
     pluck('payload'),
@@ -393,7 +405,7 @@ export const wordsUpdateWorkerEpic = (action) =>
     })
   );
 
-export const clearHelperTagsEpic = (action) =>
+export const clearHelperTagsEpic: Epic<any> = (action) =>
   action.pipe(
     ofType(ParserActionTypes.RESET),
     pluck('payload', 'revertHtml'),

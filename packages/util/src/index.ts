@@ -114,3 +114,5 @@ export { default as getPremiumVoiceId, } from './voices/getPremiumVoiceId';
 export { default as getTagsFromCountry, } from './voices/getTagsFromCountry';
 export { default as isPremiumVoice, } from './voices/isPremiumVoice';
 export { default as setPremiumVoiceId, } from './voices/setPremiumVoiceId';
+
+export * from './Localization';

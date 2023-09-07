@@ -13,8 +13,8 @@ export type Settings = {
 export type SectionType = {
   node?: Element | HTMLElement | Text;
   encoded?: string;
+  pos?: { top: number; width: number; height: number };
   text: string;
-  pos: { top: number; width: number; height: number };
 };
 
 export type PlayerSectionsType = {

@@ -1,4 +1,3 @@
-import { useLingui, } from '@lingui/react';
 import {
   Alert, Box, CssBaseline, Snackbar, 
 } from '@mui/material';
@@ -16,7 +15,6 @@ import {
   notificationTextSelector,
   notificationTypeSelector,
   appThemeModeSelector,
-  appLanguageSelector,
   appRouteSelector,
   hotkeysSelector,
   hotkeysDisableSelector,
@@ -56,14 +54,12 @@ const alertStyle = {
 
 function App() {
   // console.log('App', { appRoute });
-  const { i18n, } = useLingui();
   let keysMap = Object.create(null);
   const dispatch = useDispatch();
   const appRoute = useSelector(appRouteSelector);
   const notificationText = useSelector(notificationTextSelector);
   const notificationType = useSelector(notificationTypeSelector);
   const themeMode = useSelector(appThemeModeSelector);
-  const language = useSelector(appLanguageSelector);
   const hotkeys = useSelector(hotkeysSelector);
   const disableHotkeys = useSelector(hotkeysDisableSelector);
 
@@ -110,11 +106,6 @@ function App() {
 
     /* eslint-disable react-hooks/exhaustive-deps */
   }, [ dispatch, ]);
-
-  useEffect(() => {
-    // console.log('activating', language);
-    i18n.activate(language);
-  }, [ language, ]);
 
   const onKeyUp = (e) => {
     if (disableHotkeys) return;

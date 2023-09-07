@@ -1,5 +1,4 @@
 import { keyframes, } from '@emotion/react';
-import { t, } from '@lingui/macro';
 import { SickSharp, } from '@mui/icons-material';
 import {
   Typography,
@@ -23,6 +22,7 @@ import {
   routeIndex,
   setApp,
 } from '@pericles/store';
+import { t, } from '@pericles/util';
 
 const colorLoop = keyframes`
 0%, 100% {

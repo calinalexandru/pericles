@@ -1,5 +1,4 @@
 import { keyframes, } from '@emotion/react';
-import { t, } from '@lingui/macro';
 import { LocalFireDepartmentSharp, } from '@mui/icons-material';
 import { Typography, Box, Button, } from '@mui/material';
 import { lightBlue, orange, red, } from '@mui/material/colors';
@@ -10,6 +9,7 @@ import usePlayer from '@/hooks/usePlayer';
 import useRoutes from '@/hooks/useRoutes';
 import { PLAYER_STATUS, } from '@pericles/constants';
 import { playerStatusSelector, } from '@pericles/store';
+import { t, } from '@pericles/util';
 
 const colorLoop = keyframes`
 0%, 100% {

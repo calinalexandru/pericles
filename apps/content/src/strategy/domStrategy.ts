@@ -47,7 +47,7 @@ export default class DomStrategy {
     skipUntilY,
     fromCursor,
   }: {
-    parserType?: ParserTypes;
+    parserType: ParserTypes;
     working?: boolean;
     userGenerated?: boolean;
     parserIframes?: ParserIframesType;

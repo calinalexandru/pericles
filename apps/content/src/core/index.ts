@@ -1,9 +1,7 @@
-import { i18n, } from '@lingui/core';
 import { combineEpics, createEpicMiddleware, } from 'redux-observable';
 import thunk from 'redux-thunk';
 import { applyMiddleware, } from 'webext-redux';
 
-import { DEFAULT_VALUES, MESSAGES, } from '@pericles/constants';
 import { appNewContent, store, } from '@pericles/store';
 import { getBrowserAPI, } from '@pericles/util';
 
@@ -48,8 +46,8 @@ export default (): void => {
       console.log('content.state', state);
     });
 
-    i18n.load(MESSAGES);
-    i18n.activate(DEFAULT_VALUES.APP.LANGUAGE);
+    // i18n.load(MESSAGES);
+    // i18n.activate(DEFAULT_VALUES.APP.LANGUAGE);
   };
 
   // Listens for when the store gets initialized

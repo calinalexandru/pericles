@@ -1,4 +1,3 @@
-import { t, } from '@lingui/macro';
 import FindInPageSharpIcon from '@mui/icons-material/FindInPageSharp';
 import KeyboardSharpIcon from '@mui/icons-material/KeyboardSharp';
 import RadioSharpIcon from '@mui/icons-material/RadioSharp';
@@ -39,6 +38,7 @@ import {
   hotkeysDisableSelector,
   playerTabSelector,
 } from '@pericles/store';
+import { t, } from '@pericles/util';
 
 export default function TweaksComponent() {
   const disableHotkeys = useSelector(hotkeysDisableSelector);

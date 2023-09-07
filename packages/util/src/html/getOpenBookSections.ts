@@ -1,17 +1,13 @@
+import { SectionType, } from '@pericles/constants';
+
 import isMinText from '../predicates/isMinText';
 import getInnerText from '../string-work/getInnerText';
 
 import alterDom from './alterDom';
 import removeHTMLSpaces from './removeHTMLSpaces';
 
-type AccType = {
-  node: Element;
-  text: string;
-  encoded: string;
-};
-
 export default function getOpenBookSections(page: number): {
-  out: AccType[];
+  out: SectionType[];
   maxPage: number;
 } {
   console.log('getOpenBookSections.page', page);
@@ -21,7 +17,7 @@ export default function getOpenBookSections(page: number): {
   console.log('getOpenBookSections.curPage', curPage);
   return {
     out: Array.from(curPage.querySelectorAll('.textLayer')).reduce(
-      (acc: AccType[], section) => {
+      (acc: SectionType[], section) => {
         let text = '';
         if (
           isMinText(removeHTMLSpaces(getInnerText(section.textContent || '')))

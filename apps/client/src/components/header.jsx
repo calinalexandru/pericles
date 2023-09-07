@@ -1,4 +1,3 @@
-import { t, } from '@lingui/macro';
 import { InfoSharp, SettingsSharp, } from '@mui/icons-material';
 import CloudUploadSharpIcon from '@mui/icons-material/CloudUploadSharp';
 import {
@@ -11,7 +10,7 @@ import { useSelector, } from 'react-redux';
 import useSettings from '@/hooks/useSettings';
 import { ATTRIBUTES, } from '@pericles/constants';
 import { playerStatusSelector, settingsVisibleSelector, } from '@pericles/store';
-import { isLoading, isPlaying, } from '@pericles/util';
+import { isLoading, isPlaying, t, } from '@pericles/util';
 
 const useStyles = makeStyles(() => ({
   root: {

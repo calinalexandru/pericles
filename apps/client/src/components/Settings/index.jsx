@@ -1,4 +1,3 @@
-import { t, } from '@lingui/macro';
 import {
   TextField,
   Box,
@@ -30,7 +29,12 @@ import {
   settingsVoicesSelector,
   settingsVolumeSelector,
 } from '@pericles/store';
-import { getIsoLangFromString, getIsoLang, getCountry, } from '@pericles/util';
+import {
+  getIsoLangFromString,
+  getIsoLang,
+  getCountry,
+  t,
+} from '@pericles/util';
 
 import filterFunc from './utils';
 

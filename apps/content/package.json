@@ -17,8 +17,7 @@
     "clean": "rimraf dist/*",
     "clean:modules": "rimraf node_modules",
     "clean:lock": "rimraf pnpm-lock.yaml",
-    "clean:store": "pnpm store prune",
-    "modules:install": "pnpm install"
+    "clean:store": "pnpm store prune"
   },
   "repository": {
     "type": "git",
@@ -31,9 +30,6 @@
   "author": "Alexandru Calin",
   "license": "MIT",
   "dependencies": {
-    "@lingui/core": "3.13.3",
-    "@lingui/macro": "3.13.3",
-    "@lingui/react": "3.13.3",
     "@pericles/constants": "workspace:*",
     "@pericles/store": "workspace:*",
     "@pericles/util": "workspace:*",

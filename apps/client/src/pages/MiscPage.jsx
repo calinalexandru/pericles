@@ -1,4 +1,3 @@
-import { t, } from '@lingui/macro';
 import { Brightness2Sharp, Brightness7Sharp, } from '@mui/icons-material';
 import {
   Button,
@@ -34,7 +33,7 @@ import {
   appThemeModeSelector,
   setApp,
 } from '@pericles/store';
-import { getIsoLangFromString, } from '@pericles/util';
+import { getIsoLangFromString, t, } from '@pericles/util';
 
 function MiscPage({
   onOtherSettingsChanged,

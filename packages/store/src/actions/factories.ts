@@ -13,13 +13,17 @@ export function createAsyncActionTypes(
   };
 }
 
-export function createAsyncActions<Payload = undefined>(baseAction: string) {
+export function createAsyncActions<
+  RequestPayload = void,
+  SuccessPayload = void
+>(baseAction: string) {
   const actionTypes = createAsyncActionTypes(baseAction);
+  // type OptionalPayload<P> = P extends undefined ? void : P | undefined;
 
   return {
     idle: createAction(actionTypes.IDLE),
-    request: createAction<Payload>(actionTypes.REQUEST),
-    success: createAction<Payload>(actionTypes.SUCCESS),
+    request: createAction<RequestPayload>(actionTypes.REQUEST),
+    success: createAction<SuccessPayload>(actionTypes.SUCCESS),
     failure: createAction<Error>(actionTypes.FAILURE),
   };
 }

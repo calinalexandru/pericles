@@ -11,9 +11,6 @@
     "last 2 versions"
   ],
   "dependencies": {
-    "@lingui/core": "3.13.3",
-    "@lingui/macro": "3.13.3",
-    "@lingui/react": "3.13.3",
     "@pericles/constants": "workspace:*",
     "@pericles/store": "workspace:*",
     "@pericles/util": "workspace:*",

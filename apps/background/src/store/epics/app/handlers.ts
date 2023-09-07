@@ -1,9 +1,8 @@
-import { i18n, } from '@lingui/core';
 import { StateObservable, } from 'redux-observable';
 import { of, } from 'rxjs';
 
 import Speech from '@/speech';
-import { MESSAGES, VARIABLES, } from '@pericles/constants';
+import { VARIABLES, } from '@pericles/constants';
 import {
   RootState,
   appReload,
@@ -32,7 +31,6 @@ export function handleAppInit(state: RootState): void {
   } catch (e) {
     console.warn('speech init failed', e);
   }
-  i18n.load(MESSAGES);
 }
 
 export function handleAppSet(
@@ -55,10 +53,6 @@ export function handleAppSet(
   if (Object.keys(highlightSettings).length > 0) {
     console.log('app.set -> highlight.reloadSettings');
     mpToContent(highlightReloadSettings());
-  }
-
-  if (VARIABLES.APP.LANGUAGE in payload) {
-    i18n.activate(payload[VARIABLES.APP.LANGUAGE]);
   }
 }
 

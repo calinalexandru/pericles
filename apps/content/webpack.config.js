@@ -30,7 +30,7 @@ const config = {
       {
         test: /\.(ts|tsx)$/,
         // exclude: [ /node_modules/, /compromise/, ],
-        exclude: [ /node_modules/, ],
+        exclude: [/node_modules/],
         use: [
           {
             loader: 'ts-loader',
@@ -82,7 +82,7 @@ const config = {
   },
   resolve: {
     // symlinks: false,
-    extensions: [ '*', '.js', '.jsx', '.ts', '.tsx', ],
+    extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
     alias: {
       '@/core': path.resolve(__dirname, 'src/core'),
       '@/store': path.resolve(__dirname, 'src/store'),
@@ -93,6 +93,9 @@ const config = {
       '@/strategy': path.resolve(__dirname, 'src/strategy'),
       '@/assets': path.resolve(__dirname, 'src/assets'),
     },
+  },
+  stats: {
+    errorDetails: true,
   },
 };
 
