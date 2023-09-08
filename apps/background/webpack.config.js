@@ -1,5 +1,5 @@
 const path = require('path');
-
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
@@ -13,7 +13,7 @@ const isEnvProduction = mode === 'production';
 const config = {
   performance: false,
   mode,
-  target: [ 'web', ],
+  target: ['web'],
   devtool: mode === 'development' ? 'inline-source-map' : false,
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -23,33 +23,16 @@ const config = {
   module: {
     rules: [
       {
-        test: /\.(ts|tsx)$/,
+        test: /\.(js|jsx|ts|tsx)$/,
         exclude: /node_modules/,
-        use: [
-          {
-            loader: 'ts-loader',
-            options: {
-              compilerOptions: {
-                skipLibCheck: true,
-              },
-            },
-          },
-        ],
-      },
-      {
-        test: /\.(js|jsx)$/,
-        use: [
-          {
-            loader: 'babel-loader',
-          },
-        ],
-        resolve: {
-          fullySpecified: false,
+        use: {
+          loader: 'swc-loader',
         },
       },
     ],
   },
   plugins: [
+    new ForkTsCheckerWebpackPlugin(),
     new CopyPlugin({
       patterns: [
         {
@@ -74,7 +57,7 @@ const config = {
     minimizer: [],
   },
   resolve: {
-    extensions: [ '*', '.js', '.jsx', '.ts', '.tsx', ],
+    extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
     alias: {
       '@/core': path.resolve(__dirname, 'src/core'),
       '@/store': path.resolve(__dirname, 'src/store'),
