@@ -1,4 +1,5 @@
 const path = require('path');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 const TerserPlugin = require('terser-webpack-plugin');
 
@@ -28,30 +29,10 @@ const config = {
   module: {
     rules: [
       {
-        test: /\.(ts|tsx)$/,
-        // exclude: [ /node_modules/, /compromise/, ],
-        exclude: [/node_modules/],
-        use: [
-          {
-            loader: 'ts-loader',
-            options: {
-              // transpileOnly: true,
-              compilerOptions: {
-                skipLibCheck: true,
-              },
-            },
-          },
-        ],
-      },
-      {
-        test: /\.(js|jsx)$/,
-        use: [
-          {
-            loader: 'babel-loader',
-          },
-        ],
-        resolve: {
-          fullySpecified: false,
+        test: /\.(js|jsx|ts|tsx)$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'swc-loader',
         },
       },
       {
@@ -80,6 +61,7 @@ const config = {
       },
     ],
   },
+  plugins: [new ForkTsCheckerWebpackPlugin()],
   resolve: {
     // symlinks: false,
     extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],

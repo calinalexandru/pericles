@@ -9,8 +9,7 @@
   ],
   "scripts": {
     "dev": "NODE_ENV=development NODE_OPTIONS=--openssl-legacy-provider webpack --mode development --progress --color",
-    "build": "npm run prebuild && npm run bundle",
-    "prebuild": "NODE_ENV=production NODE_OPTIONS=--openssl-legacy-provider webpack --mode production --progress --color",
+    "build": "NODE_ENV=production NODE_OPTIONS=--openssl-legacy-provider webpack --mode production --progress --color",
     "bundle": "NODE_ENV=production NODE_OPTIONS=--openssl-legacy-provider webpack --config webpack.bundle.config.js --mode production --progress --color",
     "test": "jest",
     "linking": "pnpm link ../constants && pnpm link ../store && pnpm link ../util",

@@ -27,7 +27,7 @@ import {
 import { getIsoLangFromString, t, } from '@pericles/util';
 
 import Flag from '../primitives/Flag/Flag';
-import Subtitle from '../primitives/subtitle';
+import Subtitle from '../primitives/Subtitle';
 
 const lightButtonSx = {
   bgcolor: 'secondary.main',

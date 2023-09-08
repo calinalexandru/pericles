@@ -20,7 +20,7 @@ import { useSelector, } from 'react-redux';
 
 import useAppSettings from '@/hooks/useAppSettings';
 import useHotkeysSettings from '@/hooks/useHotkeysSettings';
-import ColorPicker from '@/primitives/colorPicker';
+import ColorPicker from '@/primitives/ColorPicker';
 import {
   SECTION_HIGHLIGHT_STYLES,
   VARIABLES,

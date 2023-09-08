@@ -10,7 +10,7 @@ import { keys, } from 'ramda';
 import React, { Suspense, useEffect, useMemo, } from 'react';
 import { useDispatch, useSelector, } from 'react-redux';
 
-import LoadingSpinner from '@/primitives/loadingSpinner';
+import LoadingSpinner from '@/primitives/LoadingSpinner';
 import {
   notificationTextSelector,
   notificationTypeSelector,

@@ -8,6 +8,7 @@ const { api: core, isFirefox, } = getBrowserAPI();
 //   [key: string]: any;
 // }
 
+/* eslint-disable-next-line */
 type Tab = chrome.tabs.Tab;
 
 interface PayloadAction {
@@ -40,7 +41,7 @@ function sendMessageToTab(tab: Tab, message: PayloadAction): Promise<any> {
   // }
 
   return new Promise((resolve, reject) => {
-    core.tabs.sendMessage(tab.id || 0, messagePayload, (response) => {
+    core.tabs.sendMessage(tab.id || 0, messagePayload, (response: any) => {
       if (core.runtime.lastError) {
         reject(
           new Error(
@@ -65,7 +66,7 @@ function internal(m: PayloadAction, id: number): Promise<any> {
         core.tabs
           .query({})
           .then(callback)
-          .catch((error) =>
+          .catch((error: any) =>
             reject(
               new Error(JSON.stringify({ message: error, response: false, }))
             )
