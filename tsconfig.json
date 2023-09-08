@@ -1,22 +1,30 @@
 {
   "compilerOptions": {
+    "rootDir": ".",
     "target": "ES2022",
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
     ],
+    "baseUrl": ".",
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "strict": false,
+    "strict": true,
+    "strictPropertyInitialization": false,
     "forceConsistentCasingInFileNames": true,
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": false,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "paths": {
+      "@pericles/*": [
+        "packages/*/src/index.ts"
+      ]
+    }
   },
   "include": [
     "apps/*/src/**/*.ts",
@@ -28,9 +36,20 @@
     "packages/*/src/**/*.js",
     "packages/*/src/**/*.jsx"
   ],
+  "references": [
+    {
+      "path": "./packages/util/src"
+    },
+    {
+      "path": "./packages/store/src"
+    },
+    {
+      "path": "./packages/constants/src"
+    }
+  ],
   "exclude": [
     "node_modules",
     "apps/*/node_modules",
     "packages/*/node_modules"
-  ],
+  ]
 }

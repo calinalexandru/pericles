@@ -14,7 +14,7 @@ import { useSelector, } from 'react-redux';
 
 import useSettings from '@/hooks/useSettings';
 import AutocompleteOption from '@/primitives/autocompleteOption';
-import FlagLabel from '@/primitives/flag/index';
+import FlagLabel from '@/primitives/Flag/Flag';
 import {
   ISO_LANGS,
   COUNTRIES,

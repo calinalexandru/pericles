@@ -3,7 +3,7 @@
   "sideEffects": false,
   "version": "1.0.26",
   "description": "Pericles' reducers, initialState",
-  "main": "src/index.ts",
+  "main": "src/index",
   "files": [
     "src"
   ],

@@ -13,19 +13,10 @@ import {
   ButtonGroup,
   Stack,
 } from '@mui/material';
-import { func, string, } from 'prop-types';
-import { applySpec, keys, propOr, } from 'ramda';
 import React, { useState, } from 'react';
-import { connect, } from 'react-redux';
+import { useSelector, useDispatch, } from 'react-redux';
 
-import Flag from '@/primitives/flag';
-import Subtitle from '@/primitives/subtitle';
-import {
-  VARIABLES,
-  MESSAGES,
-  DEFAULT_VALUES,
-  ISO_LANGS,
-} from '@pericles/constants';
+import { VARIABLES, MESSAGES, ISO_LANGS, } from '@pericles/constants';
 import {
   appFactoryReset,
   appLanguageSelector,
@@ -35,14 +26,30 @@ import {
 } from '@pericles/store';
 import { getIsoLangFromString, t, } from '@pericles/util';
 
-function MiscPage({
-  onOtherSettingsChanged,
-  onReloadApp,
-  onFactoryReset,
-  language,
-  setThemeMode,
-  themeMode,
-}) {
+import Flag from '../primitives/Flag/Flag';
+import Subtitle from '../primitives/subtitle';
+
+const lightButtonSx = {
+  bgcolor: 'secondary.main',
+};
+
+const darkButtonSx = {
+  bgcolor: 'primary.light',
+};
+
+const iconStyle = {
+  marginRight: '3px',
+} as React.CSSProperties;
+
+const buttonStyle = {
+  textTransform: 'initial',
+} as React.CSSProperties;
+
+const MiscPage: React.FC = () => {
+  const dispatch = useDispatch();
+  const language = useSelector(appLanguageSelector);
+  const themeMode = useSelector(appThemeModeSelector);
+
   const [ reloadApp, setReloadApp, ] = useState(false);
   const [ factoryReset, setFactoryReset, ] = useState(false);
 
@@ -53,6 +60,10 @@ function MiscPage({
   const onFactoryResetAbort = () => {
     setFactoryReset(false);
   };
+
+  const onOtherSettingsChanged = (key: string, val: any) =>
+    dispatch(setApp({ [key]: val, }));
+  const onReloadApp = () => dispatch(appReload());
 
   const isDarkMode = themeMode === 'dark';
   const isLightMode = themeMode === 'light';
@@ -69,49 +80,23 @@ function MiscPage({
           fullWidth={true}
         >
           <Button
-            onClick={() => {
-              setThemeMode('light');
-            }}
-            style={{
-              textTransform: 'initial',
-            }}
-            sx={
-              isLightMode
-                ? {
-                  bgcolor: 'secondary.main',
-                }
-                : {}
-            }
+            onClick={() => dispatch(setApp({ themeMode: 'light', }))}
+            style={buttonStyle}
+            sx={isLightMode ? lightButtonSx : {}}
           >
             <Brightness7Sharp
               fontSize="small"
-              style={{
-                marginRight: '3px',
-              }}
-            />
+              style={iconStyle} />
             {t`light`}
           </Button>
           <Button
-            onClick={() => {
-              setThemeMode('dark');
-            }}
-            style={{
-              textTransform: 'initial',
-            }}
-            sx={
-              isDarkMode
-                ? {
-                  bgcolor: 'primary.light',
-                }
-                : {}
-            }
+            onClick={() => dispatch(setApp({ themeMode: 'dark', }))}
+            style={buttonStyle}
+            sx={isDarkMode ? darkButtonSx : {}}
           >
             <Brightness2Sharp
               fontSize="small"
-              style={{
-                marginRight: '3px',
-              }}
-            />
+              style={iconStyle} />
             {t`dark`}
           </Button>
         </ButtonGroup>
@@ -126,17 +111,17 @@ function MiscPage({
           fullWidth={true}>
           <Select
             value={language}
-            onChange={(e) => {
-              onOtherSettingsChanged(VARIABLES.APP.LANGUAGE, e.target.value);
-            }}
+            onChange={(e) =>
+              onOtherSettingsChanged(VARIABLES.APP.LANGUAGE, e.target.value)
+            }
           >
-            {keys(MESSAGES).map((locale) => (
+            {Object.keys(MESSAGES).map((locale) => (
               <MenuItem
                 key={locale}
                 value={locale}>
                 <Flag
-                  lang={propOr({}, getIsoLangFromString(locale), ISO_LANGS)}
-                  title={MESSAGES[locale].nativeName}
+                  lang={ISO_LANGS[getIsoLangFromString(locale)] || {}}
+                  title={(MESSAGES as any)[locale].nativeName}
                 />
               </MenuItem>
             ))}
@@ -157,25 +142,20 @@ function MiscPage({
           <Button
             color="secondary"
             variant="contained"
-            onClick={() => {
-              setReloadApp(true);
-            }}
+            onClick={() => setReloadApp(true)}
           >
             {t`reload_app_btn`}
           </Button>
           <Button
             color="primary"
             variant="contained"
-            onClick={() => {
-              setFactoryReset(true);
-            }}
+            onClick={() => setFactoryReset(true)}
           >
             {t`factory_reset_btn`}
           </Button>
         </Stack>
       </Box>
 
-      {/* dialog global */}
       <Dialog
         open={factoryReset}
         onClose={onFactoryResetAbort}>
@@ -190,7 +170,7 @@ function MiscPage({
           <Button
             onClick={() => {
               setFactoryReset(false);
-              onFactoryReset();
+              dispatch(appFactoryReset());
             }}
           >
             {t`submit_btn`}
@@ -198,7 +178,6 @@ function MiscPage({
         </DialogActions>
       </Dialog>
 
-      {/* dialog global */}
       <Dialog
         open={reloadApp}
         onClose={onReloadAbort}>
@@ -215,36 +194,6 @@ function MiscPage({
       </Dialog>
     </>
   );
-}
-
-MiscPage.propTypes = {
-  onOtherSettingsChanged: func,
-  onReloadApp: func,
-  onFactoryReset: func,
-  language: string,
-  setThemeMode: func,
-  themeMode: string,
 };
 
-MiscPage.defaultProps = {
-  language: DEFAULT_VALUES.APP.LANGUAGE,
-  onReloadApp: () => {},
-  onFactoryReset: () => {},
-  onOtherSettingsChanged: () => {},
-  setThemeMode: () => {},
-  themeMode: DEFAULT_VALUES.APP.THEME_MODE,
-};
-
-const mapStateToProps = applySpec({
-  language: appLanguageSelector,
-  themeMode: appThemeModeSelector,
-});
-
-const mapDispatchToProps = (dispatch) => ({
-  onOtherSettingsChanged: (key, val) => dispatch(setApp({ [key]: val, })),
-  onReloadApp: () => dispatch(appReload()),
-  onFactoryReset: () => dispatch(appFactoryReset()),
-  setThemeMode: (themeMode) => dispatch(setApp({ themeMode, })),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(MiscPage);
+export default MiscPage;

@@ -58,5 +58,5 @@ export function Icon({ alt, src, }: IconProps) {
   return <img
     alt={alt}
     src={src}
-    style={iconStyle} />;
+  style={iconStyle} />;
 }

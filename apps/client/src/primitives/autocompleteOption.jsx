@@ -5,7 +5,7 @@ import {
 } from 'prop-types';
 import React, { memo, } from 'react';
 
-import FlagLabel from '@/primitives/flag/index';
+import FlagLabel from '@/primitives/Flag/Flag';
 
 const AutocompleteOption = ({
   iso,

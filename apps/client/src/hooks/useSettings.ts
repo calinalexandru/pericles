@@ -4,14 +4,22 @@ import { useDispatch, } from 'react-redux';
 import { VARIABLES, } from '@pericles/constants';
 import { setSettings, } from '@pericles/store';
 
-export default function useSettings() {
+interface UseSettingsHook {
+  setSetting: (key: string, val: any) => void;
+  setVisible: (val: boolean) => void;
+}
+
+export default function useSettings(): UseSettingsHook {
   const dispatch = useDispatch();
+
   const setSetting = useCallback(
-    (key, val) => dispatch(setSettings({ [key]: val, })),
+    (key: string, val: any) => dispatch(setSettings({ [key]: val, })),
     [ dispatch, ]
   );
+
   const setVisible = useCallback(
-    (val) => dispatch(setSettings({ [VARIABLES.SETTINGS.VISIBLE]: val, })),
+    (val: boolean) =>
+      dispatch(setSettings({ [VARIABLES.SETTINGS.VISIBLE]: val, })),
     [ dispatch, ]
   );
 

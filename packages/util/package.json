@@ -3,7 +3,7 @@
   "sideEffects": false,
   "version": "1.1.20",
   "description": "Pericles' helpers & primitives",
-  "main": "src/index.ts",
+  "main": "src/index",
   "files": [
     "src"
   ],

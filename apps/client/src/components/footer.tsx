@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import {
   MoreHorizSharp,
   EqualizerSharp,
@@ -6,37 +5,49 @@ import {
 } from '@mui/icons-material';
 import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 import { Paper, Tab, Tabs, } from '@mui/material';
-import React from 'react';
+import React, { useCallback, useMemo, } from 'react';
 import { useSelector, } from 'react-redux';
 
-import HotkeysComponent from '@/components/hotkeys';
-import SettingsComponent from '@/components/settings';
-import TabPanel from '@/components/tabPanel';
-import TweaksComponent from '@/components/tweaks';
-import useAppSettings from '@/hooks/useAppSettings';
-import MiscPage from '@/pages/MiscPage';
 import { TABS, } from '@pericles/constants';
 import { appRouteTabSelector, settingsVisibleSelector, } from '@pericles/store';
+
+import useAppSettings from '../hooks/useAppSettings';
+import MiscPage from '../pages/MiscPage';
+
+import HotkeysComponent from './hotkeys';
+import SettingsComponent from './Settings';
+import TabPanel from './tabPanel';
+import TweaksComponent from './tweaks';
+
+const tabCSS = { color: 'secondary.dark', };
+const paperSx = {
+  bgcolor: 'tertiary.dark',
+};
 
 export default function FooterComponent() {
   console.log('FooterComopnent.rendering');
   const visible = useSelector(settingsVisibleSelector);
   const routeTab = useSelector(appRouteTabSelector);
   const { setRouteTab, } = useAppSettings();
-  const a11yProps = (index) => ({
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  });
 
-  const tabCSS = { color: 'secondary.dark', };
+  const a11yProps = useCallback(
+    (index: number) => ({
+      id: `simple-tab-${index}`,
+      'aria-controls': `simple-tabpanel-${index}`,
+    }),
+    []
+  );
+
+  const equalizerIcon = useMemo(() => <EqualizerSharp />, []);
+  const displayIcon = useMemo(() => <DisplaySettingsIcon />, []);
+  const accesibilityIcon = useMemo(() => <AccessibilityNewSharp />, []);
+  const moreIcon = useMemo(() => <MoreHorizSharp />, []);
+
   return visible ? (
     <>
       <Paper
         elevation={0}
-        sx={{
-          bgcolor: 'tertiary.dark',
-        }}
-      >
+        sx={paperSx}>
         <Tabs
           value={routeTab}
           onChange={(e, val) => {
@@ -49,25 +60,25 @@ export default function FooterComponent() {
         >
           <Tab
             sx={tabCSS}
-            icon={<EqualizerSharp />}
+            icon={equalizerIcon}
             aria-label="Voice"
             {...a11yProps(TABS.SETTINGS)}
           />
           <Tab
             sx={tabCSS}
-            icon={<DisplaySettingsIcon />}
+            icon={displayIcon}
             aria-label="Tweaks"
             {...a11yProps(TABS.TWEAKS)}
           />
           <Tab
             sx={tabCSS}
-            icon={<AccessibilityNewSharp />}
+            icon={accesibilityIcon}
             aria-label="Hotkeys"
             {...a11yProps(TABS.HOTKEYS)}
           />
           <Tab
             sx={tabCSS}
-            icon={<MoreHorizSharp />}
+            icon={moreIcon}
             aria-label="Misc"
             {...a11yProps(TABS.MISC)}
           />

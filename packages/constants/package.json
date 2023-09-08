@@ -3,7 +3,7 @@
   "sideEffects": false,
   "version": "1.0.42",
   "description": "Pericles' constants",
-  "main": "src/index.ts",
+  "main": "src/index",
   "files": [
     "src"
   ],
