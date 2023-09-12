@@ -1,8 +1,8 @@
 const { spawn } = require('child_process');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
 
 const mode = process.env.NODE_ENV || 'development';
 const isProduction = mode === 'production';
@@ -15,20 +15,6 @@ const optimization = {
   },
 };
 
-if (isProduction) {
-  optimization.minimizer = [
-    new TerserPlugin({
-      terserOptions: {
-        mangle: true,
-        ecma: 2020,
-        compress: {
-          drop_console: true,
-        },
-      },
-    }),
-  ];
-}
-
 module.exports = {
   mode,
   performance: false,
@@ -37,29 +23,13 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(ts|tsx)$/,
+        test: /\.(js|jsx|ts|tsx)$/,
         exclude: /node_modules/,
-        use: [
-          {
-            loader: 'ts-loader',
-            options: {
-              // transpileOnly: true,
-              compilerOptions: {
-                skipLibCheck: true,
-              },
-            },
-          },
-        ],
-      },
-      {
-        test: /\.(js|jsx)$/,
-        use: [
-          {
-            loader: 'babel-loader',
-          },
-        ],
-        resolve: {
-          fullySpecified: false,
+        use: {
+          loader: 'swc-loader',
+          options: {
+            configFile: process.env.SWC_CONFIG_FILE || ".swcrc"
+          }
         },
       },
       {
@@ -97,6 +67,7 @@ module.exports = {
   },
   target: ['web'],
   plugins: [
+    new ForkTsCheckerWebpackPlugin(),
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       inject: true,

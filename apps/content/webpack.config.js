@@ -1,7 +1,6 @@
 const path = require('path');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-
-const TerserPlugin = require('terser-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const mode = process.env.NODE_ENV || 'development';
 const isEnvProduction = mode === 'production';
@@ -24,7 +23,6 @@ const config = {
       filename: 'content-vendors.[contenthash].js',
       chunks: 'all',
     },
-    minimizer: [],
   },
   module: {
     rules: [
@@ -33,6 +31,9 @@ const config = {
         exclude: /node_modules/,
         use: {
           loader: 'swc-loader',
+          options: {
+            configFile: process.env.SWC_CONFIG_FILE || '.swcrc',
+          },
         },
       },
       {
@@ -61,7 +62,7 @@ const config = {
       },
     ],
   },
-  plugins: [new ForkTsCheckerWebpackPlugin()],
+  plugins: [new ForkTsCheckerWebpackPlugin(), new CleanWebpackPlugin()],
   resolve: {
     // symlinks: false,
     extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
@@ -80,19 +81,5 @@ const config = {
     errorDetails: true,
   },
 };
-
-if (isEnvProduction) {
-  config.optimization.minimizer.push(
-    new TerserPlugin({
-      terserOptions: {
-        mangle: true,
-        ecma: 2020,
-        compress: {
-          drop_console: true,
-        },
-      },
-    })
-  );
-}
 
 module.exports = config;

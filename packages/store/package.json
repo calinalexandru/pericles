@@ -22,7 +22,6 @@
   "author": "Alexandru Calin",
   "license": "MIT",
   "dependencies": {
-    "@babel/runtime": "7.18.3",
     "@pericles/constants": "workspace:*",
     "ramda": "0.27.1",
     "redux": "4.1.2",
@@ -33,12 +32,8 @@
     "webext-redux": "^2.1.9"
   },
   "devDependencies": {
-    "@babel/cli": "^7.16.0",
-    "@babel/core": "^7.16.0",
-    "@babel/preset-env": "^7.16.4",
     "@pericles/eslint-config": "workspace:*",
     "@types/redux-actions": "^2.6.2",
-    "babel-plugin-ramda": "^2.0.0",
     "cross-env": "^7.0.3",
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",

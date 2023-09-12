@@ -4,8 +4,8 @@ import React, { memo, } from 'react';
 import { connect, } from 'react-redux';
 
 import FooterComponent from '@/components/footer';
-import HeaderComponent from '@/components/header';
-import PlayerComponent from '@/components/player';
+import HeaderComponent from '@/components/Header';
+import PlayerComponent from '@/components/Player';
 import { TABS, } from '@pericles/constants';
 import { appRouteTabSelector, } from '@pericles/store';
 

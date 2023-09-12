@@ -15,7 +15,7 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "strictPropertyInitialization": false,
-    "forceConsistentCasingInFileNames": true,
+    "forceConsistentCasingInFileNames": false,
     "allowJs": true,
     "module": "esnext",
     "moduleResolution": "node",

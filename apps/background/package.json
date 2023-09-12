@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "watch": "npx tsc --watch",
-    "dev": "npm run clean && NODE_ENV=development webpack --mode development --progress --color",
+    "dev": "SWC_CONFIG_FILE=.swcrc.dev.json NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=development webpack --mode development --progress --color",
     "build": "NODE_ENV=production NODE_OPTIONS=--openssl-legacy-provider webpack --mode production --progress --color",
     "remotedev": "remotedev --hostname=localhost --port=8000",
     "test": "jest",
@@ -45,6 +45,7 @@
     "@types/chrome": "^0.0.244",
     "@types/redux-actions": "^2.6.2",
     "asn1.js": "^5.4.1",
+    "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^9.0.1",
     "dependency-cruiser": "^11.2.1",
     "eslint": "^7.32.0",

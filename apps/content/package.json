@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "watch": "npx tsc --watch",
-    "dev": "npm run clean && NODE_ENV=development NODE_OPTIONS=--openssl-legacy-provider webpack --mode development --progress --color",
+    "dev": "SWC_CONFIG_FILE=.swcrc.dev.json NODE_ENV=development NODE_OPTIONS=--openssl-legacy-provider webpack --mode development --progress --color",
     "build": "NODE_ENV=production NODE_OPTIONS=--openssl-legacy-provider webpack --mode production --progress --color ",
     "test": "jest",
     "linking": "pnpm link ../constants && pnpm link ../store && pnpm link ../util",
@@ -54,6 +54,7 @@
     "@types/react-dom": "^18.2.7",
     "@types/react-redux": "^7.1.26",
     "@types/redux-actions": "^2.6.2",
+    "clean-webpack-plugin": "^4.0.0",
     "compression-webpack-plugin": "^9.2.0",
     "css-loader": "^6.2.0",
     "dependency-cruiser": "^11.2.1",

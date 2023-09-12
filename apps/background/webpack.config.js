@@ -1,7 +1,7 @@
 const path = require('path');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
 
 const mode = process.env.NODE_ENV || 'development';
 const isEnvProduction = mode === 'production';
@@ -27,12 +27,16 @@ const config = {
         exclude: /node_modules/,
         use: {
           loader: 'swc-loader',
+          options: {
+            configFile: process.env.SWC_CONFIG_FILE || '.swcrc',
+          },
         },
       },
     ],
   },
   plugins: [
     new ForkTsCheckerWebpackPlugin(),
+    new CleanWebpackPlugin(),
     new CopyPlugin({
       patterns: [
         {
@@ -54,7 +58,6 @@ const config = {
       filename: 'background-vendors.js',
       chunks: 'all',
     },
-    minimizer: [],
   },
   resolve: {
     extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
@@ -66,19 +69,5 @@ const config = {
     },
   },
 };
-
-if (mode === 'production') {
-  config.optimization.minimizer.push(
-    new TerserPlugin({
-      terserOptions: {
-        mangle: true,
-        ecma: 2020,
-        compress: {
-          drop_console: true,
-        },
-      },
-    })
-  );
-}
 
 module.exports = config;
