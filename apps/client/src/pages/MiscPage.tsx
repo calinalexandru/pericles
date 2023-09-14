@@ -61,8 +61,10 @@ const MiscPage: React.FC = () => {
     setFactoryReset(false);
   };
 
-  const onOtherSettingsChanged = (key: string, val: any) =>
-    dispatch(setApp({ [key]: val, }));
+  const onOtherSettingsChanged = (
+    key: string,
+    val: number | string | boolean
+  ) => dispatch(setApp({ [key]: val, }));
   const onReloadApp = () => dispatch(appReload());
 
   const isDarkMode = themeMode === 'dark';

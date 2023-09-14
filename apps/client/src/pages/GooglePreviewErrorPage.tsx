@@ -2,12 +2,11 @@ import {
   Typography, Button, Paper, Alert, AlertTitle, 
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { func, } from 'prop-types';
 import React from 'react';
-import { connect, } from 'react-redux';
+import { useDispatch, } from 'react-redux';
 
 import { playerStop, } from '@pericles/store';
-import { mpToContent, } from '@pericles/util';
+// import { mpToContent, } from '@pericles/util';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -17,11 +16,21 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-function GooglePreviewErrorPage({ onErrorClose, }) {
+const GooglePreviewErrorPage: React.FC = () => {
   const onReadyAnyway = async () => {
-    mpToContent('getSections');
+    // mpToContent('getSections');
   };
+
   const cls = useStyles();
+
+  // Use useDispatch instead of mapDispatchToProps
+  const dispatch = useDispatch();
+
+  const handleClose = () => {
+    dispatch(playerStop());
+    window.close();
+  };
+
   return (
     <>
       <Alert severity="warning">
@@ -35,43 +44,18 @@ function GooglePreviewErrorPage({ onErrorClose, }) {
         <Button
           color="primary"
           variant="contained"
-          onClick={() => {
-            onErrorClose();
-            window.close();
-          }}
-        >
+          onClick={handleClose}>
           Ok
         </Button>
         <Button
           color="secondary"
-          className="danger"
           variant="contained"
-          onClick={onReadyAnyway}
-        >
+          onClick={onReadyAnyway}>
           Read anyway
         </Button>
       </Paper>
     </>
   );
-}
-
-GooglePreviewErrorPage.propTypes = {
-  onErrorClose: func,
 };
 
-GooglePreviewErrorPage.defaultProps = {
-  onErrorClose: () => {},
-};
-
-const mapStateToProps = (state) => ({ status: state.player.status, });
-
-const mapDispatchToProps = (dispatch) => ({
-  onErrorClose: () => {
-    dispatch(playerStop());
-  },
-});
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(GooglePreviewErrorPage);
+export default GooglePreviewErrorPage;

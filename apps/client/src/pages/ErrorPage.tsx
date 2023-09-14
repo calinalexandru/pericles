@@ -10,9 +10,8 @@ import {
   AlertTitle,
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { func, string, } from 'prop-types';
 import React from 'react';
-import { connect, } from 'react-redux';
+import { useDispatch, } from 'react-redux';
 
 import { ATTRIBUTES, } from '@pericles/constants';
 import { playerStop, routeIndex, setPlayer, } from '@pericles/store';
@@ -25,10 +24,19 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-function ErrorPage({ bugReportUrl, onErrorClose, }) {
-  const defaultURL = `${ATTRIBUTES.WEBSITE.URL}bug-report?incidentUrl=`;
+const defaultURL = `${ATTRIBUTES.WEBSITE.URL}bug-report?incidentUrl=`;
+const documentViewerURL = `${ATTRIBUTES.WEBSITE.URL}document-viewer`;
+
+const ErrorPage: React.FC = () => {
   const cls = useStyles();
-  const documentViewerURL = `${ATTRIBUTES.WEBSITE.URL}document-viewer`;
+
+  const dispatch = useDispatch();
+  const onErrorClose = () => {
+    dispatch(setPlayer({ buffering: false, }));
+    dispatch(playerStop());
+    dispatch(routeIndex());
+  };
+
   return (
     <>
       <Alert severity="error">
@@ -36,12 +44,10 @@ function ErrorPage({ bugReportUrl, onErrorClose, }) {
         <Typography>
           Refresh this page and try again or{' '}
           <Link
-            href={bugReportUrl || defaultURL}
+            href={defaultURL}
             rel="noopener noreferrer"
             target="_blank"
-            onClick={() => {
-              onErrorClose();
-            }}
+            onClick={onErrorClose}
           >
             report bug
           </Link>
@@ -53,9 +59,7 @@ function ErrorPage({ bugReportUrl, onErrorClose, }) {
           Trying to read PDF?
           <br /> Click&nbsp;&nbsp;
           <Link
-            onClick={() => {
-              onErrorClose();
-            }}
+            onClick={onErrorClose}
             rel="noopener noreferrer"
             href={documentViewerURL}
             target="_blank"
@@ -75,35 +79,12 @@ function ErrorPage({ bugReportUrl, onErrorClose, }) {
         <Button
           color="primary"
           variant="contained"
-          onClick={() => {
-            onErrorClose();
-          }}
-        >
+          onClick={onErrorClose}>
           Ok
         </Button>
       </Paper>
     </>
   );
-}
-
-ErrorPage.propTypes = {
-  bugReportUrl: string,
-  onErrorClose: func,
 };
 
-ErrorPage.defaultProps = {
-  bugReportUrl: '',
-  onErrorClose: () => {},
-};
-
-const mapStateToProps = (state) => ({ status: state.player.status, });
-
-const mapDispatchToProps = (dispatch) => ({
-  onErrorClose: () => {
-    dispatch(setPlayer({ buffering: false, }));
-    dispatch(playerStop());
-    dispatch(routeIndex());
-  },
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(ErrorPage);
+export default ErrorPage;

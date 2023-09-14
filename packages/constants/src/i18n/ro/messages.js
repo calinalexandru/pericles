@@ -45,9 +45,6 @@ export default {
   disable_hotkeys_title: 'Disable hotkeys',
   disable_hotkeys_description: 'will disable all hotkeys',
 
-  // Cooldown
-  servers_overload: 'Server are overloaded, player will enable shortly',
-
   // Misc
   change_language_label: 'Language',
   change_highlight_color_label: 'Change highlight color',
