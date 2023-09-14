@@ -12,7 +12,7 @@ import React, { useMemo, useState, } from 'react';
 import { useSelector, } from 'react-redux';
 
 import useSettings from '@/hooks/useSettings';
-import AutocompleteOption from '@/primitives/autocompleteOption';
+import AutocompleteOption from '@/primitives/AutocompleteOption';
 import FlagLabel from '@/primitives/Flag/Flag';
 import {
   ISO_LANGS,

@@ -13,7 +13,7 @@ export const countryCSS = css`
 
 export const FlagImg = styled.img`
   max-width: ${({ size, }) => (size === 'big' ? 30 : 15)}px;
-  ${({ size, }) =>
+  ${({ size, }: { size: 'big' | 'small' }) =>
     size === 'small'
       ? `
   position: absolute;

@@ -1,12 +1,17 @@
 import {
-  Alert, Box, CssBaseline, Snackbar, 
+  Alert,
+  AlertColor,
+  Box,
+  CssBaseline,
+  PaletteMode,
+  Snackbar,
+  SnackbarOrigin,
 } from '@mui/material';
 import {
   ThemeProvider,
   StyledEngineProvider,
   createTheme,
 } from '@mui/material/styles';
-import { keys, } from 'ramda';
 import React, { Suspense, useEffect, useMemo, } from 'react';
 import { useDispatch, useSelector, } from 'react-redux';
 
@@ -46,21 +51,22 @@ const appBoxStyle = {
 const snackBarProps = {
   vertical: 'top',
   horizontal: 'center',
-};
+} as SnackbarOrigin;
 
 const alertStyle = {
   width: '100%',
 };
 
-function App() {
+const App: React.FC = () => {
   // console.log('App', { appRoute });
-  let keysMap = Object.create(null);
+  let keysMap: Record<string, { key: string; code: string }> =
+    Object.create(null);
   const dispatch = useDispatch();
   const appRoute = useSelector(appRouteSelector);
   const notificationText = useSelector(notificationTextSelector);
-  const notificationType = useSelector(notificationTypeSelector);
-  const themeMode = useSelector(appThemeModeSelector);
-  const hotkeys = useSelector(hotkeysSelector);
+  const notificationType = useSelector(notificationTypeSelector) as AlertColor;
+  const themeMode = useSelector(appThemeModeSelector) as PaletteMode;
+  const hotkeys = useSelector(hotkeysSelector) as any;
   const disableHotkeys = useSelector(hotkeysDisableSelector);
 
   const spinner = useMemo(() => <LoadingSpinner />, []);
@@ -90,7 +96,7 @@ function App() {
       // console.log('hotkeyEvents.prev');
       playerPrev();
     },
-  };
+  } as any;
 
   const playerStatus = useSelector(playerStatusSelector);
 
@@ -107,17 +113,17 @@ function App() {
     /* eslint-disable react-hooks/exhaustive-deps */
   }, [ dispatch, ]);
 
-  const onKeyUp = (e) => {
+  const onKeyUp = (e: KeyboardEvent) => {
     if (disableHotkeys) return;
     // console.log('onKeyPress$', e);
     keysMap[e.code] = { key: e.key, code: e.code, };
-    const activeHotkeys = keys(keysMap)
-      .filter((k) => keysMap[k] !== false)
+    const activeHotkeys = Object.keys(keysMap)
+      .filter((k) => !keysMap[k])
       .map((k) => keysMap[k].code)
       .sort();
     // console.log('activeHotkeys', activeHotkeys);
-    const curEvent = Object.keys(hotkeyEvents).find((evt) => {
-      const candidates = hotkeys[evt].map((key) => key.code).sort();
+    const curEvent = Object.keys(hotkeyEvents).find((evt: string) => {
+      const candidates = hotkeys[evt].map((key: any) => key.code).sort();
       // console.log('candidates', candidates);
       return JSON.stringify(activeHotkeys) === JSON.stringify(candidates);
     });
@@ -139,7 +145,7 @@ function App() {
     };
   }, [ disableHotkeys, ]);
 
-  const CurrentPage = useMemo(() => routes[appRoute], [ appRoute, ]);
+  const CurrentPage = useMemo(() => (routes as any)[appRoute], [ appRoute, ]);
   const theme = useMemo(
     () =>
       createTheme({
@@ -147,8 +153,9 @@ function App() {
           fontFamily: '"Sora", Roboto',
           fontSize: 13,
         },
-        palette:
-          themeMode === 'light' ? { ...paletteLight, } : { ...paletteDark, },
+        palette: (themeMode === 'light'
+          ? { ...paletteLight, }
+          : { ...paletteDark, }) as any,
       }),
     [ themeMode, ]
   );
@@ -178,6 +185,6 @@ function App() {
       </ThemeProvider>
     </StyledEngineProvider>
   );
-}
+};
 
 export default App;
