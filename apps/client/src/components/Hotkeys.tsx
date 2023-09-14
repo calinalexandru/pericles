@@ -16,12 +16,17 @@ import {
 } from '@pericles/store';
 import { isStopped, } from '@pericles/util';
 
-let keysMap = Object.create(null);
+type Hotkey = {
+  key: string;
+  code: string;
+};
+
+let keysMap: Record<string, Hotkey> = Object.create(null);
 const textFieldInputProps = {
   readOnly: true,
 };
 
-export default function HotkeysComponent() {
+const HotkeysComponent: React.FC = () => {
   const [ ignoreWarning, setIgnoreWarning, ] = useState(false);
   const { stop: playerStop, } = usePlayer();
   const status = useSelector(playerStatusSelector);
@@ -35,10 +40,9 @@ export default function HotkeysComponent() {
     if (isStopped(status)) playerStop();
   };
 
-  const getKeyCombo = (keys) =>
+  const getKeyCombo = (keys: Hotkey[]) =>
     keys
       .map((playKey) => {
-        // console.log('getKeyCombo', playKey);
         if (playKey?.key?.trim?.()?.length) {
           return playKey.key.toLocaleUpperCase();
         }
@@ -158,4 +162,6 @@ export default function HotkeysComponent() {
       </Box>
     </div>
   );
-}
+};
+
+export default HotkeysComponent;

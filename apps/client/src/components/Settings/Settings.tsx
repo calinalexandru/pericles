@@ -8,7 +8,6 @@ import {
   Autocomplete,
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import { propOr, } from 'ramda';
 import React, { useMemo, useState, } from 'react';
 import { useSelector, } from 'react-redux';
 
@@ -21,6 +20,7 @@ import {
   DEFAULT_VALUES,
   VARIABLES,
   ATTRIBUTES,
+  VoiceType,
 } from '@pericles/constants';
 import {
   settingsPitchSelector,
@@ -55,35 +55,31 @@ const useStyles = makeStyles(() => ({
     marginLeft: -20,
   },
 }));
+
 let timerVolume = 0;
 let timerPitch = 0;
 let timerRate = 0;
 
 export default function SettingsComponent() {
-  console.log('SettingsComponent.rendering');
   const { setSetting: onSettingChanged, } = useSettings();
   const volume = useSelector(settingsVolumeSelector);
   const rate = useSelector(settingsRateSelector);
   const pitch = useSelector(settingsPitchSelector);
   const voiceProp = useSelector(settingsVoiceSelector);
-  const voices = useSelector(settingsVoicesSelector);
+  const voices: VoiceType[] = useSelector(settingsVoicesSelector);
   const classes = useStyles();
-  const [ inputVolume, setInputVolume, ] = useState(volume);
-  const [ inputRate, setInputRate, ] = useState(rate);
-  const [ inputPitch, setInputPitch, ] = useState(pitch);
+  const [ inputVolume, setInputVolume, ] = useState<number>(volume);
+  const [ inputRate, setInputRate, ] = useState<number>(rate);
+  const [ inputPitch, setInputPitch, ] = useState<number>(pitch);
 
   const options = useMemo(() => voices, [ voices, ]);
 
-  const voiceChanged = (event, value, key) => {
-    console.log('voiceChanged-internal', event, value, key);
+  const voiceChanged = (event: any, value: VoiceType | null) => {
     if (!value) return;
     onSettingChanged(VARIABLES.SETTINGS.VOICE, value.id);
   };
 
-  const voice = useMemo(
-    () => propOr({}, voiceProp, voices),
-    [ voiceProp, voices, ]
-  );
+  const voice = useMemo(() => voices[voiceProp] || {}, [ voiceProp, voices, ]);
 
   console.log('voices', voices);
 
@@ -112,10 +108,12 @@ export default function SettingsComponent() {
           style={{ width: '100%', }}
           value={voice}
           // renderOption={(props, option) => ({ props, option })}
-          renderOption={(
-            { onClick, key, 'data-option-index': optionIndex, },
-            option
-          ) => {
+          renderOption={(props, option) => {
+            const {
+              onClick,
+              key,
+              'data-option-index': optionIndex,
+            } = props as any;
             // console.log('renderOption', props);
             const { lang = '', countryCode = '', shortTitle = '', } = option;
             // console.log({ lang, countryCode, shortTitle });
@@ -136,12 +134,8 @@ export default function SettingsComponent() {
           renderInput={(params) => {
             // console.log('renderInput', params, voice);
             const { lang = '', countryCode = '', } = voice;
-            const iso = propOr({}, getIsoLangFromString(lang), ISO_LANGS);
-            const dialect = propOr(
-              {},
-              countryCode.toLocaleLowerCase(),
-              COUNTRIES
-            );
+            const iso = ISO_LANGS[getIsoLangFromString(lang)] || {};
+            const dialect = COUNTRIES[countryCode.toLocaleLowerCase()] || {};
             // console.log('renderInput', iso, dialect);
             params.InputProps.startAdornment = (
               <InputAdornment position="start">
@@ -173,7 +167,7 @@ export default function SettingsComponent() {
           </Typography>
           <Slider
             onChange={(e, value) => {
-              setInputVolume(value);
+              setInputVolume(Number(value));
               clearTimeout(timerVolume);
               timerVolume = setTimeout(() => {
                 onSettingChanged(VARIABLES.SETTINGS.VOLUME, value);
@@ -201,7 +195,7 @@ export default function SettingsComponent() {
           </Typography>
           <Slider
             onChange={(_, value) => {
-              setInputRate(value);
+              setInputRate(Number(value));
               clearTimeout(timerRate);
               timerRate = setTimeout(() => {
                 onSettingChanged(VARIABLES.SETTINGS.RATE, value);
@@ -228,7 +222,7 @@ export default function SettingsComponent() {
           </Typography>
           <Slider
             onChange={(_, value) => {
-              setInputPitch(value);
+              setInputPitch(Number(value));
               clearTimeout(timerPitch);
               timerPitch = setTimeout(() => {
                 onSettingChanged(VARIABLES.SETTINGS.PITCH, value);

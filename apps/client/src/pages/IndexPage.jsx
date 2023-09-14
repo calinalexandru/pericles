@@ -3,7 +3,7 @@ import { applySpec, } from 'ramda';
 import React, { memo, } from 'react';
 import { connect, } from 'react-redux';
 
-import FooterComponent from '@/components/footer';
+import FooterComponent from '@/components/Footer';
 import HeaderComponent from '@/components/Header';
 import PlayerComponent from '@/components/Player';
 import { TABS, } from '@pericles/constants';

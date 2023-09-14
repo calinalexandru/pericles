@@ -1,7 +1,7 @@
 import {
   Backdrop, Button, FormControl, SxProps, 
 } from '@mui/material';
-import React, { useState, MouseEvent, } from 'react';
+import React, { useState, MouseEvent, useMemo, } from 'react';
 import { RgbaStringColorPicker, } from 'react-colorful';
 
 interface ColorPickerProps {
@@ -12,7 +12,6 @@ interface ColorPickerProps {
 const formControlSx = { position: 'static', mx: 1, } as SxProps;
 
 const buttonSx = {
-  bgcolor: (props: ColorPickerProps) => props.value,
   border: 1,
   borderColor: 'primary.dark',
   minWidth: 'unset',
@@ -34,7 +33,10 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
   onChange = () => {},
 }) => {
   const [ show, setShow, ] = useState(false);
-
+  const buttonSxWithValue = useMemo(
+    () => ({ ...buttonSx, bgcolor: value, }),
+    [ value, ]
+  );
   const handleBackdropClick = (e: MouseEvent<HTMLDivElement>) => {
     if (e.target === null) return;
     const classList = Array.from((e.target as HTMLElement).classList).join(',');
@@ -46,7 +48,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
     <FormControl sx={formControlSx}>
       <Button
         size="small"
-        sx={buttonSx}
+        sx={buttonSxWithValue}
         onClick={() => {
           setShow(!show);
         }}

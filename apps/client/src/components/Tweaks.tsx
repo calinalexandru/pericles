@@ -14,7 +14,6 @@ import {
   MenuItem,
   Divider,
 } from '@mui/material';
-import { keys, } from 'ramda';
 import React, { useEffect, } from 'react';
 import { useSelector, } from 'react-redux';
 
@@ -40,6 +39,16 @@ import {
 } from '@pericles/store';
 import { t, } from '@pericles/util';
 
+const switchInputProps = { 'aria-label': 'primary checkbox', };
+const listSx = { width: '100%', bgcolor: 'background.paper', };
+const listItemTextSx = {
+  mx: 1,
+  fontSize: '0.8rem',
+};
+const listItemSx = {
+  position: 'static',
+};
+
 export default function TweaksComponent() {
   const disableHotkeys = useSelector(hotkeysDisableSelector);
   const autoscroll = useSelector(appAutoscrollSelector);
@@ -64,8 +73,10 @@ export default function TweaksComponent() {
     if (!wordTracker) clearWords(playerTab);
   }, [ wordTracker, clearWords, playerTab, ]);
 
+  console.log('Tweaks', { wordTrackerColor, highlightColor, });
+
   return (
-    <List sx={{ width: '100%', bgcolor: 'background.paper', }}>
+    <List sx={listSx}>
       <ListItem>
         <ListItemAvatar>
           <Avatar>
@@ -84,12 +95,12 @@ export default function TweaksComponent() {
           onChange={(e, value) => {
             setAppSetting(VARIABLES.APP.AUTOSCROLL, value);
           }}
-          inputProps={{ 'aria-label': 'primary checkbox', }}
+          inputProps={switchInputProps}
           value="1"
         />
       </ListItem>
       <Divider />
-      <ListItem sx={{ position: 'static', }}>
+      <ListItem sx={listItemSx}>
         <ListItemAvatar>
           <Avatar>
             <TranslateSharpIcon />
@@ -112,17 +123,14 @@ export default function TweaksComponent() {
                     e.target.value
                   );
                 }}
-                sx={{
-                  mx: 1,
-                  fontSize: '0.8rem',
-                }}
+                sx={listItemTextSx}
               >
-                {keys(WORD_TRACKER_STYLES).map((style) => (
+                {Object.keys(WORD_TRACKER_STYLES).map((style) => (
                   <MenuItem
                     dense={true}
                     divider={true}
                     key={style}
-                    value={WORD_TRACKER_STYLES[style]}
+                    value={(WORD_TRACKER_STYLES as any)[style]}
                   >
                     {style.toLocaleLowerCase()}
                   </MenuItem>
@@ -144,12 +152,12 @@ export default function TweaksComponent() {
           onChange={(e, value) => {
             setAppSetting(VARIABLES.APP.WORD_TRACKER, value);
           }}
-          inputProps={{ 'aria-label': 'primary checkbox', }}
+          inputProps={switchInputProps}
           value="1"
         />
       </ListItem>
       <Divider />
-      <ListItem style={{ position: 'static', }}>
+      <ListItem sx={listItemSx}>
         <ListItemAvatar>
           <Avatar>
             <SubtitlesSharpIcon />
@@ -170,17 +178,14 @@ export default function TweaksComponent() {
                   setAppSetting(VARIABLES.APP.HIGHLIGHT_STYLE, e.target.value);
                   highlightSection(playerTab);
                 }}
-                sx={{
-                  mx: 1,
-                  fontSize: '0.8rem',
-                }}
+                sx={listItemTextSx}
               >
-                {keys(SECTION_HIGHLIGHT_STYLES).map((style) => (
+                {Object.keys(SECTION_HIGHLIGHT_STYLES).map((style) => (
                   <MenuItem
                     dense={true}
                     divider={true}
                     key={style}
-                    value={SECTION_HIGHLIGHT_STYLES[style]}
+                    value={(SECTION_HIGHLIGHT_STYLES as any)[style]}
                   >
                     {style.toLocaleLowerCase()}
                   </MenuItem>
@@ -202,7 +207,7 @@ export default function TweaksComponent() {
           onChange={(e, value) => {
             setAppSetting(VARIABLES.APP.SECTION_TRACKER, value);
           }}
-          inputProps={{ 'aria-label': 'primary checkbox', }}
+          inputProps={switchInputProps}
           value="1"
         />
       </ListItem>
@@ -225,7 +230,7 @@ export default function TweaksComponent() {
           onChange={(e, value) => {
             setAppSetting(VARIABLES.APP.MINI_PLAYER, value);
           }}
-          inputProps={{ 'aria-label': 'primary checkbox', }}
+          inputProps={switchInputProps}
           value="1"
         />
       </ListItem>
@@ -248,7 +253,7 @@ export default function TweaksComponent() {
           onChange={(event, value) => {
             setHotkeysSetting(VARIABLES.HOTKEYS.DISABLE, value);
           }}
-          inputProps={{ 'aria-label': 'primary checkbox', }}
+          inputProps={switchInputProps}
           value="1"
         />
       </ListItem>

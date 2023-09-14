@@ -14,10 +14,10 @@ import { appRouteTabSelector, settingsVisibleSelector, } from '@pericles/store';
 import useAppSettings from '../hooks/useAppSettings';
 import MiscPage from '../pages/MiscPage';
 
-import HotkeysComponent from './hotkeys';
-import SettingsComponent from './Settings';
-import TabPanel from './tabPanel';
-import TweaksComponent from './tweaks';
+import HotkeysComponent from './Hotkeys';
+import SettingsComponent from './Settings/Settings';
+import TabPanel from './TabPanel';
+import TweaksComponent from './Tweaks';
 
 const tabCSS = { color: 'secondary.dark', };
 const paperSx = {
