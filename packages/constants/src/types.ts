@@ -133,3 +133,8 @@ export type Variables = {
     STOP: KeyCombo[];
   };
 };
+
+export type Hotkey = {
+  key: string;
+  code: string;
+};

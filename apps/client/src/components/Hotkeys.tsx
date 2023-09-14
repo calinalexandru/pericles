@@ -6,6 +6,7 @@ import { useSelector, } from 'react-redux';
 
 import useHotkeysSettings from '@/hooks/useHotkeysSettings';
 import usePlayer from '@/hooks/usePlayer';
+import { Hotkey, } from '@pericles/constants';
 import {
   hotkeysNextSelector,
   hotkeysPlaySelector,
@@ -15,11 +16,6 @@ import {
   playerStatusSelector,
 } from '@pericles/store';
 import { isStopped, } from '@pericles/util';
-
-type Hotkey = {
-  key: string;
-  code: string;
-};
 
 let keysMap: Record<string, Hotkey> = Object.create(null);
 const textFieldInputProps = {

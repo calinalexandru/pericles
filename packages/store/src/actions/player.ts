@@ -55,10 +55,15 @@ export const proxyResetAndRequestPlay = createAsyncActions<any>(
 export const setPlayer = createAction<Partial<PlayerState>>(
   PlayerActionTypes.SET
 );
-export const playerPlay = createAction<{
+
+export type PlayerPlayParams = {
   userGenerated: boolean;
   fromCursor: boolean;
-}>(PlayerActionTypes.PLAY);
+};
+
+export const playerPlay = createAction<PlayerPlayParams>(
+  PlayerActionTypes.PLAY
+);
 export const playerProxyPlay = createAction<any>(PlayerActionTypes.PROXY_PLAY);
 export const playerPause = createAction(PlayerActionTypes.PAUSE);
 export const playerResume = createAction(PlayerActionTypes.RESUME);

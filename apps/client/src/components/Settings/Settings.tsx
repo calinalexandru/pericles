@@ -170,7 +170,7 @@ export default function SettingsComponent() {
               setInputVolume(Number(value));
               clearTimeout(timerVolume);
               timerVolume = setTimeout(() => {
-                onSettingChanged(VARIABLES.SETTINGS.VOLUME, value);
+                onSettingChanged(VARIABLES.SETTINGS.VOLUME, Number(value));
               }, ATTRIBUTES.MISC.SLIDER_DEBOUNCE);
             }}
             value={inputVolume}
@@ -198,7 +198,7 @@ export default function SettingsComponent() {
               setInputRate(Number(value));
               clearTimeout(timerRate);
               timerRate = setTimeout(() => {
-                onSettingChanged(VARIABLES.SETTINGS.RATE, value);
+                onSettingChanged(VARIABLES.SETTINGS.RATE, Number(value));
               }, ATTRIBUTES.MISC.SLIDER_DEBOUNCE);
             }}
             value={inputRate}
@@ -225,7 +225,7 @@ export default function SettingsComponent() {
               setInputPitch(Number(value));
               clearTimeout(timerPitch);
               timerPitch = setTimeout(() => {
-                onSettingChanged(VARIABLES.SETTINGS.PITCH, value);
+                onSettingChanged(VARIABLES.SETTINGS.PITCH, Number(value));
               }, ATTRIBUTES.MISC.SLIDER_DEBOUNCE);
             }}
             value={inputPitch}

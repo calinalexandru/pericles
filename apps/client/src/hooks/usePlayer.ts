@@ -2,6 +2,7 @@ import { useCallback, } from 'react';
 import { useDispatch, } from 'react-redux';
 
 import {
+  PlayerPlayParams,
   playerNext,
   playerPause,
   playerPlay,
@@ -14,7 +15,7 @@ export default function usePlayer() {
   const dispatch = useDispatch();
 
   const play = useCallback(
-    (params) => {
+    (params: PlayerPlayParams) => {
       dispatch(playerPlay(params));
     },
     [ dispatch, ]
@@ -33,7 +34,7 @@ export default function usePlayer() {
   }, [ dispatch, ]);
 
   const next = useCallback(() => {
-    dispatch(playerNext());
+    dispatch(playerNext({ auto: false, }));
   }, [ dispatch, ]);
 
   const prev = useCallback(() => {

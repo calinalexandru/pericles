@@ -43,7 +43,8 @@ export default function PlayButton() {
   const playOrParse = useCallback(() => {
     // console.log(playOrParse');
     if (pausedState.includes(status)) resume();
-    else if (playState.includes(status)) play({ userGenerated: true, });
+    else if (playState.includes(status))
+      play({ userGenerated: true, fromCursor: false, });
     else if (pauseState.includes(status)) pause();
   }, [ status, resume, play, pause, ]);
 
