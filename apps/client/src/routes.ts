@@ -7,8 +7,8 @@ export default {
   [ROUTES.ERROR]: React.lazy(() => import('./pages/ErrorPage')),
   [ROUTES.ERROR_PDF]: React.lazy(() => import('./pages/PDFPreviewErrorPage')),
   [ROUTES.SKIP]: React.lazy(() => import('./pages/SkipPage')),
-  errorGooglePreview: React.lazy(() =>
-    import('./pages/GooglePreviewErrorPage')
+  errorGooglePreview: React.lazy(
+    () => import('./pages/GooglePreviewErrorPage')
   ),
   errorPdfPreview: React.lazy(() => import('./pages/PDFPreviewErrorPage')),
 };

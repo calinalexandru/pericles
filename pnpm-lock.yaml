@@ -15,9 +15,6 @@ importers:
       '@pericles/util':
         specifier: workspace:*
         version: link:../../packages/util
-      ramda:
-        specifier: 0.27.1
-        version: 0.27.1
       react:
         specifier: ^18.1.0
         version: 18.1.0
@@ -81,7 +78,7 @@ importers:
         version: 1.1.2(eslint-plugin-import@2.27.5)
       eslint-plugin-import:
         specifier: ^2.25.4
-        version: 2.27.5(@typescript-eslint/parser@6.4.0)(eslint-import-resolver-typescript@3.6.0)(eslint-import-resolver-webpack@0.13.2)(eslint@8.21.0)
+        version: 2.27.5(eslint@7.32.0)
       fork-ts-checker-webpack-plugin:
         specifier: ^8.0.0
         version: 8.0.0(typescript@4.8.4)(webpack@5.51.1)
@@ -299,9 +296,6 @@ importers:
       prop-types:
         specifier: 15.8.1
         version: 15.8.1
-      ramda:
-        specifier: 0.27.1
-        version: 0.27.1
       react:
         specifier: 17.0.2
         version: 17.0.2
@@ -377,7 +371,7 @@ importers:
         version: 1.1.2(eslint-plugin-import@2.27.5)
       eslint-plugin-import:
         specifier: ^2.25.4
-        version: 2.27.5(@typescript-eslint/parser@6.4.0)(eslint-import-resolver-typescript@3.6.0)(eslint-import-resolver-webpack@0.13.2)(eslint@8.21.0)
+        version: 2.27.5(eslint@7.32.0)
       eslint-plugin-jsx-a11y:
         specifier: ^6.5.1
         version: 6.6.1(eslint@7.32.0)
@@ -568,9 +562,6 @@ importers:
       compromise:
         specifier: 14.2.0
         version: 14.2.0
-      ramda:
-        specifier: 0.27.1
-        version: 0.27.1
       rxjs:
         specifier: 7.5.1
         version: 7.5.1
@@ -601,7 +592,7 @@ importers:
         version: 8.5.0(eslint@7.32.0)
       eslint-plugin-import:
         specifier: ^2.24.0
-        version: 2.27.5(@typescript-eslint/parser@6.4.0)(eslint-import-resolver-typescript@3.6.0)(eslint-import-resolver-webpack@0.13.2)(eslint@8.21.0)
+        version: 2.27.5(eslint@7.32.0)
       jest:
         specifier: ^27.4.5
         version: 27.4.5
@@ -4159,7 +4150,7 @@ packages:
     dependencies:
       confusing-browser-globals: 1.0.11
       eslint: 7.32.0
-      eslint-plugin-import: 2.27.5(@typescript-eslint/parser@6.4.0)(eslint-import-resolver-typescript@3.6.0)(eslint-import-resolver-webpack@0.13.2)(eslint@8.21.0)
+      eslint-plugin-import: 2.27.5(eslint@7.32.0)
       object.assign: 4.1.4
       object.entries: 1.1.7
       semver: 6.3.1
@@ -4227,7 +4218,7 @@ packages:
     dependencies:
       eslint: 7.32.0
       eslint-config-airbnb-base: 15.0.0(eslint-plugin-import@2.27.5)(eslint@7.32.0)
-      eslint-plugin-import: 2.27.5(@typescript-eslint/parser@6.4.0)(eslint-import-resolver-typescript@3.6.0)(eslint-import-resolver-webpack@0.13.2)(eslint@8.21.0)
+      eslint-plugin-import: 2.27.5(eslint@7.32.0)
       eslint-plugin-jsx-a11y: 6.6.1(eslint@7.32.0)
       eslint-plugin-react: 7.30.1(eslint@7.32.0)
       eslint-plugin-react-hooks: 4.6.0(eslint@7.32.0)

@@ -36,10 +36,13 @@ export type ParserIframesType = {
 export type ParserTypes = typeof PARSER_TYPES[keyof typeof PARSER_TYPES];
 
 export type VoiceType = {
-  id: string;
+  id: number;
   lang: string;
+  local: string;
   countryCode: string;
   shortTitle: string;
+  tags: string;
+  nativeName: string;
   groupName: string;
   text: string;
 };

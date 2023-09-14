@@ -1,4 +1,4 @@
-import { join, pipe, } from 'ramda';
+import { VoiceType, } from '@pericles/constants';
 
 import { getBrowserAPI, } from '../util/getBrowserAPI';
 
@@ -9,18 +9,25 @@ import getIsoLangFromString from './getIsoLangFromString';
 import getNativeNameFromIsoLang from './getNativeNameFromIsoLang';
 import getTagsFromCountry from './getTagsFromCountry';
 
-const setVoices = (voices) => {
-  // console.log('setVoices', voices);
-  let voiceNames = [];
-  const groupMap = [];
-  let groupId;
-  let groupMatch = [];
+interface VoiceItem {
+  voiceName?: string;
+  name?: string;
+  lang: string;
+}
+
+const setVoices = (voices: VoiceItem[]): VoiceType[] => {
+  let voiceNames: VoiceType[] = [];
+  const groupMap: string[] = [];
+  let groupId: number;
+  let groupMatch: RegExpMatchArray | null;
   let name = '';
   const voiceProviders = [ 'Google', 'Microsoft', 'eSpeak', 'Chrome OS', ];
   const voiceProvidersRegex = new RegExp(voiceProviders.join('|'));
+
   voiceNames = voices.map((item, key) => {
-    name = item.voiceName || item.name;
+    name = item.voiceName || item.name || '';
     groupMatch = name.match(voiceProvidersRegex);
+
     if (groupMatch && groupMatch[0]) {
       groupId = groupMap.indexOf(groupMatch[0]);
       if (groupId === -1) {
@@ -28,32 +35,30 @@ const setVoices = (voices) => {
         groupId = groupMap.length - 1;
       }
     }
-    const out = {
+
+    const out: VoiceType = {
       id: key,
       lang: item.lang,
       local: item.lang,
       countryCode: item.lang,
       text: name,
       groupName: groupMap[groupId] || '',
-      nativeName: pipe(
-        getIsoLangFromString,
-        getIsoLang,
-        getNativeNameFromIsoLang
-      )(item.lang),
-      tags: pipe(
-        getCountryCodeFromString,
-        getCountry,
-        getTagsFromCountry,
-        join(' ')
-      )(item.lang),
+      nativeName: getNativeNameFromIsoLang(
+        getIsoLang(getIsoLangFromString(item.lang))
+      ),
+      tags: getTagsFromCountry(
+        getCountry(getCountryCodeFromString(item.lang))
+      ).join(' '),
       shortTitle: name,
     };
-    const compoundLangRegex = new RegExp('[a-z]{2}-[a-z]{2}', 'i');
-    if (compoundLangRegex.test(item.lang)) {
-      out.countryCode = item.lang.slice(3).toLocaleUpperCase();
-    } else out.countryCode = item.lang ? item.lang.toLocaleUpperCase() : null;
 
-    out.shortTitle = out.text;
+    const compoundLangRegex = /^[a-z]{2}-[a-z]{2}$/i;
+    if (compoundLangRegex.test(item.lang)) {
+      out.countryCode = item.lang.slice(3).toUpperCase();
+    } else {
+      out.countryCode = item.lang ? item.lang.toUpperCase() : '';
+    }
+
     if (groupMatch && groupMatch[0]) {
       out.shortTitle = out.text.replace(groupMatch[0], '');
     }
@@ -62,7 +67,7 @@ const setVoices = (voices) => {
   });
 
   if (voiceNames.findIndex((voice) => voice.groupName === 'Chrome OS') !== -1) {
-    voiceNames = voiceNames.sort((a, b) =>
+    voiceNames.sort((a, b) =>
       b.groupName === 'Chrome OS' && a.groupName !== 'Chrome OS' ? 1 : -1
     );
   }
@@ -70,16 +75,16 @@ const setVoices = (voices) => {
   return voiceNames;
 };
 
-export default function getBrowserAPIVoices() {
+export default function getBrowserAPIVoices(): Promise<VoiceType[]> {
   return new Promise((resolve, reject) => {
     const { api: browserAPI, } = getBrowserAPI();
     try {
       if (browserAPI.tts) {
-        browserAPI.tts.getVoices(async (voices) => {
+        browserAPI.tts.getVoices((voices: any) => {
           resolve(setVoices(voices));
         });
       } else {
-        const voices = speechSynthesis.getVoices();
+        const voices: any = speechSynthesis.getVoices();
         resolve(setVoices(voices));
       }
     } catch (e) {
