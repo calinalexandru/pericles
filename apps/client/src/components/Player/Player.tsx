@@ -1,5 +1,5 @@
 import { Grid, } from '@mui/material';
-import React from 'react';
+import React, { useMemo, } from 'react';
 
 import NextButton from './NextButton';
 import PlayButton from './PlayButton';
@@ -8,38 +8,54 @@ import StopButton from './StopButton';
 import { buttonGridSX, containerSX, } from './style';
 
 export default function PlayerComponent() {
+  const playGridSx = useMemo(
+    () => ({
+      ...buttonGridSX,
+      borderBottom: 'none',
+      bgcolor: 'secondary.light',
+    }),
+    []
+  );
+
+  const stopGridSx = useMemo(
+    () => ({
+      ...buttonGridSX,
+      borderBottom: 'none',
+      borderLeft: 'none',
+    }),
+    []
+  );
+
+  const nextGridSx = useMemo(
+    () => ({
+      ...buttonGridSX,
+      borderLeft: 'none',
+    }),
+    []
+  );
+
   return (
     <>
       <Grid
         container={true}
-        align="center"
+        alignItems="center"
         sx={containerSX}>
         <Grid
           xs={9}
-          sx={{
-            ...buttonGridSX,
-            borderBottom: 'none',
-            bgcolor: 'secondary.light',
-          }}
-          item={true}
-        >
+          sx={playGridSx}
+          item={true}>
           <PlayButton />
         </Grid>
         <Grid
           xs={3}
           item={true}
-          sx={{
-            ...buttonGridSX,
-            borderBottom: 'none',
-            borderLeft: 'none',
-          }}
-        >
+          sx={stopGridSx}>
           <StopButton />
         </Grid>
       </Grid>
       <Grid
         container={true}
-        align="center">
+        alignItems="center">
         <Grid
           item={true}
           xs={6}
@@ -49,11 +65,7 @@ export default function PlayerComponent() {
         <Grid
           item={true}
           xs={6}
-          sx={{
-            ...buttonGridSX,
-            borderLeft: 'none',
-          }}
-        >
+          sx={nextGridSx}>
           <NextButton />
         </Grid>
       </Grid>

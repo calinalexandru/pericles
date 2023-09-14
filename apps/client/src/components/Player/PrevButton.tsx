@@ -4,25 +4,30 @@ import React from 'react';
 import { useSelector, } from 'react-redux';
 
 import usePlayer from '@/hooks/usePlayer';
-import { PLAYER_STATUS, } from '@pericles/constants';
+import { PLAYER_STATUS, PlayerStatusTypes, } from '@pericles/constants';
 import { playerStatusSelector, } from '@pericles/store';
+
+const prevButtonSx = { width: '100%', borderRadius: 0, };
+const iconSx = { fontSize: '1.9rem', };
 
 export default function PrevButton() {
   const { prev, } = usePlayer();
   const status = useSelector(playerStatusSelector);
   return (
     <IconButton
-      disabled={[
-        PLAYER_STATUS.STOPPED,
-        PLAYER_STATUS.LOADING,
-        PLAYER_STATUS.ERROR,
-      ].includes(status)}
+      disabled={(
+        [
+          PLAYER_STATUS.STOPPED,
+          PLAYER_STATUS.LOADING,
+          PLAYER_STATUS.ERROR,
+        ] as PlayerStatusTypes[]
+      ).includes(status)}
       onClick={prev}
       color="primary"
       size="small"
-      sx={{ width: '100%', borderRadius: 0, }}
+      sx={prevButtonSx}
     >
-      <SkipPreviousSharp sx={{ fontSize: '1.9rem', }} />
+      <SkipPreviousSharp sx={iconSx} />
     </IconButton>
   );
 }

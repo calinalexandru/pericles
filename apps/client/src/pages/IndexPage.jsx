@@ -5,7 +5,7 @@ import { connect, } from 'react-redux';
 
 import FooterComponent from '@/components/Footer';
 import HeaderComponent from '@/components/Header';
-import PlayerComponent from '@/components/Player';
+import PlayerComponent from '@/components/Player/Player';
 import { TABS, } from '@pericles/constants';
 import { appRouteTabSelector, } from '@pericles/store';
 
