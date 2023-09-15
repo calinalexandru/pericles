@@ -10,79 +10,80 @@ import {
   playerStop,
   playerSoftNext,
   playerSoftPrev,
+  HotkeysState,
 } from '@pericles/store';
 
-const userIsTyping = (e: KeyboardEvent) => {
+const userIsTyping = (e: KeyboardEvent): boolean => {
   const target = e.target as HTMLElement;
   const tagName = target.tagName.toLocaleLowerCase();
   const inputTags = [ 'input', 'textarea', ];
-  const output =
-    inputTags.includes(tagName) || target.hasAttribute('contenteditable');
-  console.log('userIsTyping: target, output', target, output);
-  return output;
+  return inputTags.includes(tagName) || target.hasAttribute('contenteditable');
 };
 
 export default () => {
-  const hotkeyEvents: any = {
-    start: () => {
-      console.log('hotkeyEvents.start');
-      store.dispatch(playerPlay({ userGenerated: true, fromCursor: false, }));
-    },
-    play: () => {
-      console.log('hotkeyEvents.toggle');
-      store.dispatch(playerToggle());
-    },
-    stop: () => {
-      console.log('hotkeyEvents.stop');
-      store.dispatch(playerStop());
-    },
-    next: () => {
-      console.log('hotkeyEvents.next');
-      store.dispatch(playerSoftNext());
-    },
-    prev: () => {
-      console.log('hotkeyEvents.prev');
-      store.dispatch(playerSoftPrev());
-    },
-  };
+  type HotkeyEvent = 'start' | 'play' | 'stop' | 'next' | 'prev';
 
-  let keysMap: { [key: string]: { key: string; code: string } } =
-    Object.create(null);
+  const hotkeyEvents = new Map<HotkeyEvent, () => void>();
+  hotkeyEvents.set('start', () => {
+    store.dispatch(playerPlay({ userGenerated: true, fromCursor: false, }));
+  });
+  hotkeyEvents.set('play', () => {
+    store.dispatch(playerToggle());
+  });
+  hotkeyEvents.set('stop', () => {
+    store.dispatch(playerStop());
+  });
+  hotkeyEvents.set('next', () => {
+    store.dispatch(playerSoftNext());
+  });
+  hotkeyEvents.set('prev', () => {
+    store.dispatch(playerSoftPrev());
+  });
+
+  const keysMap: Map<string, { key: string; code: string }> = new Map();
 
   const onKeyPress$ = fromEvent<KeyboardEvent>(document, 'keydown').pipe(
     tap((e) => {
       if (userIsTyping(e)) return;
-      console.log('onKeyPress$', e);
-      keysMap[e.code] = { key: e.key, code: e.code, };
+      keysMap.set(e.code, { key: e.key, code: e.code, });
       const state = store.getState();
-      if (state === null) return;
-      const hotkeys: any = hotkeysSelector(state);
-      const activeHotkeys = Object.keys(keysMap)
-        .filter((k: string) => keysMap[k] !== null)
-        .map((k: string) => keysMap[k].code)
+      if (!state) return;
+      const hotkeys: HotkeysState = hotkeysSelector(state);
+
+      const activeHotkeys = Array.from(keysMap.values())
+        .map((entry) => entry.code)
         .sort();
-      console.log('activeHotkeys', activeHotkeys);
-      // console.log('keysMap', keysMap)
-      const curEvent = Object.keys(hotkeyEvents).find((evt) => {
-        const candidates = hotkeys[evt]
-          .map((key: { code: string }) => key.code)
-          .sort();
-        console.log('candidates', candidates);
+
+      const curEvent = Array.from(hotkeyEvents.keys()).find((evt) => {
+        const entries = Object.entries(hotkeys);
+
+        const matchingEntry = entries.find(([ key, ]) => key === evt);
+        if (!matchingEntry) return false;
+
+        const [ , value, ] = matchingEntry;
+        if (!Array.isArray(value)) return false;
+
+        const candidates = value.map((key) => key.code).sort();
         return JSON.stringify(activeHotkeys) === JSON.stringify(candidates);
-      });
-      if (!hotkeysDisableSelector(state) && curEvent && hotkeyEvents[curEvent])
-        hotkeyEvents[curEvent]();
+      }) as HotkeyEvent | undefined;
+
+      if (
+        !hotkeysDisableSelector(state) &&
+        curEvent &&
+        hotkeyEvents.has(curEvent)
+      ) {
+        hotkeyEvents.get(curEvent)!();
+      }
     }),
     ignoreElements()
   );
 
   const onKeyRelease$ = fromEvent(document, 'keyup').pipe(
     tap(() => {
-      keysMap = Object.create(null);
+      keysMap.clear();
     }),
     ignoreElements()
   );
 
-  // run
   combineLatest([ onKeyPress$, onKeyRelease$, ]).subscribe();
 };

@@ -1,7 +1,5 @@
 export interface MessageRequest {
-  activeTab?: {
-    id: number;
-  };
+  activeTab?: chrome.tabs.Tab;
   message?: {
     payload?: Record<string, any>;
   };

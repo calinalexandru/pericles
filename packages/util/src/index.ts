@@ -96,6 +96,8 @@ export { default as isTextNode, } from './predicates/isTextNode';
 export { default as isValidTag, } from './predicates/isValidTag';
 export { default as isWaiting, } from './predicates/isWaiting';
 export { default as isWikipedia, } from './predicates/isWikipedia';
+export { default as isHtmlElement, } from './predicates/isHtmlElement';
+export { default as isWindow, } from './predicates/isWindow';
 
 /* string-work */
 export { default as getInnerText, } from './string-work/getInnerText';

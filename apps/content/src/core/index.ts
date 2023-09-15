@@ -45,9 +45,6 @@ export default (): void => {
       const state = store.getState();
       console.log('content.state', state);
     });
-
-    // i18n.load(MESSAGES);
-    // i18n.activate(DEFAULT_VALUES.APP.LANGUAGE);
   };
 
   // Listens for when the store gets initialized

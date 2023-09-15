@@ -82,7 +82,7 @@ export default () => {
       const state = store.getState();
       if (state === null) return;
       const target = e.target as HTMLElement;
-      if (!isGoogleBook(parserTypeSelector(state))) return true;
+      if (!isGoogleBook(parserTypeSelector(state))) return;
       const nextPageLabel = target.getAttribute('aria-label');
       if (
         nextPageLabel === 'Next Page' ||
@@ -91,7 +91,6 @@ export default () => {
         console.log('googleBookNext$', target);
         store.dispatch(playerStop());
       }
-      return true;
     }),
     ignoreElements()
   );
@@ -101,7 +100,7 @@ export default () => {
       const state = store.getState();
       if (state === null) return;
       const target = e.target as HTMLElement;
-      if (!isGoogleBook(parserTypeSelector(state))) return true;
+      if (!isGoogleBook(parserTypeSelector(state))) return;
       const prevPageLabel = target.getAttribute('aria-label');
       if (
         prevPageLabel === 'Previous Page' ||
@@ -110,8 +109,6 @@ export default () => {
         console.log('googleBookPrev$', target);
         store.dispatch(playerStop());
       }
-
-      return true;
     }),
     ignoreElements()
   );
