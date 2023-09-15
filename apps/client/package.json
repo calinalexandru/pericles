@@ -58,6 +58,7 @@
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
     "@types/react-redux": "^7.1.26",
+    "chokidar": "^3.5.3",
     "clean-webpack-plugin": "^4.0.0",
     "concurrently": "^8.2.1",
     "copy-webpack-plugin": "^9.0.1",

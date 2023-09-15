@@ -1,5 +1,6 @@
 import { ATTRIBUTES, SectionType, } from '@pericles/constants';
 
+import isElementNode from '../../predicates/isElementNode';
 import isMinText from '../../predicates/isMinText';
 import isTextNode from '../../predicates/isTextNode';
 import isValidNode from '../../predicates/isValidNode';
@@ -11,13 +12,15 @@ import setStoredNode from '../setStoredNode';
 
 import {
   determineVisibility,
+  processAnyNode,
   processElementNode,
   processTextNode,
   pushAndClearBuffer,
+  validateElementNode,
 } from './util';
 
 interface WalkTheDOMParams {
-  node: HTMLElement;
+  node: Node;
   buffer: SectionType[];
   lastKey: number;
   userGenerated: boolean;
@@ -49,8 +52,8 @@ export default function walkTheDOM({
     callStackCounter,
     blocked,
   });
-  let nextNode: HTMLElement | null;
-  let nextAfterIframe: HTMLElement | null;
+  let nextNode: Node | null;
+  let nextAfterIframe: Node | null;
 
   if (!isValidNode(node)) {
     return { out: pushAndClearBuffer(buffer, lastKey), blocked, };
@@ -58,24 +61,24 @@ export default function walkTheDOM({
 
   if (
     isTextNode(node) &&
-    isMinText(removeHTMLSpaces(getInnerText(node.nodeValue || ''))) &&
-    determineVisibility(node, playFromCursor, userGenerated)
+    determineVisibility(node, playFromCursor, userGenerated) &&
+    isMinText(removeHTMLSpaces(getInnerText(node.nodeValue || '')))
   ) {
-    ({ nextNode, nextAfterIframe, } = processTextNode(
-      node as unknown as Text,
-      buffer,
-      lastKey
-    ));
-    console.log('walkTheDom.node', nextNode);
+    ({ nextNode, nextAfterIframe, } = processTextNode(node, buffer, lastKey));
+  } else if (
+    isElementNode(node) &&
+    determineVisibility(node, playFromCursor, userGenerated) &&
+    validateElementNode(node)
+  ) {
+    ({ nextNode, nextAfterIframe, } = processElementNode(node, buffer, lastKey));
   } else {
-    ({ nextNode, nextAfterIframe, } = processElementNode(
+    ({ nextNode, nextAfterIframe, } = processAnyNode(
       node,
-      buffer,
-      lastKey,
       playFromCursor,
       userGenerated
     ));
   }
+  console.log('walkTheDom.node', nextNode);
 
   if (callStackCounter >= ATTRIBUTES.MISC.MAX_RECURSION_STACK_CALL) {
     console.warn('walkTheDom.callstack exceeded');

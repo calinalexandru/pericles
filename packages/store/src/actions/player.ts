@@ -95,6 +95,5 @@ export const playerEnd = createAction<any>(PlayerActionTypes.END);
 export const playerTimeout = createAction(PlayerActionTypes.TIMEOUT);
 export const playerHealthCheck = createAction(PlayerActionTypes.HEALTH_CHECK);
 export const playerToggle = createAction(PlayerActionTypes.TOGGLE);
-export const playerError = createAction(PlayerActionTypes.ERROR);
 
 export const setSections = createAction<any>(SectionsActionTypes.SET);

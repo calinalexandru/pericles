@@ -6,7 +6,7 @@ import { appNewContent, store, } from '@pericles/store';
 import { getBrowserAPI, } from '@pericles/util';
 
 import appEpic from '../store/epics/app';
-import parserEpic from '../store/epics/parser';
+import parserEpic from '../store/epics/parser/parser';
 
 import api from './api';
 import controller from './controller';

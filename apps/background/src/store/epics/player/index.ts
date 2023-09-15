@@ -122,7 +122,7 @@ const proxyResetAndRequestPlayEpic: Epic<any> = (action, state) =>
     ofType(proxyResetAndRequestPlay.request),
     pluck('payload'),
     tap((payload) => {
-      console.log('proxyResetAndRequestPlayEpic');
+      console.log('proxyResetAndRequestPlayEpic', payload);
       mpToContent(
         [
           resetParser({ revertHtml: false, }),

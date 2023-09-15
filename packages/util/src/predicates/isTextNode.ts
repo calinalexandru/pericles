@@ -1,5 +1,3 @@
-import { NODE_TYPES, } from '@pericles/constants';
-
-export default function isTextNode(node: HTMLElement) {
-  return node.nodeType === NODE_TYPES.TEXT;
+export default function isTextNode(node: Node): node is Text {
+  return node instanceof Text;
 }

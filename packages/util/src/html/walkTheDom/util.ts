@@ -1,12 +1,12 @@
 import { SectionType, } from '@pericles/constants';
 
 import getSentencesFromText from '../../nlp/getSentencesFromText';
+import isElementNode from '../../predicates/isElementNode';
 import isHeading from '../../predicates/isHeading';
 import isMaxText from '../../predicates/isMaxText';
 import isMinText from '../../predicates/isMinText';
 import isParagraph from '../../predicates/isParagraph';
 import isSkippableByDesign from '../../predicates/isSkippableByDesign';
-import isTextNode from '../../predicates/isTextNode';
 import isValidTag from '../../predicates/isValidTag';
 import isWikipedia from '../../predicates/isWikipedia';
 import getInnerText from '../../string-work/getInnerText';
@@ -99,18 +99,21 @@ export const pushAndClearBuffer = (
 };
 
 export const determineVisibility = (
-  node: HTMLElement,
+  node: Node,
   playFromCursor: number,
   userGenerated: boolean
-): boolean =>
-  isTextNode(node)
-    ? isVisibleNode({ window, node, fromCursorY: playFromCursor, })
-    : isVisible({
+): boolean => {
+  if (isElementNode(node)) {
+    return isVisible({
       window,
       el: node,
       inViewport: userGenerated,
       fromY: playFromCursor,
     });
+  }
+
+  return isVisibleNode({ window, node, fromCursorY: playFromCursor, });
+};
 
 export const pushNode = (text: string, node: HTMLElement | Text): void => {
   const pos = getPosition(node, true);
@@ -126,6 +129,7 @@ export const processTextNode = (
   nextNode: HTMLElement | null;
   nextAfterIframe: HTMLElement | null;
 } => {
+  console.log('util.processTextNode', node);
   let nextNode;
   let parents: HTMLElement[] = [];
   let nextAfterIframe;
@@ -176,57 +180,63 @@ export const processTextNode = (
 export const processElementNode = (
   node: HTMLElement,
   buffer: SectionType[],
-  lastKey: number,
+  lastKey: number
+) => {
+  console.log('util.processElementNode', node);
+  let nextAfterIframe: HTMLElement | null = null;
+  let nextNode: HTMLElement | null = null;
+
+  pushAndClearBuffer(buffer, lastKey);
+  alterDom(node, lastKey + buffer.length);
+  pushSection(
+    buffer,
+    node,
+    getInnerText(node.innerText || node.textContent || '')
+  );
+  const result = findNextSibling(node, true);
+  if (result !== null && 'next' in result) {
+    ({ next: nextNode, nextAfterIframe = null, } = result);
+  }
+
+  return { nextNode, nextAfterIframe, };
+};
+
+export const processAnyNode = (
+  node: Node,
   playFromCursor: number,
   userGenerated: boolean
 ) => {
-  let nextAfterIframe;
-  let nextNode;
+  console.log('util.processAnyNode', node);
+  const nextSiblingResult = findNextSibling(node, true);
   const isVisibleNodeOrText = determineVisibility(
     node,
     playFromCursor,
     userGenerated
   );
+  const result: any =
+    (isWikipedia() && isSkippableByDesign(node)) || !isVisibleNodeOrText
+      ? nextSiblingResult
+      : node.childNodes[0]
+        ? { next: node.childNodes[0], }
+        : nextSiblingResult;
 
+  const { next: nextNode, nextAfterIframe, } = result;
+
+  return { nextNode, nextAfterIframe, };
+};
+
+export const validateElementNode = (node: HTMLElement) => {
   const isValidElement =
     isValidTag(node) &&
     isMinText(
       removeHTMLSpaces(getInnerText(node.innerText || node.textContent || ''))
     );
 
-  const isTypePara =
-    isVisibleNodeOrText &&
-    (isParagraph(node) ||
-      isHeading(node) ||
-      (!hasChildNodes(node) &&
-        isMinText(getInnerText(node.innerText || node.textContent || ''))));
+  const isReadbleType =
+    isParagraph(node) ||
+    isHeading(node) ||
+    (!hasChildNodes(node) &&
+      isMinText(getInnerText(node.innerText || node.textContent || '')));
 
-  if (isValidElement && isTypePara) {
-    pushAndClearBuffer(buffer, lastKey);
-    alterDom(node, lastKey + buffer.length);
-    pushSection(
-      buffer,
-      node,
-      getInnerText(node.innerText || node.textContent || '')
-    );
-    const result = findNextSibling(node, true);
-    if (result !== null && 'next' in result) {
-      ({ next: nextNode, nextAfterIframe, } = result);
-    }
-  } else {
-    const nextSiblingResult = findNextSibling(node, true);
-
-    const result: any =
-      (isWikipedia() && isSkippableByDesign(node)) ||
-      !isValidElement ||
-      !isVisibleNodeOrText
-        ? nextSiblingResult
-        : node.childNodes[0]
-          ? { next: node.childNodes[0], }
-          : nextSiblingResult;
-
-    ({ next: nextNode, nextAfterIframe, } = result);
-  }
-
-  return { nextNode, nextAfterIframe, };
+  return isValidElement && isReadbleType;
 };

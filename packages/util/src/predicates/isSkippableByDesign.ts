@@ -1,3 +1,5 @@
+import isHTMLElement from './isHtmlElement';
+
 type ElementDescriptor = {
   tagName: string;
   attr: string;
@@ -16,11 +18,7 @@ const elementsList: ElementDescriptor[] = [
   { tagName: 'div', attr: 'id', value: [ 'toc', ], },
 ];
 
-function isHTMLElement(node: HTMLElement | Text): node is HTMLElement {
-  return node instanceof HTMLElement;
-}
-
-export default function isSkippableByDesign(el: HTMLElement | Text): boolean {
+export default function isSkippableByDesign(el: Node): boolean {
   if (!isHTMLElement(el)) {
     return false;
   }

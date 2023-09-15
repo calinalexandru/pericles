@@ -1,3 +1,3 @@
-export default function isValidNode(node: HTMLElement | null): boolean {
-  return !!node?.nodeType;
+export default function isValidNode(node: unknown): node is Node {
+  return node instanceof Node;
 }

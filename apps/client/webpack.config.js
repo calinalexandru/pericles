@@ -1,3 +1,4 @@
+const chokidar = require('chokidar');
 const { spawn } = require('child_process');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const path = require('path');
@@ -15,6 +16,17 @@ const optimization = {
   },
 };
 
+function runBundle() {
+  console.log('Running bundle task...');
+  const child = spawn('npm', ['run', 'bundle'], { stdio: 'inherit' });
+
+  child.on('close', (code) => {
+    if (code !== 0) {
+      console.error(`dev:bundle process exited with code ${code}`);
+    }
+  });
+}
+
 module.exports = {
   mode,
   performance: false,
@@ -28,8 +40,8 @@ module.exports = {
         use: {
           loader: 'swc-loader',
           options: {
-            configFile: process.env.SWC_CONFIG_FILE || ".swcrc"
-          }
+            configFile: process.env.SWC_CONFIG_FILE || '.swcrc',
+          },
         },
       },
       {
@@ -91,20 +103,29 @@ module.exports = {
     }),
     {
       apply: (compiler) => {
-        compiler.hooks.done.tap('Dev Bundle Runner Plugin', (stats) => {
-          if (stats.hasErrors()) {
-            console.log('Build failed, not running bundle task.');
-          } else {
-            console.log('Running bundle task...');
-            const child = spawn('npm', ['run', 'bundle'], {
-              stdio: 'inherit',
+        compiler.hooks.afterEmit.tap('AfterEmitPlugin', (compilation) => {
+          if (!compiler.watcher) {
+            const watcher = chokidar.watch([
+              '../background/src',
+              '../content/src',
+            ]);
+
+            watcher.on('change', (changedPath) => {
+              console.log(
+                `File ${changedPath} was changed, running bundle task...`,
+              );
+              runBundle();
             });
 
-            child.on('close', (code) => {
-              if (code !== 0) {
-                console.error(`dev:bundle process exited with code ${code}`);
-              }
-            });
+            compiler.watcher = watcher;
+          }
+        });
+
+        compiler.hooks.done.tap('Dev Bundle Runner Plugin', (stats) => {
+          if (!stats.hasErrors()) {
+            runBundle();
+          } else {
+            console.log('Build failed, not running bundle task.');
           }
         });
       },
