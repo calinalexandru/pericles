@@ -3,18 +3,11 @@ import { Subject, } from 'rxjs';
 import { DEFAULT_VALUES, SettingKeys, } from '@pericles/constants';
 
 import ChromeSynth from './synth/ChromeSynth';
+import { UtteranceEvent, } from './synth/Utterance';
 
 interface StreamParams {
   event: string;
-  params: any;
-}
-
-interface Settings {
-  voices?: any[];
-  volume?: number;
-  pitch?: number;
-  rate?: number;
-  voice?: string;
+  params: UtteranceEvent;
 }
 
 export default class Speech {
@@ -39,8 +32,6 @@ export default class Speech {
       'onEnd',
       'onError',
       'onBoundary',
-      'onBuffering',
-      'onWordsUpdate',
     ];
 
     console.log('Attaching streams...');
@@ -71,8 +62,8 @@ export default class Speech {
     return voice === Speech.synth.voice;
   }
 
-  static crash(code: any) {
-    Speech.stream$.next({ event: 'onError', params: { code, }, });
+  static crash(code: string) {
+    Speech.stream$.next({ event: 'onError', params: {type: 'error', errorMessage: code, }, });
   }
 
   static continue() {

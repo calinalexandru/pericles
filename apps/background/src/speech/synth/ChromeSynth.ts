@@ -2,37 +2,30 @@ import { getBrowserAPI, } from '@pericles/util';
 
 import BaseSynth from './BaseSynth';
 import ISynth from './ISynth';
-import Utterance from './Utterance';
+import Utterance, { UtteranceEvent, } from './Utterance';
 
 export default class ChromeSynth extends BaseSynth implements ISynth {
 
-  private resumeTimer: any;
+  private resumeTimer: number;
 
-  private msg: any;
-
-  private synth: any;
+  /* eslint-disable-next-line no-undef */
+  private synth: typeof chrome.tts;
 
   private text: string;
 
   private currentMsgKey: number;
 
-  private onEnd: any;
+  private onEnd: (event: UtteranceEvent) => void;
 
-  private onResume: any;
+  private onResume: (event: UtteranceEvent) => void;
 
-  private onPause: any;
+  private onPause: (event: UtteranceEvent) => void;
 
-  private onWordsUpdate: any;
+  private onStart: (event: UtteranceEvent) => void;
 
-  private onStart: any;
-
-  private onBoundary: any;
-
-  private onBuffering: any;
+  private onBoundary: (event: UtteranceEvent) => void;
 
   private isCanceled: boolean;
-
-  private static voices: any;
 
   constructor() {
     super();
@@ -40,12 +33,9 @@ export default class ChromeSynth extends BaseSynth implements ISynth {
     this.onStart = () => {};
     this.onEnd = () => {};
     this.onBoundary = () => {};
-    this.onBuffering = () => {};
-    this.onWordsUpdate = () => {};
     this.onPause = () => {};
     this.onResume = () => {};
     this.currentMsgKey = 0;
-    this.msg = {};
     this.text = '';
     this.resumeTimer = 0;
     this.isCanceled = false;
@@ -63,10 +53,20 @@ export default class ChromeSynth extends BaseSynth implements ISynth {
     }, 5000);
   }
 
-  async speak(text: string): Promise<any> {
+  async speak(text: string): Promise<void> {
     this.isCanceled = false;
     this.text = text;
-    const voiceObj = await this.getVoiceByKey(this.voice);
+    /* eslint-disable-next-line no-undef */
+    let voiceObj: chrome.tts.TtsVoice | null;
+    try {
+      voiceObj = await this.getVoiceByKey(this.voice);
+    } catch (e) {
+      console.error(
+        'ChromeSynth.speak - voiceObj is not of type chrome.tts.TtsVoice'
+      );
+      return;
+      voiceObj = null;
+    }
 
     console.log('voiceObj', voiceObj, this.voice);
     const ttsOptions = Utterance.getNew({
@@ -76,25 +76,24 @@ export default class ChromeSynth extends BaseSynth implements ISynth {
       pitch: this.pitch,
       rate: this.rate,
       text: this.text,
-      onStart: (e: any) => {
+      onStart: (e) => {
         if (this.isCanceled) return;
         this.clearResumeInfinity();
         this.activateResumeInfinity();
-        this.onBuffering({ buffering: false, });
         this.onStart(e);
       },
-      onBoundary: (params: any) => {
+      onBoundary: (e) => {
         if (this.isCanceled) return;
-        this.onBoundary(params);
+        this.onBoundary(e);
       },
-      onEnd: (e: any) => {
+      onEnd: (e) => {
         if (this.isCanceled) return;
         this.clearResumeInfinity();
         this.onEnd(e);
       },
-      onError: () => {
+      onError: (e) => {
         if (this.isCanceled) return;
-        this.onEnd({ continueSpeaking: true, });
+        this.onEnd(e);
       },
     });
 
@@ -102,21 +101,22 @@ export default class ChromeSynth extends BaseSynth implements ISynth {
     getBrowserAPI().api.tts.speak(ttsText, restTtsOptions);
   }
 
-  async getVoiceByKey(voiceKey: number) {
+  /* eslint-disable-next-line no-undef */
+  async getVoiceByKey(voiceKey: number): Promise<chrome.tts.TtsVoice> {
     return new Promise((resolve, reject) => {
       try {
-        this.synth.getVoices((voices: any) => {
-          resolve(voices[voiceKey]);
+        this.synth.getVoices((voices) => {
+          const voice = voices.at(voiceKey);
+          if (voice) {
+            resolve(voice);
+          } else {
+            reject(new Error("Voice not found for provided voiceKey."));
+          }
         });
       } catch (e) {
         reject(e);
       }
     });
-  }
-
-  static setVoices(voices: any) {
-    console.log('voices', voices);
-    ChromeSynth.voices = voices;
   }
 
   continue() {

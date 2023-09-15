@@ -1,23 +1,13 @@
-type UtteranceEvent = {
-  type:
-    | 'start'
-    | 'word'
-    | 'end'
-    | 'interrupted'
-    | 'cancelled'
-    | 'error'
-    | 'marker'
-    | 'sentence'
-    | 'pause'
-    | 'resume';
-};
+/* eslint-disable-next-line no-undef */
+export type UtteranceEvent = chrome.tts.TtsEvent;
 
 type UtteranceOptions = {
   lang?: string;
   volume?: number;
   pitch?: number;
   rate?: number;
-  voice?: any;
+  /* eslint-disable-next-line no-undef */
+  voice?: chrome.tts.TtsVoice;
   text: string;
   onStart?: (event: UtteranceEvent) => void;
   onEnd?: (event: UtteranceEvent) => void;
@@ -38,6 +28,7 @@ type NewUtterance = {
 export default class Utterance {
 
   static getNew(options: UtteranceOptions): NewUtterance {
+    console.log('Utterance.getNew.options', options);
     const {
       lang,
       volume,
@@ -59,6 +50,7 @@ export default class Utterance {
       voiceName: voice ? voice.voiceName : undefined,
       text,
       onEvent: (event: UtteranceEvent) => {
+        console.log('Utterance.onEvent.typez', event.type, event);
         switch (event.type) {
         case 'start':
           if (onStart) onStart(event);

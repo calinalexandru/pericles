@@ -1,8 +1,7 @@
-// /* eslint-disable no-unused-vars */
 import { tap, } from 'rxjs/operators';
 
 import Speech from '@/speech';
-import { ERROR_CODES, PLAYER_STATUS, } from '@pericles/constants';
+import { PLAYER_STATUS, } from '@pericles/constants';
 import {
   store,
   parserEndSelector,
@@ -11,14 +10,12 @@ import {
   playerKeySelector,
   playerStatusSelector,
   playerTabSelector,
-  parserWordsUpdate,
   highlightSection,
   autoscrollSet,
   highlightWord,
   setPlayer,
   playerNext,
   playerCrash,
-  playerTimeout,
   playerEnd,
 } from '@pericles/store';
 import {
@@ -39,13 +36,9 @@ export default (): void => {
         const parserIframes = parserIframesSelector(state);
         const { event, params, } = out;
         const {
-          wordList,
           charIndex,
-          charLength,
-          buffering,
+          errorMessage,
           // index,
-          // continueSpeaking = false,
-          code: errorCode,
         } = params || {};
         console.log('Speech.stream$.subscribe', { params, });
         const playerKey = playerKeySelector(state);
@@ -55,6 +48,7 @@ export default (): void => {
           store.dispatch(
             setPlayer({
               status: PLAYER_STATUS.PLAYING,
+              buffering: false,
             })
           );
           mpToContent(
@@ -93,28 +87,14 @@ export default (): void => {
           }
           break;
         case 'onBoundary':
-          console.log('onBoundary', charIndex, charLength);
-          mpToContent(highlightWord({ charIndex, charLength, }), playingTab);
-          break;
-        case 'onWordsUpdate':
-          console.log('onWordsUpdate', wordList);
-          mpToContent(parserWordsUpdate({ wordList, }), playingTab);
-          break;
-        case 'onBuffering':
-          // console.log('onBuffering', buffering);
-          store.dispatch(setPlayer({ buffering, }));
+          console.log('onBoundary', charIndex, length);
+          mpToContent(highlightWord({ charIndex, charLength: length, }), playingTab);
           break;
         case 'onError':
           console.log('onError');
-          if (Object.values(ERROR_CODES.WEBSOCKET).includes(errorCode)) {
+          if (errorMessage) {
             store.dispatch(
-              playerCrash({ message: 'websocket caused player crash', })
-            );
-          } else if (errorCode === ERROR_CODES.PLAYER.TIMEOUT) {
-            store.dispatch(playerTimeout());
-          } else if (errorCode === ERROR_CODES.PLAYER.TEXT_EXCEED) {
-            store.dispatch(
-              playerCrash({ message: 'Your text is too big for me, senapi', })
+              playerCrash({ message: errorMessage, })
             );
           } else {
             store.dispatch(playerCrash({ message: 'generic player crash', }));
