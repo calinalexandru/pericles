@@ -88,14 +88,15 @@ export default (): void => {
           break;
         case 'onBoundary':
           console.log('onBoundary', charIndex, length);
-          mpToContent(highlightWord({ charIndex, charLength: length, }), playingTab);
+          mpToContent(
+            highlightWord({ charIndex, charLength: length, }),
+            playingTab
+          );
           break;
         case 'onError':
           console.log('onError');
           if (errorMessage) {
-            store.dispatch(
-              playerCrash({ message: errorMessage, })
-            );
+            store.dispatch(playerCrash({ message: errorMessage, }));
           } else {
             store.dispatch(playerCrash({ message: 'generic player crash', }));
           }

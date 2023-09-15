@@ -8,7 +8,6 @@ export default class ChromeSynth extends BaseSynth implements ISynth {
 
   private resumeTimer: number;
 
-  /* eslint-disable-next-line no-undef */
   private synth: typeof chrome.tts;
 
   private text: string;
@@ -56,7 +55,6 @@ export default class ChromeSynth extends BaseSynth implements ISynth {
   async speak(text: string): Promise<void> {
     this.isCanceled = false;
     this.text = text;
-    /* eslint-disable-next-line no-undef */
     let voiceObj: chrome.tts.TtsVoice | null;
     try {
       voiceObj = await this.getVoiceByKey(this.voice);
@@ -101,7 +99,6 @@ export default class ChromeSynth extends BaseSynth implements ISynth {
     getBrowserAPI().api.tts.speak(ttsText, restTtsOptions);
   }
 
-  /* eslint-disable-next-line no-undef */
   async getVoiceByKey(voiceKey: number): Promise<chrome.tts.TtsVoice> {
     return new Promise((resolve, reject) => {
       try {
@@ -110,7 +107,7 @@ export default class ChromeSynth extends BaseSynth implements ISynth {
           if (voice) {
             resolve(voice);
           } else {
-            reject(new Error("Voice not found for provided voiceKey."));
+            reject(new Error('Voice not found for provided voiceKey.'));
           }
         });
       } catch (e) {

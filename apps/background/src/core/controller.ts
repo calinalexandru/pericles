@@ -1,7 +1,5 @@
 import { combineLatest, fromEventPattern, } from 'rxjs';
-import {
-  filter, map, pluck, tap, 
-} from 'rxjs/operators';
+import { filter, map, tap, } from 'rxjs/operators';
 
 import { ATTRIBUTES, } from '@pericles/constants';
 import {
@@ -34,25 +32,27 @@ export default () => {
     contexts: [ 'selection', ],
   });
 
-  const tabFocus$ = fromEventPattern(
+  const tabFocus$ = fromEventPattern<chrome.tabs.TabActiveInfo>(
     (handler) => api.tabs.onActivated.addListener(handler),
     (handler) => api.tabs.onActivated.removeListener(handler)
   ).pipe(
-    map((tabs: any) => tabs),
-    pluck('tabId'),
+    map((activeInfo) => activeInfo.tabId),
     tap((tabId: number) => {
       console.log('set tab ID', tabId);
       store.dispatch(setApp({ activeTab: tabId, }));
     })
   );
 
-  const contextMenuClick$ = fromEventPattern(
+  const contextMenuClick$ = fromEventPattern<
+    [chrome.contextMenus.OnClickData, chrome.tabs.Tab]
+  >(
     (handler) => api.contextMenus.onClicked.addListener(handler),
     (handler) => api.contextMenus.onClicked.removeListener(handler)
   ).pipe(
-    map(([ info, ]: any) => info),
-    pluck('menuItemId'),
-    filter((item) => item === ATTRIBUTES.CONTEXT_MENU.READ_SELECTION),
+    map(([ info, ]) => info.menuItemId),
+    filter(
+      (menuItemId) => menuItemId === ATTRIBUTES.CONTEXT_MENU.READ_SELECTION
+    ),
     tap(() => {
       console.log('reading selection');
       store.dispatch(playerStop());
@@ -60,13 +60,16 @@ export default () => {
     })
   );
 
-  const contextMenuClick2$ = fromEventPattern(
+  const contextMenuClick2$ = fromEventPattern<
+    [chrome.contextMenus.OnClickData, chrome.tabs.Tab]
+  >(
     (handler) => api.contextMenus.onClicked.addListener(handler),
     (handler) => api.contextMenus.onClicked.removeListener(handler)
   ).pipe(
-    map(([ info, ]: any) => info),
-    pluck('menuItemId'),
-    filter((item) => item === ATTRIBUTES.CONTEXT_MENU.READ_FROM_HERE),
+    map(([ info, ]) => info.menuItemId),
+    filter(
+      (menuItemId) => menuItemId === ATTRIBUTES.CONTEXT_MENU.READ_FROM_HERE
+    ),
     tap(() => {
       store.dispatch(playerStop());
       setTimeout(() => {

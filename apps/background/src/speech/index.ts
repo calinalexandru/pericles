@@ -27,12 +27,7 @@ export default class Speech {
   }
 
   private static attachStreams(): void {
-    const events: string[] = [
-      'onStart',
-      'onEnd',
-      'onError',
-      'onBoundary',
-    ];
+    const events: string[] = [ 'onStart', 'onEnd', 'onError', 'onBoundary', ];
 
     console.log('Attaching streams...');
     events.forEach((event) => {
@@ -63,7 +58,10 @@ export default class Speech {
   }
 
   static crash(code: string) {
-    Speech.stream$.next({ event: 'onError', params: {type: 'error', errorMessage: code, }, });
+    Speech.stream$.next({
+      event: 'onError',
+      params: { type: 'error', errorMessage: code, },
+    });
   }
 
   static continue() {

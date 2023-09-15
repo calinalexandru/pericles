@@ -1,4 +1,3 @@
-/* eslint-disable-next-line no-undef */
 export type UtteranceEvent = chrome.tts.TtsEvent;
 
 type UtteranceOptions = {
@@ -6,7 +5,6 @@ type UtteranceOptions = {
   volume?: number;
   pitch?: number;
   rate?: number;
-  /* eslint-disable-next-line no-undef */
   voice?: chrome.tts.TtsVoice;
   text: string;
   onStart?: (event: UtteranceEvent) => void;

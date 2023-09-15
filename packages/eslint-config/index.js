@@ -1,4 +1,7 @@
 module.exports = {
+  globals: {
+    chrome: 'readonly',
+  },
   extends: [
     'airbnb',
     'airbnb-typescript',

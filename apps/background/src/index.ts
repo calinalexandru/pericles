@@ -26,7 +26,7 @@ import settingsReducer from './store/reducers/settings';
 // the service worker wakes up from idle.
 let isInitialized: boolean = false;
 
-const init = async (preloadedState: RootState): Promise<void> => {
+const init = async (preloadedState: RootState): Promise<void | Error> => {
   console.log('preloadedState', preloadedState);
   const observableMiddleware = createEpicMiddleware();
   store.initialize(
@@ -58,7 +58,7 @@ const init = async (preloadedState: RootState): Promise<void> => {
     try {
       getBrowserAPI().api.tabs.query(
         { active: true, currentWindow: true, },
-        (tabs: any) => {
+        (tabs: chrome.tabs.Tab[]) => {
           const activeTab = tabs[0];
           const activeTabId = activeTab.id;
 
@@ -67,8 +67,8 @@ const init = async (preloadedState: RootState): Promise<void> => {
           resolve();
         }
       );
-    } catch (e: any) {
-      reject(e as Error);
+    } catch (e) {
+      reject(e);
     }
   });
 };
