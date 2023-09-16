@@ -1,3 +1,4 @@
+import { IDOMWalker, } from '@/interfaces/api';
 import {
   PARSER_TYPES,
   ParserIframesType,
@@ -11,6 +12,7 @@ import {
   getGoogleDocsSections,
   getGoogleDocsSectionsSvg,
   getGoogleFormsSections,
+  getLastNode,
   getOpenBookSections,
   isGoogleBook,
   isGoogleDocs,
@@ -25,8 +27,6 @@ export default class DomStrategy {
 
   userGenerated: boolean = false;
 
-  working: boolean = false;
-
   fromCursor: boolean = false;
 
   skipUntilY: number = 0;
@@ -35,9 +35,10 @@ export default class DomStrategy {
 
   parserIframes: ParserIframesType;
 
+  domWalker: IDOMWalker;
+
   constructor({
     parserType = PARSER_TYPES.DEFAULT,
-    working,
     userGenerated,
     parserIframes,
     parserKey,
@@ -45,7 +46,6 @@ export default class DomStrategy {
     fromCursor,
   }: {
     parserType: ParserTypes;
-    working?: boolean;
     userGenerated?: boolean;
     parserIframes?: ParserIframesType;
     parserKey?: number;
@@ -54,7 +54,6 @@ export default class DomStrategy {
   }) {
     console.log('DomStrategy.constructor', {
       parserType,
-      working,
       userGenerated,
       parserIframes,
       parserKey,
@@ -62,12 +61,12 @@ export default class DomStrategy {
       fromCursor,
     });
     this.type = parserType;
-    this.working = working || false;
     this.userGenerated = userGenerated || false;
     this.parserKey = parserKey || 0;
     this.skipUntilY = skipUntilY || 0;
     this.fromCursor = fromCursor || false;
     this.parserIframes = parserIframes || {};
+    this.domWalker = new DOMWalker();
   }
 
   getSections() {
@@ -110,14 +109,14 @@ export default class DomStrategy {
       //   userGenerated: this.userGenerated,
       //   playFromCursor: this.fromCursor ? this.skipUntilY : 0,
       // }));
-      const domWalker = new DOMWalker({
-        playFromCursor: this.skipUntilY,
-        userGenerated: this.userGenerated,
-        lastKey: this.parserKey,
-        node: this.userGenerated ? getElementFromPoint(0) : null,
-      });
-      domWalker.resetSentenceBuffer();
-      ({ out, blocked, } = domWalker.walk());
+      this.domWalker.playFromCursor = this.fromCursor ? this.skipUntilY : 0;
+      this.domWalker.userGenerated = this.userGenerated;
+      this.domWalker.lastKey = this.parserKey;
+      this.domWalker.node = this.userGenerated
+        ? getElementFromPoint(0)
+        : getLastNode(this.parserKey ? this.parserKey - 1 : 0);
+      this.domWalker.resetSentenceBuffer();
+      ({ out, blocked, } = this.domWalker.walk());
     }
 
     return {

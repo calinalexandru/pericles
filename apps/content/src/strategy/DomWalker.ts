@@ -14,13 +14,6 @@ import AnyNodeProcessor from './AnyNodeProcessor';
 import ElementNodeProcessor from './ElementNodeProcessor';
 import TextNodeProcessor from './TextNodeProcessor';
 
-interface WalkTheDOMParams {
-  node?: Node | null;
-  lastKey: number;
-  userGenerated: boolean;
-  playFromCursor: number;
-}
-
 interface WalkTheDOMResult {
   out: SectionType[];
   blocked: boolean;
@@ -48,11 +41,7 @@ export default class DOMWalker implements IDOMWalker {
 
   public results: WalkTheDOMResult[] = [];
 
-  constructor(params: WalkTheDOMParams) {
-    this.node = params.node || this.storedNode;
-    this.lastKey = params.lastKey;
-    this.userGenerated = params.userGenerated;
-    this.playFromCursor = params.playFromCursor;
+  constructor() {
     this.processors = [
       new TextNodeProcessor(),
       new ElementNodeProcessor(),

@@ -55,6 +55,7 @@ export const determineVisibility = (
   playFromCursor: number,
   userGenerated: boolean
 ): boolean => {
+  console.log('determineVisibility', node, playFromCursor, userGenerated);
   if (isElementNode(node)) {
     return isVisible({
       window,
@@ -79,6 +80,8 @@ export const validateElementNode = (node: HTMLElement) => {
     isHeading(node) ||
     (!hasChildNodes(node) &&
       isMinText(getInnerText(node.innerText || node.textContent || '')));
+
+  console.log('validateElementNode', { isValidElement, isReadbleType, });
 
   return isValidElement && isReadbleType;
 };

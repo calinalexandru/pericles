@@ -3,6 +3,7 @@ export { default as canAccessIframe, } from './helpers/canAccessIframe';
 export { default as clickNextGoogleBookPage, } from './helpers/clickNextGoogleBookPage';
 export { default as clickPrevGoogleBookPage, } from './helpers/clickPrevGoogleBookPage';
 export { default as compareValuesWithMargin, } from './helpers/compareValuesWithMargin';
+export { default as getLastNode, } from './html/getLastNode';
 export { default as findAvailableIframe, } from './helpers/findAvailableIframe';
 /* helpers */
 export { default as findWorkingIframe, } from './helpers/findWorkingIframe';
