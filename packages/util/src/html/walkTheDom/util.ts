@@ -1,37 +1,24 @@
 import { SectionType, } from '@pericles/constants';
 
-import getSentencesFromText from '../../nlp/getSentencesFromText';
 import isElementNode from '../../predicates/isElementNode';
 import isHeading from '../../predicates/isHeading';
-import isMaxText from '../../predicates/isMaxText';
 import isMinText from '../../predicates/isMinText';
 import isParagraph from '../../predicates/isParagraph';
-import isSkippableByDesign from '../../predicates/isSkippableByDesign';
 import isValidTag from '../../predicates/isValidTag';
-import isWikipedia from '../../predicates/isWikipedia';
 import getInnerText from '../../string-work/getInnerText';
-import alterDom from '../alterDom';
-import alterNode from '../alterNode';
-import appendWindowSentenceBuffer from '../appendWindowSentenceBuffer';
-import findNextSibling from '../findNextSibling';
-import getSelfIframes from '../getSelfIframes';
-import getWindowSentenceBuffer from '../getWindowSentenceBuffer';
 import hasChildNodes from '../hasChildNodes';
 import isVisible from '../isVisible';
 import isVisibleNode from '../isVisibleNode';
-import removeHelperTags from '../removeHelperTags';
 import removeHTMLSpaces from '../removeHTMLSpaces';
-import sectionQuerySelector from '../sectionQuerySelector';
-import setWindowSentenceBuffer from '../setWindowSentenceBuffer';
 
-type Position = {
+export type Position = {
   top: number;
   width: number;
   height: number;
 };
 
-const getPosition = (
-  node: Element | HTMLElement | Text,
+export const getPosition = (
+  node: Node | Element | HTMLElement | Text,
   relativeToParent = false
 ): Position => {
   const element: Element =
@@ -63,41 +50,6 @@ export const pushSection = (
   return buffer;
 };
 
-export const pushAndClearBuffer = (
-  buffer: SectionType[],
-  lastKey: number
-): SectionType[] => {
-  //   console.log('pushAndClearBuffer', { buffer, lastKey, });
-  if (getWindowSentenceBuffer()?.text?.length) {
-    if (isMinText(getWindowSentenceBuffer()?.text || '')) {
-      const { text, top, width, height, } = getWindowSentenceBuffer();
-      buffer.push({ text, pos: { top, width, height, }, } as SectionType);
-    } else {
-      const nodesInFrame: HTMLElement[] = getSelfIframes().reduce(
-        (acc, iframe) => [
-          ...acc,
-          ...Array.from(
-            iframe.document.querySelectorAll<HTMLElement>(
-              sectionQuerySelector(lastKey + buffer.length)
-            )
-          ),
-        ],
-        [] as HTMLElement[]
-      );
-      removeHelperTags(
-        Array.from(
-          document.querySelectorAll<HTMLElement>(
-            sectionQuerySelector(lastKey + buffer.length)
-          )
-        )
-      );
-      if (nodesInFrame.length) removeHelperTags(nodesInFrame);
-    }
-    setWindowSentenceBuffer({});
-  }
-  return buffer;
-};
-
 export const determineVisibility = (
   node: Node,
   playFromCursor: number,
@@ -113,116 +65,6 @@ export const determineVisibility = (
   }
 
   return isVisibleNode({ window, node, fromCursorY: playFromCursor, });
-};
-
-export const pushNode = (text: string, node: HTMLElement | Text): void => {
-  const pos = getPosition(node, true);
-  const outer = { text, ...pos, };
-  appendWindowSentenceBuffer(outer);
-};
-
-export const processTextNode = (
-  node: Text,
-  buffer: SectionType[],
-  lastKey: number
-): {
-  nextNode: HTMLElement | null;
-  nextAfterIframe: HTMLElement | null;
-} => {
-  console.log('util.processTextNode', node);
-  let nextNode;
-  let parents: HTMLElement[] = [];
-  let nextAfterIframe;
-  let firstParagraph: any;
-
-  if (
-    node.nodeValue &&
-    isMaxText(removeHTMLSpaces(getInnerText(node.nodeValue)))
-  ) {
-    const sentences = getSentencesFromText(node.nodeValue) || [];
-    firstParagraph = sentences[0] || {};
-    parents = [];
-
-    // Ensure nodeValue is defined and is a string
-    const nodeValueLength = node.nodeValue.length;
-
-    // Ensure firstParagraph.text is defined and is a string
-    const firstParagraphLength = firstParagraph.text
-      ? firstParagraph.text.length
-      : 0;
-
-    nextNode = node.splitText(
-      firstParagraph && nodeValueLength >= firstParagraphLength
-        ? firstParagraphLength
-        : Math.floor(nodeValueLength / 2)
-    );
-  } else {
-    const result = findNextSibling(node, true);
-    if (result !== null && 'next' in result && 'parents' in result) {
-      ({ next: nextNode, parents, nextAfterIframe, } = result);
-    }
-  }
-
-  const nodeText = getInnerText(node.nodeValue || '');
-  pushNode(nodeText, node);
-  alterNode(node, lastKey + buffer.length);
-
-  if (firstParagraph || (parents.length && parents[0].tagName !== 'A')) {
-    pushAndClearBuffer(buffer, lastKey);
-  }
-
-  return {
-    nextNode: nextNode as HTMLElement,
-    nextAfterIframe: nextAfterIframe as HTMLElement,
-  };
-};
-
-export const processElementNode = (
-  node: HTMLElement,
-  buffer: SectionType[],
-  lastKey: number
-) => {
-  console.log('util.processElementNode', node);
-  let nextAfterIframe: HTMLElement | null = null;
-  let nextNode: HTMLElement | null = null;
-
-  pushAndClearBuffer(buffer, lastKey);
-  alterDom(node, lastKey + buffer.length);
-  pushSection(
-    buffer,
-    node,
-    getInnerText(node.innerText || node.textContent || '')
-  );
-  const result = findNextSibling(node, true);
-  if (result !== null && 'next' in result) {
-    ({ next: nextNode, nextAfterIframe = null, } = result);
-  }
-
-  return { nextNode, nextAfterIframe, };
-};
-
-export const processAnyNode = (
-  node: Node,
-  playFromCursor: number,
-  userGenerated: boolean
-) => {
-  console.log('util.processAnyNode', node);
-  const nextSiblingResult = findNextSibling(node, true);
-  const isVisibleNodeOrText = determineVisibility(
-    node,
-    playFromCursor,
-    userGenerated
-  );
-  const result: any =
-    (isWikipedia() && isSkippableByDesign(node)) || !isVisibleNodeOrText
-      ? nextSiblingResult
-      : node.childNodes[0]
-        ? { next: node.childNodes[0], }
-        : nextSiblingResult;
-
-  const { next: nextNode, nextAfterIframe, } = result;
-
-  return { nextNode, nextAfterIframe, };
 };
 
 export const validateElementNode = (node: HTMLElement) => {

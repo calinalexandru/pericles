@@ -11,16 +11,13 @@ import {
   getGoogleDocsSections,
   getGoogleDocsSectionsSvg,
   getGoogleFormsSections,
-  getLastNode,
   getOpenBookSections,
-  getStoredNode,
   isGoogleBook,
   isGoogleDocs,
   isGoogleDocsSvg,
-  isIframeParsing,
-  setWindowSentenceBuffer,
-  walkTheDOM,
 } from '@pericles/util';
+
+import DOMWalker from './DomWalker';
 
 export default class DomStrategy {
 
@@ -55,6 +52,15 @@ export default class DomStrategy {
     skipUntilY?: number;
     fromCursor?: boolean;
   }) {
+    console.log('DomStrategy.constructor', {
+      parserType,
+      working,
+      userGenerated,
+      parserIframes,
+      parserKey,
+      skipUntilY,
+      fromCursor,
+    });
     this.type = parserType;
     this.working = working || false;
     this.userGenerated = userGenerated || false;
@@ -65,14 +71,14 @@ export default class DomStrategy {
   }
 
   getSections() {
-    const { hostname, } = window.location;
+    // const { hostname, } = window.location;
     let pageIndex = 0;
     let maxPage = 0;
     let out = [];
     let blocked = false;
-    const nextNode = this.working
-      ? getStoredNode()
-      : getLastNode(this.parserKey ? this.parserKey - 1 : 0);
+    // const nextNode = this.working
+    //   ? getStoredNode()
+    //   : getLastNode(this.parserKey ? this.parserKey - 1 : 0);
     if (isGoogleBook(this.type)) {
       pageIndex = getGoogleBookPage(window);
       ({ maxPage, out, } = getGoogleBookSections());
@@ -89,21 +95,29 @@ export default class DomStrategy {
       ({ maxPage, out, } = getOpenBookSections(1));
       console.log('open-book.sections', out);
     } else {
-      setWindowSentenceBuffer('');
-      ({ out, blocked, } = walkTheDOM({
-        node:
-          !this.working && this.userGenerated
-            ? getElementFromPoint(
-              (isIframeParsing(hostname, this.parserIframes) &&
-                  this.parserIframes?.[hostname]?.top) ||
-                  0
-            )
-            : nextNode,
-        buffer: [],
-        lastKey: this.parserKey,
+      // setWindowSentenceBuffer('');
+      // ({ out, blocked, } = walkTheDOM({
+      //   node:
+      //     !this.working && this.userGenerated
+      //       ? getElementFromPoint(
+      //         (isIframeParsing(hostname, this.parserIframes) &&
+      //             this.parserIframes?.[hostname]?.top) ||
+      //             0
+      //       )
+      //       : nextNode,
+      //   buffer: [],
+      //   lastKey: this.parserKey,
+      //   userGenerated: this.userGenerated,
+      //   playFromCursor: this.fromCursor ? this.skipUntilY : 0,
+      // }));
+      const domWalker = new DOMWalker({
+        playFromCursor: this.skipUntilY,
         userGenerated: this.userGenerated,
-        playFromCursor: this.fromCursor ? this.skipUntilY : 0,
-      }));
+        lastKey: this.parserKey,
+        node: this.userGenerated ? getElementFromPoint(0) : null,
+      });
+      domWalker.resetSentenceBuffer();
+      ({ out, blocked, } = domWalker.walk());
     }
 
     return {

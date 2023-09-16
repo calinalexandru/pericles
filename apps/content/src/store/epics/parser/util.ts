@@ -157,11 +157,20 @@ export const mapPayloadToResponse = (
     return {
       fromCursor,
       skip: true,
-      message: 'no html found',
       iframes,
       isIframe,
       sections: [],
-      end: true,
+      end:
+        (
+          [
+            PARSER_TYPES.GOOGLE_DOC,
+            PARSER_TYPES.GOOGLE_DOC_SVG,
+            PARSER_TYPES.GOOGLE_BOOK,
+            PARSER_TYPES.GOOGLE_FORM,
+          ] as ParserTypes[]
+        ).includes(parserType) ||
+        out.length < ATTRIBUTES.MISC.MIN_SECTIONS ||
+        blocked,
       type: parserType,
       maxPage,
       tab,
@@ -223,8 +232,8 @@ export const processResponse = (
       routeErrorPdf(),
     ]);
   }
-  if (skip) {
-    if (!isIframe && !sectionsArr.length && end && iframes) {
+  if (!end && skip) {
+    if (!isIframe && !sectionsArr.length && iframes) {
       console.log('got into the iframe garbage');
       const availableIframeKey: string | boolean = findAvailableIframe(
         iframes as unknown as ParserIframesType

@@ -2,8 +2,7 @@ import { ATTRIBUTES, } from '@pericles/constants';
 
 import getMarginsForScanBlock from '../math/getMarginsForScanBlock';
 
-import getLastNode from './getLastNode';
-// import getSelfIframes from './getSelfIframes';
+import getFirstNode from './getFirstNode';
 
 const comparator = (expr1: boolean, expr2: boolean): number => {
   if (expr1 && !expr2) return -1;
@@ -89,5 +88,5 @@ export default function getElementFromPoint(offset: number): HTMLElement {
       compareByChildNodeCount(a, b)
   );
 
-  return sortedElems1[0] || getLastNode();
+  return sortedElems1[0] || getFirstNode();
 }
