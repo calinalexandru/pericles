@@ -32,9 +32,9 @@ export default class AnyNodeProcessor implements NodeProcessingStrategy {
           ? { next: node.childNodes[0], }
           : nextSiblingResult;
 
-    const { next: nextNode, nextAfterIframe, } = result;
+    const { next: nextNode, nextAfterIframe, iframeBlocked, } = result;
 
-    return { nextNode, nextAfterIframe, };
+    return { nextNode, nextAfterIframe, iframeBlocked, };
   }
 
 }

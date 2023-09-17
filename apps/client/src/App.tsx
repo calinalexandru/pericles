@@ -105,13 +105,13 @@ const App: React.FC = () => {
   // with the initial playerStatus found in state
   // on application mount to decide
   // if we want to dispatch a heath check
-  useEffect(() => {
-    if (!isStopped(playerStatus)) {
-      dispatch(playerHealthCheck());
-    }
+  // useEffect(() => {
+  //   // if (!isStopped(playerStatus)) {
+  //   //   dispatch(playerHealthCheck());
+  //   // }
 
-    /* eslint-disable react-hooks/exhaustive-deps */
-  }, [ dispatch, ]);
+  //   /* eslint-disable react-hooks/exhaustive-deps */
+  // }, [ dispatch, ]);
 
   const onKeyUp = (e: KeyboardEvent) => {
     if (disableHotkeys) return;

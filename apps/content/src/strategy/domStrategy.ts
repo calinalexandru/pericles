@@ -17,6 +17,7 @@ import {
   isGoogleBook,
   isGoogleDocs,
   isGoogleDocsSvg,
+  isIframeParsing,
 } from '@pericles/util';
 
 import DOMWalker from './DomWalker';
@@ -70,11 +71,12 @@ export default class DomStrategy {
   }
 
   getSections() {
-    // const { hostname, } = window.location;
+    const { hostname, } = window.location;
     let pageIndex = 0;
     let maxPage = 0;
     let out = [];
-    let blocked = false;
+    let end = false;
+    let iframeBlocked = false;
     // const nextNode = this.working
     //   ? getStoredNode()
     //   : getLastNode(this.parserKey ? this.parserKey - 1 : 0);
@@ -113,16 +115,21 @@ export default class DomStrategy {
       this.domWalker.userGenerated = this.userGenerated;
       this.domWalker.lastKey = this.parserKey;
       this.domWalker.node = this.userGenerated
-        ? getElementFromPoint(0)
+        ? getElementFromPoint(
+          (isIframeParsing(hostname, this.parserIframes) &&
+              this.parserIframes?.[hostname]?.top) ||
+              0
+        )
         : getLastNode(this.parserKey ? this.parserKey - 1 : 0);
       this.domWalker.resetSentenceBuffer();
-      ({ out, blocked, } = this.domWalker.walk());
+      ({ out, end, iframeBlocked, } = this.domWalker.walk());
     }
 
     return {
       out,
       maxPage,
-      blocked,
+      end,
+      iframeBlocked,
       pageIndex,
     };
   }

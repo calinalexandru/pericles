@@ -131,15 +131,11 @@ export default class ChromeSynth extends BaseSynth implements ISynth {
   pause() {
     console.log('synth.chrome.pause', this.text);
     this.synth.pause();
-    this.clearResumeInfinity();
-    // this.onPause();
   }
 
   resume() {
     console.log('synth.chrome.resume', this.text);
     this.synth.resume();
-    this.activateResumeInfinity();
-    // this.onResume();
   }
 
 }

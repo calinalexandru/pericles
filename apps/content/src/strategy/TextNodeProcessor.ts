@@ -36,6 +36,7 @@ export default class TextNodeProcessor implements NodeProcessingStrategy {
     let parents: Node[] = [];
     let nextAfterIframe: Node | null = null;
     let firstParagraph: { text: string } | null = null;
+    let iframeBlocked = false;
 
     if (
       node.nodeValue &&
@@ -60,7 +61,7 @@ export default class TextNodeProcessor implements NodeProcessingStrategy {
     } else {
       const result = findNextSiblingWithParents(node);
       if (result !== null && 'next' in result && 'parents' in result) {
-        ({ next: nextNode, parents, nextAfterIframe, } = result);
+        ({ next: nextNode, parents, nextAfterIframe, iframeBlocked, } = result);
       }
     }
 
@@ -78,6 +79,7 @@ export default class TextNodeProcessor implements NodeProcessingStrategy {
     }
 
     return {
+      iframeBlocked,
       nextNode,
       nextAfterIframe: nextAfterIframe || null,
     };

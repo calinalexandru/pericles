@@ -28,9 +28,9 @@ export default class ElementNodeProcessor implements NodeProcessingStrategy {
   }
 
   process(node: HTMLElement, walkerInstance: IDOMWalker): ProcessResult {
-    console.log('ElementNodeProcessor.process', node);
     let nextAfterIframe: Node | null = null;
     let nextNode: Node | null = null;
+    let iframeBlocked: boolean = false;
 
     walkerInstance.pushAndClearBuffer();
     alterDom(node, walkerInstance.lastKey + walkerInstance.sections.length);
@@ -39,11 +39,12 @@ export default class ElementNodeProcessor implements NodeProcessingStrategy {
       getInnerText(node.innerText || node.textContent || '')
     );
     const result = findNextSiblingWithParents(node);
+    console.log('ElementNodeProcessor.process', node, result);
     if (result !== null && 'next' in result) {
-      ({ next: nextNode, nextAfterIframe = null, } = result);
+      ({ next: nextNode, nextAfterIframe = null, iframeBlocked, } = result);
     }
 
-    return { nextNode, nextAfterIframe, };
+    return { nextNode, nextAfterIframe, iframeBlocked, };
   }
 
 }

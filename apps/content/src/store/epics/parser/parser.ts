@@ -57,7 +57,7 @@ export const getSectionsAndPlayEpic: Epic<
   action$.pipe(
     ofType(sectionsRequestAndPlay.request),
     pluck('payload'),
-    filter((payload: any) => payload?.iframe === false),
+    // filter((payload: any) => payload?.iframe === false),
     logInitialData(),
     withLatestFrom(state$),
     map(([ payload, state, ]) => mapPayloadToResponse(payload, state)),

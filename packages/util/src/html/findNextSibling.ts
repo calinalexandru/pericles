@@ -4,6 +4,7 @@ import canAccessIframe from '../helpers/canAccessIframe';
 import getIframeDocument from '../helpers/getIframeDocument';
 
 type SiblingWithParents = {
+  iframeBlocked: boolean;
   next: Node | null;
   parents: Node[];
   nextAfterIframe: Node | null;
@@ -42,12 +43,15 @@ function findImmediateSibling(el: Node): Node | null {
  * @param {HTMLIFrameElement} el - The iframe element.
  * @returns {Node | null} - The sibling node or null.
  */
-function getNextSiblingFromIframe(el: HTMLIFrameElement): Node | null {
+function getNextSiblingFromIframe(el: HTMLIFrameElement): {
+  node: Node | null;
+  iframeBlocked: boolean;
+} {
   const nextIframeSibling = findNextSiblingInIframe(el);
   if (nextIframeSibling) {
-    return nextIframeSibling;
+    return { node: nextIframeSibling, iframeBlocked: false, };
   }
-  return findNextSibling(el, false);
+  return findNextSibling(el, false, true);
 }
 
 /**
@@ -59,8 +63,16 @@ function getNextSiblingFromIframe(el: HTMLIFrameElement): Node | null {
  */
 export function findNextSibling(
   el: Node,
-  accessIframe: boolean = true
-): Node | null {
+  accessIframe: boolean = true,
+  previousIframeBlocked: boolean = false
+): { node: Node | null; iframeBlocked: boolean } {
+  if (previousIframeBlocked === true) {
+    return {
+      node: el,
+      iframeBlocked: true,
+    };
+  }
+
   if (
     el instanceof HTMLIFrameElement &&
     accessIframe &&
@@ -69,10 +81,10 @@ export function findNextSibling(
     return getNextSiblingFromIframe(el);
   }
 
-  return findImmediateSibling(el);
+  return { node: findImmediateSibling(el), iframeBlocked: false, };
 }
 
-/**
+/* *
  * Finds the next sibling of a node and gathers all of its parent nodes.
  * For iframes, it retrieves the sibling both inside and outside the iframe.
  * @param {Node} el - The starting node.
@@ -84,20 +96,21 @@ export function findNextSiblingWithParents(
   accessIframe: boolean = true
 ): SiblingWithParents {
   const parents: Node[] = [];
-  const sibling = findNextSibling(el, accessIframe);
-
+  let nextAfterIframe: Node | null = null;
+  const { node: sibling, iframeBlocked, } = findNextSibling(el, accessIframe);
+  if (accessIframe === true && iframeBlocked) {
+    if (sibling instanceof Node) {
+      ({ node: nextAfterIframe, } = findNextSibling(sibling, false));
+    }
+    return { iframeBlocked: true, next: sibling, parents, nextAfterIframe, };
+  }
   let parent = el.parentNode;
   while (parent) {
     parents.push(parent);
     parent = parent.parentNode;
   }
-
-  return {
-    next: sibling,
-    parents,
-    nextAfterIframe:
-      sibling instanceof HTMLIFrameElement
-        ? findNextSibling(sibling, accessIframe)
-        : null,
-  };
+  if (sibling instanceof HTMLIFrameElement) {
+    ({ node: nextAfterIframe, } = findNextSibling(sibling, false));
+  }
+  return { iframeBlocked: false, next: sibling, parents, nextAfterIframe, };
 }

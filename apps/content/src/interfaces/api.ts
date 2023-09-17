@@ -17,6 +17,7 @@ export interface MaybeAction {
 export interface ProcessResult {
   nextNode: Node | null;
   nextAfterIframe: Node | null;
+  iframeBlocked: boolean;
 }
 
 export interface NodeProcessingStrategy {
@@ -37,7 +38,8 @@ export interface IProcessResult {
 
 export interface IWalkTheDOMResult {
   out: SectionType[];
-  blocked: boolean;
+  end: boolean;
+  iframeBlocked: boolean;
 }
 
 export interface IWalkTheDOMParams {

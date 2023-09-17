@@ -31,13 +31,9 @@ export default function getLastNode(parserKey: number = 0): HTMLElement {
     lastSection = iframeSections[iframeSections.length - 1];
   }
 
-  const out = (
-    lastSection ? findNextSibling(lastSection) : getFirstNode()
-  ) as HTMLElement;
-  console.log(
-    'getLastNode.lastSection',
-    lastSection,
-    findNextSibling(lastSection)
-  );
-  return out;
+  if (lastSection) {
+    return findNextSibling(lastSection).node;
+  }
+
+  return getFirstNode();
 }

@@ -89,7 +89,7 @@ export { default as isReady, } from './predicates/isReady';
 export { default as isSkippableByDesign, } from './predicates/isSkippableByDesign';
 export { default as isStopped, } from './predicates/isStopped';
 export { default as isTextNode, } from './predicates/isTextNode';
-export { default as isValidTag, } from './predicates/isValidTag';
+export { default as isNode, } from './predicates/isNode';
 export { default as isWaiting, } from './predicates/isWaiting';
 export { default as isWikipedia, } from './predicates/isWikipedia';
 export { default as isHtmlElement, } from './predicates/isHtmlElement';

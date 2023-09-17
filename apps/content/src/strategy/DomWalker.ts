@@ -5,10 +5,10 @@ import {
   getPosition,
   getSelfIframes,
   isMinText,
+  isNode,
   removeHelperTags,
   sectionQuerySelector,
 } from '@pericles/util';
-import isValidNode from '@pericles/util/src/predicates/isValidNode';
 
 import AnyNodeProcessor from './AnyNodeProcessor';
 import ElementNodeProcessor from './ElementNodeProcessor';
@@ -16,7 +16,8 @@ import TextNodeProcessor from './TextNodeProcessor';
 
 interface WalkTheDOMResult {
   out: SectionType[];
-  blocked: boolean;
+  iframeBlocked: boolean;
+  end: boolean;
 }
 
 export default class DOMWalker implements IDOMWalker {
@@ -118,26 +119,34 @@ export default class DOMWalker implements IDOMWalker {
   walk(): WalkTheDOMResult {
     const stack: (Node | null)[] = [ this.node, ];
     let nextNode: Node | null = null;
+    let iframeBlocked = false;
     while (stack.length) {
       const node = stack.pop();
+      console.log('DomWalker.walk', node);
       let nextAfterIframe: Node | null = null;
 
-      if (!isValidNode(node)) {
+      if (!isNode(node)) {
         this.pushAndClearBuffer();
         return {
+          iframeBlocked: false,
           out: this.sections,
-          blocked: true,
+          end: true,
         };
       }
 
       for (const processor of this.processors) {
         if (processor.shouldProcess(node, this)) {
-          ({ nextNode, nextAfterIframe, } = processor.process(node, this));
+          ({ nextNode, nextAfterIframe, iframeBlocked, } = processor.process(
+            node,
+            this
+          ));
           break;
         }
       }
 
-      if (!nextNode && this.storedIframeNode) {
+      console.log('DomWalker.walk.nextNode', nextNode);
+
+      if (iframeBlocked && this.storedIframeNode) {
         nextNode = this.storedIframeNode;
         this.storedIframeNode = null;
       }
@@ -150,6 +159,7 @@ export default class DOMWalker implements IDOMWalker {
       if (nextNode) {
         this.storedNode = nextNode;
         if (this.sections.length < ATTRIBUTES.MISC.MIN_SECTIONS) {
+          console.log('DomWalker.walk stackPush.nextNode', nextNode);
           stack.push(nextNode);
         }
       } else {
@@ -159,7 +169,8 @@ export default class DOMWalker implements IDOMWalker {
 
     return {
       out: this.sections,
-      blocked: !nextNode,
+      iframeBlocked,
+      end: !nextNode,
     };
   }
 

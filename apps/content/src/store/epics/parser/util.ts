@@ -74,6 +74,7 @@ export type PayloadResponseType = {
   sections?: SectionType[];
   end?: boolean;
   isIframe?: boolean;
+  iframeBlocked?: boolean;
   pageIndex?: number;
   tab?: number;
   iframes?: ParserIframesType;
@@ -122,7 +123,6 @@ export const mapPayloadToResponse = (
     {};
   const userGenerated = payload?.userGenerated || false;
   const fromCursor = payload.fromCursor || false;
-  const working = payload.working || false;
   const tab = payload.tab || 0;
   const parserKey = parserKeySelector(state);
   const voiceProp = settingsVoiceSelector(state);
@@ -141,20 +141,22 @@ export const mapPayloadToResponse = (
     parserKey,
     parserIframes,
     fromCursor,
-    working,
   });
 
-  const { out, maxPage, pageIndex, blocked, } = domStrategy.getSections();
+  const { out, maxPage, pageIndex, end, iframeBlocked, } =
+    domStrategy.getSections();
 
   console.log('domStrategy.getSections', {
     out,
     maxPage,
     pageIndex,
-    blocked,
+    end,
+    iframeBlocked,
   });
 
   if (!out.length)
     return {
+      iframeBlocked,
       fromCursor,
       skip: true,
       iframes,
@@ -170,7 +172,7 @@ export const mapPayloadToResponse = (
           ] as ParserTypes[]
         ).includes(parserType) ||
         out.length < ATTRIBUTES.MISC.MIN_SECTIONS ||
-        blocked,
+        end,
       type: parserType,
       maxPage,
       tab,
@@ -186,6 +188,7 @@ export const mapPayloadToResponse = (
   );
 
   return {
+    iframeBlocked,
     sections: out.map(({ text, pos, }) => ({ text, ...(pos && { pos, }), })),
     fromCursor,
     iframes,
@@ -200,7 +203,7 @@ export const mapPayloadToResponse = (
         ] as ParserTypes[]
       ).includes(parserType) ||
       sectionsArr.length < ATTRIBUTES.MISC.MIN_SECTIONS ||
-      blocked,
+      end,
     maxPage,
     pageIndex,
     type: parserType,
@@ -214,10 +217,11 @@ export const processResponse = (
     message = '',
     skip = false,
     end = false,
+    iframeBlocked = false,
     maxPage = 0,
     type = PARSER_TYPES.DEFAULT,
     pageIndex = 0,
-    iframes,
+    iframes = {},
     isIframe = false,
     sections: sectionsArr = [],
     tab = 0,
@@ -233,11 +237,9 @@ export const processResponse = (
     ]);
   }
   if (!end && skip) {
-    if (!isIframe && !sectionsArr.length && iframes) {
+    if (!isIframe && iframeBlocked) {
       console.log('got into the iframe garbage');
-      const availableIframeKey: string | boolean = findAvailableIframe(
-        iframes as unknown as ParserIframesType
-      );
+      const availableIframeKey: string | boolean = findAvailableIframe(iframes);
       let newIframes = iframes;
       if (availableIframeKey !== false) {
         newIframes = {
@@ -285,7 +287,7 @@ export const processResponse = (
       ? [
         setSections({ sections: mergeSections, }),
         setParser({
-          iframes,
+          ...(iframes && { iframes, }),
           key: mergeSections.length,
           end,
           type,
