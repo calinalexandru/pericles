@@ -36,7 +36,7 @@ export default class ElementNodeProcessor implements NodeProcessingStrategy {
     }
 
     return {
-      pushAndClearBufferBefore: true,
+      finalizeSentenceBufferBefore: true,
       domAlterations,
       sectionToAdd: {
         text: getInnerText(node.innerText || node.textContent || ''),

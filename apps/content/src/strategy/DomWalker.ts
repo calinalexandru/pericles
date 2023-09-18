@@ -42,6 +42,8 @@ export default class DOMWalker implements IDOMWalker {
 
   private nodeAfterIframe: Node | null;
 
+  domAlterationsBatch: { fn: (key: number) => void; data: number }[] = [];
+
   constructor() {
     this.processors = [
       new TextNodeProcessor(),
@@ -79,7 +81,7 @@ export default class DOMWalker implements IDOMWalker {
     this.sections.push({ node, text, pos, });
   }
 
-  pushAndClearBuffer(): void {
+  finalizeSentenceBuffer(): void {
     if (!this.sentenceBuffer) return;
 
     if (isMinText(this.sentenceBuffer.text)) {
@@ -103,84 +105,114 @@ export default class DOMWalker implements IDOMWalker {
     return { nextNode: null, nextAfterIframe: null, iframeBlocked: false, };
   }
 
-  walk(): WalkTheDOMResult {
+  handleNodeAfterIframe(): void {
     if (this.nodeAfterIframe) {
       this.node = this.nodeAfterIframe;
       this.nodeAfterIframe = null;
     }
+  }
 
-    const stack: (Node | null)[] = [ this.node, ];
-    let nextNode: Node | null = null;
-    const iframeBlocked = false;
-    while (stack.length) {
-      const node = stack.pop();
+  processAndHandleNode(node: Node): {
+    nextNode: Node | null;
+    iframeBlocked: boolean;
+  } {
+    const {
+      finalizeSentenceBufferAfter,
+      finalizeSentenceBufferBefore,
+      nodeToAdd,
+      domAlterations,
+      sectionToAdd,
+      nextNode,
+      nextAfterIframe,
+      iframeBlocked: processorIframeBlocked,
+    } = this.processNode(node);
 
-      if (!isNode(node)) {
-        this.pushAndClearBuffer();
-        return {
-          iframeBlocked: false,
-          out: this.sections,
-          end: true,
-        };
-      }
-
-      const {
-        pushAndClearBufferAfter,
-        pushAndClearBufferBefore,
-        nodeToAdd,
-        domAlterations,
-        sectionToAdd,
-        nextNode: processorNextNode,
-        nextAfterIframe,
-        iframeBlocked: processorIframeBlocked,
-      } = this.processNode(node);
-
-      if (pushAndClearBufferBefore) {
-        this.pushAndClearBuffer();
-      }
-
-      if (domAlterations) {
-        domAlterations(this.lastKey + this.sections.length);
-      }
-
-      if (sectionToAdd) {
-        this.pushSection(sectionToAdd.node, sectionToAdd.text);
-      }
-
-      if (nodeToAdd) {
-        this.pushNode(nodeToAdd.text, nodeToAdd.node);
-      }
-
-      if (pushAndClearBufferAfter) {
-        this.pushAndClearBuffer();
-      }
-
-      if (processorIframeBlocked && nextAfterIframe) {
-        this.nodeAfterIframe = nextAfterIframe;
-      }
-
-      if (processorIframeBlocked) {
-        this.pushAndClearBuffer();
-        return {
-          out: this.sections,
-          iframeBlocked: true,
-          end: true,
-        };
-      }
-
-      nextNode = processorNextNode;
-      if (nextNode && this.sections.length < ATTRIBUTES.MISC.MIN_SECTIONS) {
-        stack.push(nextNode);
-      } else {
-        this.pushAndClearBuffer();
-      }
+    if (finalizeSentenceBufferBefore) {
+      this.finalizeSentenceBuffer();
     }
+
+    if (domAlterations) {
+      this.domAlterationsBatch.push({
+        fn: domAlterations,
+        data: this.lastKey + this.sections.length,
+      });
+    }
+
+    if (sectionToAdd) {
+      this.pushSection(sectionToAdd.node, sectionToAdd.text);
+    }
+
+    if (nodeToAdd) {
+      this.pushNode(nodeToAdd.text, nodeToAdd.node);
+    }
+
+    if (finalizeSentenceBufferAfter) {
+      this.finalizeSentenceBuffer();
+    }
+
+    if (processorIframeBlocked && nextAfterIframe) {
+      this.nodeAfterIframe = nextAfterIframe;
+    }
+
+    return { nextNode, iframeBlocked: processorIframeBlocked, };
+  }
+
+  pushNextNodeOntoStack(stack: (Node | null)[], nextNode: Node | null): void {
+    if (
+      isNode(nextNode) &&
+      this.sections.length < ATTRIBUTES.MISC.MIN_SECTIONS
+    ) {
+      stack.push(nextNode);
+    }
+  }
+
+  processBatchedDomAlterations(): void {
+    for (const alteration of this.domAlterationsBatch) {
+      alteration.fn(alteration.data);
+    }
+    this.domAlterationsBatch = [];
+  }
+
+  finalizeWalk(
+    nextNode: Node | null,
+    end?: boolean,
+    iframeBlocked?: boolean
+  ): WalkTheDOMResult {
+    this.finalizeSentenceBuffer();
+
+    this.processBatchedDomAlterations();
 
     return {
       out: this.sections,
-      iframeBlocked,
-      end: !nextNode,
+      iframeBlocked: iframeBlocked || false,
+      end: end || !nextNode,
     };
+  }
+
+  walk(): WalkTheDOMResult {
+    this.handleNodeAfterIframe();
+
+    const stack: (Node | null)[] = [ this.node, ];
+    let nextNode: Node | null = null;
+
+    while (stack.length) {
+      const node = stack.pop();
+
+      if (!isNode(node)) return this.finalizeWalk(null);
+
+      const {
+        nextNode: processorNextNode,
+        iframeBlocked: processorIframeBlocked,
+      } = this.processAndHandleNode(node);
+
+      this.pushNextNodeOntoStack(stack, processorNextNode);
+
+      if (processorIframeBlocked) return this.finalizeWalk(null, true, true);
+
+      nextNode = processorNextNode;
+    }
+
+    return this.finalizeWalk(nextNode);
   }
 
 }

@@ -75,7 +75,7 @@ export default class TextNodeProcessor implements NodeProcessingStrategy {
 
     return {
       domAlterations,
-      pushAndClearBufferAfter: !!firstParagraph,
+      finalizeSentenceBufferAfter: !!firstParagraph,
       nodeToAdd: {
         text: getInnerText(node.nodeValue || ''),
         node,

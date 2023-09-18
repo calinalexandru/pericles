@@ -18,8 +18,8 @@ export interface ProcessResult {
   nextNode: Node | null;
   nextAfterIframe: Node | null;
   iframeBlocked: boolean;
-  pushAndClearBufferBefore?: boolean;
-  pushAndClearBufferAfter?: boolean;
+  finalizeSentenceBufferBefore?: boolean;
+  finalizeSentenceBufferAfter?: boolean;
   sectionToAdd?: { node: HTMLElement; text: string };
   nodeToAdd?: { node: Text; text: string };
   domAlterations?: (key: number) => void;
@@ -73,6 +73,6 @@ export interface IDOMWalker {
   }): void;
   pushNode(text: string, node: HTMLElement | Text): void;
   pushSection(node: HTMLElement, text: string): void;
-  pushAndClearBuffer(): void;
+  finalizeSentenceBuffer(): void;
   walk(): IWalkTheDOMResult;
 }
