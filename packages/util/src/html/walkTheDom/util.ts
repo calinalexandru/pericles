@@ -1,7 +1,7 @@
 import { SectionType, } from '@pericles/constants';
 
-import isElementNode from '../../predicates/isElementNode';
 import isHeading from '../../predicates/isHeading';
+import isHTMLElement from '../../predicates/isHtmlElement';
 import isMinText from '../../predicates/isMinText';
 import isParagraph from '../../predicates/isParagraph';
 import isValidTag from '../../predicates/isValidTag';
@@ -56,7 +56,7 @@ export const determineVisibility = (
   userGenerated: boolean
 ): boolean => {
   console.log('determineVisibility', node, playFromCursor, userGenerated);
-  if (isElementNode(node)) {
+  if (isHTMLElement(node)) {
     return isVisible({
       window,
       el: node,

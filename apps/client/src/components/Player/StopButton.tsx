@@ -4,7 +4,7 @@ import React from 'react';
 import { useSelector, } from 'react-redux';
 
 import usePlayer from '@/hooks/usePlayer';
-import { PLAYER_STATUS, PlayerStatusTypes, } from '@pericles/constants';
+import { PLAYER_STATUS, } from '@pericles/constants';
 import { playerStatusSelector, } from '@pericles/store';
 
 const stopButtonSx = {
@@ -19,13 +19,7 @@ export default function StopButton() {
   const status = useSelector(playerStatusSelector);
   return (
     <IconButton
-      disabled={(
-        [
-          PLAYER_STATUS.STOPPED,
-          PLAYER_STATUS.LOADING,
-          PLAYER_STATUS.WAITING,
-        ] as PlayerStatusTypes[]
-      ).includes(status)}
+      disabled={status === PLAYER_STATUS.STOPPED}
       onClick={stop}
       color="primary"
       size="large"

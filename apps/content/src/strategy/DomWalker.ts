@@ -34,23 +34,27 @@ export default class DOMWalker implements IDOMWalker {
 
   public sentenceBuffer: SectionType | null = null;
 
-  public storedNode: Node | null = null;
-
-  public storedIframeNode: Node | null = null;
-
   public sections: SectionType[] = [];
 
   public results: WalkTheDOMResult[] = [];
 
   constructor() {
+    console.log('DomWalker.constructor');
     this.processors = [
       new TextNodeProcessor(),
       new ElementNodeProcessor(),
       new AnyNodeProcessor(),
     ];
+    this.reset();
   }
 
-  public resetSentenceBuffer() {
+  reset() {
+    this.node = null;
+    this.playFromCursor = 0;
+    this.lastKey = 0;
+    this.userGenerated = false;
+    this.sections = [];
+    this.results = [];
     this.sentenceBuffer = null;
   }
 
@@ -117,6 +121,7 @@ export default class DOMWalker implements IDOMWalker {
   }
 
   walk(): WalkTheDOMResult {
+    console.log('DomWalker.walk - init:starting');
     const stack: (Node | null)[] = [ this.node, ];
     let nextNode: Node | null = null;
     let iframeBlocked = false;
@@ -144,20 +149,17 @@ export default class DOMWalker implements IDOMWalker {
         }
       }
 
-      console.log('DomWalker.walk.nextNode', nextNode);
+      console.log('DomWalker.walk.afterProcessors', {
+        nextNode,
+        nextAfterIframe,
+        iframeBlocked,
+      });
 
-      if (iframeBlocked && this.storedIframeNode) {
-        nextNode = this.storedIframeNode;
-        this.storedIframeNode = null;
-      }
-
-      if (nextAfterIframe && !this.storedIframeNode) {
-        this.storedIframeNode = nextAfterIframe;
-        nextAfterIframe = null;
+      if (iframeBlocked && nextAfterIframe) {
+        nextNode = nextAfterIframe;
       }
 
       if (nextNode) {
-        this.storedNode = nextNode;
         if (this.sections.length < ATTRIBUTES.MISC.MIN_SECTIONS) {
           console.log('DomWalker.walk stackPush.nextNode', nextNode);
           stack.push(nextNode);
@@ -167,6 +169,7 @@ export default class DOMWalker implements IDOMWalker {
       }
     }
 
+    console.log('DomWalker.walk - init:ending');
     return {
       out: this.sections,
       iframeBlocked,

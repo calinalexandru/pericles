@@ -57,11 +57,9 @@ export interface IDOMWalker {
   playFromCursor: number;
   sections: SectionType[];
   sentenceBuffer: SectionType | null;
-  storedNode: Node | null;
-  storedIframeNode: Node | null;
 
   // Methods
-  resetSentenceBuffer(): void;
+  reset(): void;
   appendSentenceBuffer(data: {
     top: number;
     width: number;

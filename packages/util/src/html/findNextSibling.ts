@@ -74,8 +74,8 @@ export function findNextSibling(
   }
 
   if (
-    el instanceof HTMLIFrameElement &&
     accessIframe &&
+    el instanceof HTMLIFrameElement &&
     el.getAttribute('id') !== ATTRIBUTES.ATTRS.CONTENT_IFRAME
   ) {
     return getNextSiblingFromIframe(el);

@@ -18,9 +18,12 @@ export default handleActions<ParserState, Partial<ParserState>>(
         ...payload,
       };
     },
-    [ParserActionTypes.RESET]: () => ({
-      ...defaultValues,
-    }),
+    [ParserActionTypes.RESET]: () => {
+      console.log('Parser Reducer.reset');
+      return {
+        ...defaultValues,
+      };
+    },
     [PageActionTypes.SET]: (state, { payload, }: { payload: any }) => {
       console.log('page.set', state, payload);
       return {

@@ -9,7 +9,7 @@ import {
   determineVisibility,
   findNextSiblingWithParents,
   getInnerText,
-  isElementNode,
+  isHtmlElement,
   validateElementNode,
 } from '@pericles/util';
 
@@ -17,7 +17,7 @@ export default class ElementNodeProcessor implements NodeProcessingStrategy {
 
   shouldProcess(node: Node, walkerInstance: IDOMWalker): boolean {
     return (
-      isElementNode(node) &&
+      isHtmlElement(node) &&
       determineVisibility(
         node,
         walkerInstance.playFromCursor,

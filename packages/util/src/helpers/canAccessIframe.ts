@@ -1,9 +1,10 @@
 export default function canAccessIframe(iframe: any): Document | boolean {
+  let out = false;
   try {
-    console.log('canAccessIframe', iframe, true);
-    return iframe.contentDocument || iframe.contentWindow.document;
+    out = !!(iframe.contentDocument || iframe.contentWindow.document);
   } catch {
-    console.log('canAccessIframe', iframe, false);
-    return false;
+    out = false;
   }
+  console.log('canAccessIframe', iframe, out);
+  return out;
 }

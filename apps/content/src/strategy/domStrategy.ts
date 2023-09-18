@@ -38,39 +38,27 @@ export default class DomStrategy {
 
   domWalker: IDOMWalker;
 
-  constructor({
-    parserType = PARSER_TYPES.DEFAULT,
-    userGenerated,
-    parserIframes,
-    parserKey,
-    skipUntilY,
-    fromCursor,
-  }: {
-    parserType: ParserTypes;
-    userGenerated?: boolean;
-    parserIframes?: ParserIframesType;
-    parserKey?: number;
-    skipUntilY?: number;
-    fromCursor?: boolean;
-  }) {
-    console.log('DomStrategy.constructor', {
-      parserType,
-      userGenerated,
-      parserIframes,
-      parserKey,
-      skipUntilY,
-      fromCursor,
-    });
-    this.type = parserType;
-    this.userGenerated = userGenerated || false;
-    this.parserKey = parserKey || 0;
-    this.skipUntilY = skipUntilY || 0;
-    this.fromCursor = fromCursor || false;
-    this.parserIframes = parserIframes || {};
+  constructor() {
     this.domWalker = new DOMWalker();
+    this.reset();
+  }
+
+  reset(): void {
+    this.type = PARSER_TYPES.DEFAULT;
+    this.userGenerated = false;
+    this.parserKey = 0;
+    this.skipUntilY = 0;
+    this.fromCursor = false;
+    this.parserIframes = {};
   }
 
   getSections() {
+    console.log('DomStrategy.getSections', {
+      parserKey: this.parserKey,
+      skipUntilY: this.skipUntilY,
+      fromCursor: this.fromCursor,
+      userGenerated: this.userGenerated,
+    });
     const { hostname, } = window.location;
     let pageIndex = 0;
     let maxPage = 0;
@@ -111,6 +99,8 @@ export default class DomStrategy {
       //   userGenerated: this.userGenerated,
       //   playFromCursor: this.fromCursor ? this.skipUntilY : 0,
       // }));
+      this.domWalker.reset();
+
       this.domWalker.playFromCursor = this.fromCursor ? this.skipUntilY : 0;
       this.domWalker.userGenerated = this.userGenerated;
       this.domWalker.lastKey = this.parserKey;
@@ -121,7 +111,6 @@ export default class DomStrategy {
               0
         )
         : getLastNode(this.parserKey ? this.parserKey - 1 : 0);
-      this.domWalker.resetSentenceBuffer();
       ({ out, end, iframeBlocked, } = this.domWalker.walk());
     }
 

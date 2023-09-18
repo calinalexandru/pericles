@@ -18,23 +18,29 @@ export default class AnyNodeProcessor implements NodeProcessingStrategy {
   }
 
   process(node: Node, walkerInstance: IDOMWalker): ProcessResult {
-    console.log('AnyNodeProcessor.process', node);
     const nextSiblingResult = findNextSiblingWithParents(node);
+    console.log('AnyNodeProcessor.process', node);
     const isVisibleNodeOrText = determineVisibility(
       node,
       walkerInstance.playFromCursor,
       walkerInstance.userGenerated
     );
-    const result: any =
-      (isWikipedia() && isSkippableByDesign(node)) || !isVisibleNodeOrText
-        ? nextSiblingResult
-        : node.childNodes[0]
-          ? { next: node.childNodes[0], }
-          : nextSiblingResult;
+    if (
+      nextSiblingResult.next &&
+      ((isWikipedia() && isSkippableByDesign(node)) || !isVisibleNodeOrText)
+    ) {
+      return {
+        nextNode: nextSiblingResult.next,
+        nextAfterIframe: nextSiblingResult.nextAfterIframe,
+        iframeBlocked: nextSiblingResult.iframeBlocked,
+      };
+    }
 
-    const { next: nextNode, nextAfterIframe, iframeBlocked, } = result;
-
-    return { nextNode, nextAfterIframe, iframeBlocked, };
+    return {
+      nextNode: node.childNodes[0] || nextSiblingResult.next,
+      nextAfterIframe: nextSiblingResult.nextAfterIframe,
+      iframeBlocked: nextSiblingResult.iframeBlocked,
+    };
   }
 
 }

@@ -18,7 +18,6 @@ import {
   parserIframesSelector,
   parserKeySelector,
   parserPageSelector,
-  playerEnd,
   playerIdle,
   playerNext,
   playerProxyPlay,
@@ -32,7 +31,6 @@ import {
   settingsVoiceSelector,
 } from '@pericles/store';
 import {
-  findAvailableIframe,
   findWorkingIframe,
   getIframesForStore,
   getParserType,
@@ -84,10 +82,13 @@ export type PayloadResponseType = {
   maxPage?: number;
 };
 
+const domStrategy = new DomStrategy();
+
 export const mapPayloadToResponse = (
   payload: PayloadType,
   state: RootState
 ): PayloadResponseType => {
+  console.log('mapPayloadToResponse.payload', payload);
   const parserType = getParserType(window);
   console.log('getSectionsAndPlayEpic.parserType', parserType);
   if (isGrammarlyApp(parserType)) {
@@ -105,17 +106,17 @@ export const mapPayloadToResponse = (
     };
   }
   const parserIframes = payload?.iframes || parserIframesSelector(state);
-  if (
-    (isGoogleBook(parserType) && !isIframe) ||
-    (!isGoogleUtility(parserType) &&
-      !isIframe &&
-      findWorkingIframe(parserIframes) !== false) ||
-    (!isGoogleUtility(parserType) &&
-      isIframe &&
-      !isIframeParsing(hostname, parserIframes))
-  ) {
-    return { skip: true, };
-  }
+  // if (
+  //   (isGoogleBook(parserType) && !isIframe) ||
+  //   (!isGoogleUtility(parserType) &&
+  //     !isIframe &&
+  //     findWorkingIframe(parserIframes) !== false) ||
+  //   (!isGoogleUtility(parserType) &&
+  //     isIframe &&
+  //     !isIframeParsing(hostname, parserIframes))
+  // ) {
+  //   return { skip: true, };
+  // }
 
   const iframes =
     (Object.keys(parserIframes).length && parserIframes) ||
@@ -134,19 +135,28 @@ export const mapPayloadToResponse = (
   const { lang, } = voices[newVoiceProp] || {};
   const jpLang = !!mergedLanguages.includes(lang);
 
-  const domStrategy = new DomStrategy({
-    parserType,
-    userGenerated,
-    skipUntilY,
-    parserKey,
-    parserIframes,
-    fromCursor,
-  });
+  // const domStrategy = new DomStrategy({
+  //   parserType,
+  //   userGenerated,
+  //   skipUntilY,
+  //   parserKey,
+  //   parserIframes,
+  //   fromCursor,
+  // });
+
+  domStrategy.reset();
+
+  domStrategy.type = parserType;
+  domStrategy.userGenerated = userGenerated;
+  domStrategy.skipUntilY = skipUntilY;
+  domStrategy.parserKey = parserKey;
+  domStrategy.fromCursor = fromCursor;
 
   const { out, maxPage, pageIndex, end, iframeBlocked, } =
     domStrategy.getSections();
 
   console.log('domStrategy.getSections', {
+    userGenerated,
     out,
     maxPage,
     pageIndex,
@@ -158,21 +168,10 @@ export const mapPayloadToResponse = (
     return {
       iframeBlocked,
       fromCursor,
-      skip: true,
       iframes,
       isIframe,
       sections: [],
-      end:
-        (
-          [
-            PARSER_TYPES.GOOGLE_DOC,
-            PARSER_TYPES.GOOGLE_DOC_SVG,
-            PARSER_TYPES.GOOGLE_BOOK,
-            PARSER_TYPES.GOOGLE_FORM,
-          ] as ParserTypes[]
-        ).includes(parserType) ||
-        out.length < ATTRIBUTES.MISC.MIN_SECTIONS ||
-        end,
+      end: true,
       type: parserType,
       maxPage,
       tab,
@@ -236,46 +235,51 @@ export const processResponse = (
       routeErrorPdf(),
     ]);
   }
-  if (!end && skip) {
-    if (!isIframe && iframeBlocked) {
-      console.log('got into the iframe garbage');
-      const availableIframeKey: string | boolean = findAvailableIframe(iframes);
-      let newIframes = iframes;
-      if (availableIframeKey !== false) {
-        newIframes = {
-          ...iframes,
-          ...{
-            [availableIframeKey as string]: {
-              ...iframes[availableIframeKey as string],
-              parsing: true,
-            },
-          },
-        };
-      }
-      console.log('newIframes', newIframes);
-      return from([
-        setParser({
-          iframes,
-          end,
-          type,
-          maxPage,
-          page: pageIndex,
-        }),
-        playerEnd({
-          fromCursor,
-          iframes: newIframes,
-        }),
-      ]);
-    }
-    if (message)
-      return from([
-        playerStop(),
-        sectionsRequestAndPlay.failure(new Error(message)),
-        notificationError({ text: message, }),
-      ]);
+  // if (!isIframe && iframeBlocked) {
+  //   console.log('got into the iframe garbage');
+  //   const availableIframeKey: string | boolean = findAvailableIframe(iframes);
+  //   let newIframes = iframes;
+  //   if (availableIframeKey !== false) {
+  //     newIframes = {
+  //       ...iframes,
+  //       ...{
+  //         [availableIframeKey as string]: {
+  //           ...iframes[availableIframeKey as string],
+  //           parsing: true,
+  //         },
+  //       },
+  //     };
+  //   }
+  //   console.log('newIframes', newIframes);
+  //   return from([
+  //     setParser({
+  //       iframes,
+  //       end,
+  //       type,
+  //       maxPage,
+  //       page: pageIndex,
+  //     }),
+  //     playerEnd({
+  //       fromCursor,
+  //       iframes: newIframes,
+  //     }),
+  //   ]);
+  // }
+  if (message && end) {
+    console.log('got end and message', { message, end, });
+    return from([
+      playerStop(),
+      sectionsRequestAndPlay.failure(new Error(message)),
+      notificationError({ text: message, }),
+    ]);
+  }
+
+  if (skip) {
     return from([ playerIdle(), ]);
   }
+
   const mergeSections = [ ...playerSectionsSelector(state), ...sectionsArr, ];
+  console.log({ mergeSections, });
   if (!mergeSections.length && isGoogleBook(type)) {
     return from([
       setParser({ type, maxPage, page: pageIndex, end, }),

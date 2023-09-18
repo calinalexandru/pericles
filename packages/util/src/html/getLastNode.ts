@@ -3,7 +3,7 @@ import getFirstNode from './getFirstNode';
 import getSelfIframes from './getSelfIframes';
 import sectionQuerySelector from './sectionQuerySelector';
 
-export default function getLastNode(parserKey: number = 0): HTMLElement {
+export default function getLastNode(parserKey: number = 0): Node | null {
   console.log(
     'getLastNode.parserKey',
     parserKey,
@@ -14,6 +14,7 @@ export default function getLastNode(parserKey: number = 0): HTMLElement {
   );
   console.log('getLastNode.sections', sections);
   let lastSection = sections[sections.length - 1];
+  console.log('getLastNode.lastSection', lastSection);
 
   if (!lastSection) {
     const iframeSections = getSelfIframes().reduce(
@@ -32,7 +33,9 @@ export default function getLastNode(parserKey: number = 0): HTMLElement {
   }
 
   if (lastSection) {
-    return findNextSibling(lastSection).node;
+    const out = findNextSibling(lastSection).node;
+    console.log('getLastNode.out', out);
+    return out;
   }
 
   return getFirstNode();

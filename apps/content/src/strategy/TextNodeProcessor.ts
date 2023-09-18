@@ -60,6 +60,7 @@ export default class TextNodeProcessor implements NodeProcessingStrategy {
       );
     } else {
       const result = findNextSiblingWithParents(node);
+      console.log('TextNodeProcessor.process.result', result);
       if (result !== null && 'next' in result && 'parents' in result) {
         ({ next: nextNode, parents, nextAfterIframe, iframeBlocked, } = result);
       }

@@ -1,5 +1,6 @@
 /* html */
 export { default as canAccessIframe, } from './helpers/canAccessIframe';
+export { default as isWindowTop, } from './html/isWindowTop';
 export { default as clickNextGoogleBookPage, } from './helpers/clickNextGoogleBookPage';
 export { default as clickPrevGoogleBookPage, } from './helpers/clickPrevGoogleBookPage';
 export { default as compareValuesWithMargin, } from './helpers/compareValuesWithMargin';
