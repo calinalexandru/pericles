@@ -1,9 +1,3 @@
-import {
-  IDOMWalker,
-  NodeProcessingStrategy,
-  ProcessResult,
-  WalkTheDOMResult,
-} from '@/interfaces/api';
 import { ATTRIBUTES, SectionType, } from '@pericles/constants';
 import {
   cleanupSections,
@@ -15,29 +9,37 @@ import {
 
 import AnyNodeProcessor from './AnyNodeProcessor';
 import ElementNodeProcessor from './ElementNodeProcessor';
+import {
+  IDOMWalker,
+  NodeProcessingStrategy,
+  ProcessResult,
+  WalkTheDOMResult,
+} from './IDom';
 import TextNodeProcessor from './TextNodeProcessor';
 
 export default class DOMWalker implements IDOMWalker {
 
-  public node: Node | null = null;
+  startingNode: Node | null = null;
 
-  public lastKey: number;
+  lastDomAlterationId: number;
 
-  public userGenerated: boolean;
+  isUserTriggered: boolean;
 
-  public playFromCursor: number;
+  verticalStartOffset: number;
 
-  public processors: NodeProcessingStrategy[];
+  processors: NodeProcessingStrategy[];
 
-  public sentenceBuffer: SectionType | null = null;
+  temporarySentence: SectionType | null = null;
 
-  public sections: SectionType[] = [];
+  sections: SectionType[] = [];
 
-  public results: WalkTheDOMResult[] = [];
+  isVisible: boolean;
 
-  private nodeAfterIframe: Node | null;
+  results: WalkTheDOMResult[] = [];
 
   domAlterationsBatch: { fn: (key: number) => void; data: number }[] = [];
+
+  continuationNodeAfterIframe: Node | null;
 
   constructor() {
     this.processors = [
@@ -45,22 +47,27 @@ export default class DOMWalker implements IDOMWalker {
       new ElementNodeProcessor(),
       new AnyNodeProcessor(),
     ];
-    this.reset();
   }
 
-  reset(): void {
-    this.node = null;
-    this.playFromCursor = 0;
-    this.lastKey = 0;
-    this.userGenerated = false;
+  setup(
+    startingNode: Node | null,
+    lastDomAlterationId: number,
+    isUserTriggered: boolean,
+    verticalStartOffset: number
+  ): void {
+    this.startingNode = startingNode;
+    this.lastDomAlterationId = lastDomAlterationId;
+    this.verticalStartOffset = verticalStartOffset;
+    this.isUserTriggered = isUserTriggered;
+    this.isVisible = false;
     this.sections = [];
     this.results = [];
-    this.sentenceBuffer = null;
+    this.temporarySentence = null;
   }
 
   appendSentenceBuffer(section: SectionType): void {
-    this.sentenceBuffer = {
-      text: `${this.sentenceBuffer?.text || ''}${section.text}`,
+    this.temporarySentence = {
+      text: `${this.temporarySentence?.text || ''}${section.text}`,
       pos: section.pos,
     };
   }
@@ -77,33 +84,38 @@ export default class DOMWalker implements IDOMWalker {
   }
 
   finalizeSentenceBuffer(): void {
-    if (!this.sentenceBuffer) return;
+    if (!this.temporarySentence) return;
 
-    if (isMinText(this.sentenceBuffer.text)) {
-      this.sections.push(this.sentenceBuffer);
+    if (isMinText(this.temporarySentence.text)) {
+      this.sections.push(this.temporarySentence);
     } else {
-      cleanupSections(this.lastKey + this.sections.length);
+      cleanupSections(this.lastDomAlterationId + this.sections.length);
     }
-    this.sentenceBuffer = null;
+    this.temporarySentence = null;
   }
 
-  isVisible(node: Node) {
-    return determineVisibility(node, this.playFromCursor, this.userGenerated);
+  setAndCacheIsVisibleNode(node: Node): void {
+    this.isVisible = determineVisibility(
+      node,
+      this.verticalStartOffset,
+      this.isUserTriggered
+    );
   }
 
   processNode(node: Node): ProcessResult {
+    this.setAndCacheIsVisibleNode(node);
     for (const processor of this.processors) {
-      if (processor.shouldProcess(node, this.isVisible(node))) {
-        return processor.process(node, this.isVisible(node));
+      if (processor.shouldProcess(node, this.isVisible)) {
+        return processor.process(node, this.isVisible);
       }
     }
     return { nextNode: null, nextAfterIframe: null, iframeBlocked: false, };
   }
 
   handleNodeAfterIframe(): void {
-    if (this.nodeAfterIframe) {
-      this.node = this.nodeAfterIframe;
-      this.nodeAfterIframe = null;
+    if (this.continuationNodeAfterIframe) {
+      this.startingNode = this.continuationNodeAfterIframe;
+      this.continuationNodeAfterIframe = null;
     }
   }
 
@@ -129,7 +141,7 @@ export default class DOMWalker implements IDOMWalker {
     if (domAlterations) {
       this.domAlterationsBatch.push({
         fn: domAlterations,
-        data: this.lastKey + this.sections.length,
+        data: this.lastDomAlterationId + this.sections.length,
       });
     }
 
@@ -146,7 +158,7 @@ export default class DOMWalker implements IDOMWalker {
     }
 
     if (processorIframeBlocked && nextAfterIframe) {
-      this.nodeAfterIframe = nextAfterIframe;
+      this.continuationNodeAfterIframe = nextAfterIframe;
     }
 
     return { nextNode, iframeBlocked: processorIframeBlocked, };
@@ -187,7 +199,7 @@ export default class DOMWalker implements IDOMWalker {
   walk(): WalkTheDOMResult {
     this.handleNodeAfterIframe();
 
-    const stack: (Node | null)[] = [ this.node, ];
+    const stack: (Node | null)[] = [ this.startingNode, ];
     let nextNode: Node | null = null;
 
     while (stack.length) {

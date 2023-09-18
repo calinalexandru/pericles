@@ -1,5 +1,4 @@
 /* eslint-disable class-methods-use-this */
-import { NodeProcessingStrategy, ProcessResult, } from '@/interfaces/api';
 import {
   alterNode,
   findNextSiblingWithParents,
@@ -10,6 +9,8 @@ import {
   isTextNode,
   removeHTMLSpaces,
 } from '@pericles/util';
+
+import { NodeProcessingStrategy, ProcessResult, } from './IDom';
 
 export default class TextNodeProcessor implements NodeProcessingStrategy {
 

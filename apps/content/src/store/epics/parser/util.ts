@@ -2,7 +2,7 @@ import { Action, } from 'redux';
 import { Observable, from, } from 'rxjs';
 import { tap, } from 'rxjs/operators';
 
-import DomStrategy from '@/strategy/domStrategy';
+import DomStrategy from '@/strategy/DomStrategy';
 import {
   ATTRIBUTES,
   PARSER_TYPES,
@@ -137,14 +137,13 @@ export const mapPayloadToResponse = (
   const { lang, } = voices[newVoiceProp] || {};
   const jpLang = !!mergedLanguages.includes(lang);
 
-  domStrategy.reset();
-
-  domStrategy.type = parserType;
-  domStrategy.userGenerated = userGenerated;
-  domStrategy.skipUntilY = skipUntilY;
-  domStrategy.parserKey = parserKey;
-  domStrategy.parserIframes = parserIframes;
-  domStrategy.fromCursor = fromCursor;
+  domStrategy.setup(
+    parserType,
+    parserKey,
+    userGenerated,
+    fromCursor ? skipUntilY : 0,
+    parserIframes
+  );
 
   const { out, maxPage, pageIndex, end, iframeBlocked, } =
     domStrategy.getSections();

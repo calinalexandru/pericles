@@ -1,4 +1,3 @@
-import { IDOMWalker, } from '@/interfaces/api';
 import {
   PARSER_TYPES,
   ParserIframesType,
@@ -21,16 +20,15 @@ import {
 } from '@pericles/util';
 
 import DOMWalker from './DomWalker';
+import { GetSectionsResult, IDOMWalker, IDomStrategy, } from './IDom';
 
-export default class DomStrategy {
+export default class DomStrategy implements IDomStrategy {
 
   type: ParserTypes = PARSER_TYPES.DEFAULT;
 
-  userGenerated: boolean = false;
+  isUserTriggered: boolean = false;
 
-  fromCursor: boolean = false;
-
-  skipUntilY: number = 0;
+  verticalStartOffset: number = 0;
 
   parserKey: number = 0;
 
@@ -40,34 +38,29 @@ export default class DomStrategy {
 
   constructor() {
     this.domWalker = new DOMWalker();
-    this.reset();
   }
 
-  reset(): void {
-    this.type = PARSER_TYPES.DEFAULT;
-    this.userGenerated = false;
-    this.parserKey = 0;
-    this.skipUntilY = 0;
-    this.fromCursor = false;
-    this.parserIframes = {};
+  setup(
+    type?: ParserTypes,
+    parserKey?: number,
+    isUserTriggered?: boolean,
+    verticalStartOffset?: number,
+    parserIframes?: ParserIframesType
+  ): void {
+    this.type = type || PARSER_TYPES.DEFAULT;
+    this.parserKey = parserKey || 0;
+    this.isUserTriggered = isUserTriggered || false;
+    this.verticalStartOffset = verticalStartOffset || 0;
+    this.parserIframes = parserIframes || {};
   }
 
-  getSections() {
-    console.log('DomStrategy.getSections', {
-      parserKey: this.parserKey,
-      skipUntilY: this.skipUntilY,
-      fromCursor: this.fromCursor,
-      userGenerated: this.userGenerated,
-    });
+  getSections(): GetSectionsResult {
     const { hostname, } = window.location;
     let pageIndex = 0;
     let maxPage = 0;
     let out = [];
     let end = false;
     let iframeBlocked = false;
-    // const nextNode = this.working
-    //   ? getStoredNode()
-    //   : getLastNode(this.parserKey ? this.parserKey - 1 : 0);
     if (isGoogleBook(this.type)) {
       pageIndex = getGoogleBookPage(window);
       ({ maxPage, out, } = getGoogleBookSections());
@@ -84,18 +77,19 @@ export default class DomStrategy {
       ({ maxPage, out, } = getOpenBookSections(1));
       console.log('open-book.sections', out);
     } else {
-      this.domWalker.reset();
+      this.domWalker.setup(
+        this.isUserTriggered
+          ? getElementFromPoint(
+            (isIframeParsing(hostname, this.parserIframes) &&
+                this.parserIframes?.[hostname]?.top) ||
+                0
+          )
+          : getLastNode(this.parserKey ? this.parserKey - 1 : 0),
+        this.parserKey,
+        this.isUserTriggered,
+        this.verticalStartOffset
+      );
 
-      this.domWalker.playFromCursor = this.fromCursor ? this.skipUntilY : 0;
-      this.domWalker.userGenerated = this.userGenerated;
-      this.domWalker.lastKey = this.parserKey;
-      this.domWalker.node = this.userGenerated
-        ? getElementFromPoint(
-          (isIframeParsing(hostname, this.parserIframes) &&
-              this.parserIframes?.[hostname]?.top) ||
-              0
-        )
-        : getLastNode(this.parserKey ? this.parserKey - 1 : 0);
       ({ out, end, iframeBlocked, } = this.domWalker.walk());
     }
 

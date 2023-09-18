@@ -1,5 +1,4 @@
 /* eslint-disable class-methods-use-this */
-import { NodeProcessingStrategy, ProcessResult, } from '@/interfaces/api';
 import {
   alterDom,
   findNextSiblingWithParents,
@@ -7,6 +6,8 @@ import {
   isHtmlElement,
   validateElementNode,
 } from '@pericles/util';
+
+import { NodeProcessingStrategy, ProcessResult, } from './IDom';
 
 export default class ElementNodeProcessor implements NodeProcessingStrategy {
 
