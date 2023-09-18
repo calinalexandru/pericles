@@ -2,6 +2,7 @@ import {
   IDOMWalker,
   NodeProcessingStrategy,
   ProcessResult,
+  WalkTheDOMResult,
 } from '@/interfaces/api';
 import { ATTRIBUTES, SectionType, } from '@pericles/constants';
 import {
@@ -15,12 +16,6 @@ import {
 import AnyNodeProcessor from './AnyNodeProcessor';
 import ElementNodeProcessor from './ElementNodeProcessor';
 import TextNodeProcessor from './TextNodeProcessor';
-
-interface WalkTheDOMResult {
-  out: SectionType[];
-  iframeBlocked: boolean;
-  end: boolean;
-}
 
 export default class DOMWalker implements IDOMWalker {
 
@@ -92,11 +87,11 @@ export default class DOMWalker implements IDOMWalker {
     this.sentenceBuffer = null;
   }
 
-  private isVisible(node: Node) {
+  isVisible(node: Node) {
     return determineVisibility(node, this.playFromCursor, this.userGenerated);
   }
 
-  private processNode(node: Node): ProcessResult {
+  processNode(node: Node): ProcessResult {
     for (const processor of this.processors) {
       if (processor.shouldProcess(node, this.isVisible(node))) {
         return processor.process(node, this.isVisible(node));

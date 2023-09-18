@@ -1,5 +1,11 @@
 import { SectionType, } from '@pericles/constants';
 
+export interface WalkTheDOMResult {
+  out: SectionType[];
+  iframeBlocked: boolean;
+  end: boolean;
+}
+
 export interface MessageRequest {
   activeTab?: chrome.tabs.Tab;
   message?: {
@@ -65,6 +71,21 @@ export interface IDOMWalker {
 
   // Methods
   reset(): void;
+  handleNodeAfterIframe(): void;
+  pushNextNodeOntoStack(stack: (Node | null)[], nextNode: Node | null): void;
+  processBatchedDomAlterations(): void;
+  finalizeWalk(
+    nextNode: Node | null,
+    end?: boolean,
+    iframeBlocked?: boolean
+  ): WalkTheDOMResult;
+  processAndHandleNode(node: Node): {
+    nextNode: Node | null;
+    iframeBlocked: boolean;
+  };
+  handleNodeAfterIframe(): void;
+  isVisible(node: Node): boolean;
+  processNode(node: Node): ProcessResult;
   appendSentenceBuffer(data: {
     top: number;
     width: number;
