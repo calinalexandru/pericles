@@ -384,7 +384,7 @@ const endIframeEpic: Epic<any> = (action, state) =>
     tap((payload: any = {}) => {
       console.log('endIframeEpic', payload);
       mpToContent(
-        [ sectionsRequestAndPlay.request({ ...payload, userGenerated: false, }), ],
+        [ sectionsRequestAndPlay.request({ ...payload, userGenerated: true, }), ],
         playerTabSelector(state.value)
       );
     }),

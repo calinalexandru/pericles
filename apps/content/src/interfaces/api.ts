@@ -18,11 +18,16 @@ export interface ProcessResult {
   nextNode: Node | null;
   nextAfterIframe: Node | null;
   iframeBlocked: boolean;
+  pushAndClearBufferBefore?: boolean;
+  pushAndClearBufferAfter?: boolean;
+  sectionToAdd?: { node: HTMLElement; text: string };
+  nodeToAdd?: { node: Text; text: string };
+  domAlterations?: (key: number) => void;
 }
 
 export interface NodeProcessingStrategy {
-  shouldProcess(node: Node, walkerInstance: IDOMWalker): boolean;
-  process(node: Node, walkerInstance: IDOMWalker): ProcessResult;
+  shouldProcess(node: Node, isVisible?: boolean): boolean;
+  process(node: Node, isVisible?: boolean): ProcessResult;
 }
 
 export interface IPosition {

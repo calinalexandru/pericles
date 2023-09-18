@@ -1,11 +1,6 @@
 /* eslint-disable class-methods-use-this */
+import { NodeProcessingStrategy, ProcessResult, } from '@/interfaces/api';
 import {
-  IDOMWalker,
-  NodeProcessingStrategy,
-  ProcessResult,
-} from '@/interfaces/api';
-import {
-  determineVisibility,
   findNextSiblingWithParents,
   isSkippableByDesign,
   isWikipedia,
@@ -13,21 +8,16 @@ import {
 
 export default class AnyNodeProcessor implements NodeProcessingStrategy {
 
-  shouldProcess(node: Node, walkerInstance: IDOMWalker): boolean {
+  shouldProcess(node: Node): boolean {
     return node instanceof Node;
   }
 
-  process(node: Node, walkerInstance: IDOMWalker): ProcessResult {
+  process(node: Node, isVisible: boolean): ProcessResult {
     const nextSiblingResult = findNextSiblingWithParents(node);
     console.log('AnyNodeProcessor.process', node);
-    const isVisibleNodeOrText = determineVisibility(
-      node,
-      walkerInstance.playFromCursor,
-      walkerInstance.userGenerated
-    );
     if (
       nextSiblingResult.next &&
-      ((isWikipedia() && isSkippableByDesign(node)) || !isVisibleNodeOrText)
+      ((isWikipedia() && isSkippableByDesign(node)) || !isVisible)
     ) {
       return {
         nextNode: nextSiblingResult.next,

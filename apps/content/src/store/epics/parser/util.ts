@@ -18,6 +18,7 @@ import {
   parserIframesSelector,
   parserKeySelector,
   parserPageSelector,
+  playerEnd,
   playerIdle,
   playerNext,
   playerProxyPlay,
@@ -31,6 +32,7 @@ import {
   settingsVoiceSelector,
 } from '@pericles/store';
 import {
+  findAvailableIframe,
   findWorkingIframe,
   getIframesForStore,
   getParserType,
@@ -41,6 +43,7 @@ import {
   isIframeParsing,
   isPdfPage,
   isPremiumVoice,
+  isWindowTop,
   splitSentencesIntoWords,
   t,
 } from '@pericles/util';
@@ -71,7 +74,6 @@ export type PayloadResponseType = {
   fromCursor?: boolean;
   sections?: SectionType[];
   end?: boolean;
-  isIframe?: boolean;
   iframeBlocked?: boolean;
   pageIndex?: number;
   tab?: number;
@@ -98,7 +100,7 @@ export const mapPayloadToResponse = (
     };
   }
 
-  const isIframe = payload.iframe;
+  const isIframe = !isWindowTop();
   const { hostname, } = window.location;
   if (isPdfPage(window)) {
     return {
@@ -106,17 +108,17 @@ export const mapPayloadToResponse = (
     };
   }
   const parserIframes = payload?.iframes || parserIframesSelector(state);
-  // if (
-  //   (isGoogleBook(parserType) && !isIframe) ||
-  //   (!isGoogleUtility(parserType) &&
-  //     !isIframe &&
-  //     findWorkingIframe(parserIframes) !== false) ||
-  //   (!isGoogleUtility(parserType) &&
-  //     isIframe &&
-  //     !isIframeParsing(hostname, parserIframes))
-  // ) {
-  //   return { skip: true, };
-  // }
+  if (
+    (isGoogleBook(parserType) && !isIframe) ||
+    (!isGoogleUtility(parserType) &&
+      !isIframe &&
+      findWorkingIframe(parserIframes) !== false) ||
+    (!isGoogleUtility(parserType) &&
+      isIframe &&
+      !isIframeParsing(hostname, parserIframes))
+  ) {
+    return { skip: true, };
+  }
 
   const iframes =
     (Object.keys(parserIframes).length && parserIframes) ||
@@ -135,21 +137,13 @@ export const mapPayloadToResponse = (
   const { lang, } = voices[newVoiceProp] || {};
   const jpLang = !!mergedLanguages.includes(lang);
 
-  // const domStrategy = new DomStrategy({
-  //   parserType,
-  //   userGenerated,
-  //   skipUntilY,
-  //   parserKey,
-  //   parserIframes,
-  //   fromCursor,
-  // });
-
   domStrategy.reset();
 
   domStrategy.type = parserType;
   domStrategy.userGenerated = userGenerated;
   domStrategy.skipUntilY = skipUntilY;
   domStrategy.parserKey = parserKey;
+  domStrategy.parserIframes = parserIframes;
   domStrategy.fromCursor = fromCursor;
 
   const { out, maxPage, pageIndex, end, iframeBlocked, } =
@@ -169,7 +163,6 @@ export const mapPayloadToResponse = (
       iframeBlocked,
       fromCursor,
       iframes,
-      isIframe,
       sections: [],
       end: true,
       type: parserType,
@@ -191,7 +184,6 @@ export const mapPayloadToResponse = (
     sections: out.map(({ text, pos, }) => ({ text, ...(pos && { pos, }), })),
     fromCursor,
     iframes,
-    isIframe,
     end:
       (
         [
@@ -221,13 +213,13 @@ export const processResponse = (
     type = PARSER_TYPES.DEFAULT,
     pageIndex = 0,
     iframes = {},
-    isIframe = false,
     sections: sectionsArr = [],
     tab = 0,
     error = '',
   }: PayloadResponseType,
   state: RootState
 ): Observable<Action<any>> => {
+  const isIframe = !isWindowTop();
   if (error) {
     return from([
       setPlayer({ status: PLAYER_STATUS.ERROR, }),
@@ -235,36 +227,53 @@ export const processResponse = (
       routeErrorPdf(),
     ]);
   }
-  // if (!isIframe && iframeBlocked) {
-  //   console.log('got into the iframe garbage');
-  //   const availableIframeKey: string | boolean = findAvailableIframe(iframes);
-  //   let newIframes = iframes;
-  //   if (availableIframeKey !== false) {
-  //     newIframes = {
-  //       ...iframes,
-  //       ...{
-  //         [availableIframeKey as string]: {
-  //           ...iframes[availableIframeKey as string],
-  //           parsing: true,
-  //         },
-  //       },
-  //     };
-  //   }
-  //   console.log('newIframes', newIframes);
-  //   return from([
-  //     setParser({
-  //       iframes,
-  //       end,
-  //       type,
-  //       maxPage,
-  //       page: pageIndex,
-  //     }),
-  //     playerEnd({
-  //       fromCursor,
-  //       iframes: newIframes,
-  //     }),
-  //   ]);
-  // }
+  if (isIframe && end) {
+    const mergeSections = [ ...playerSectionsSelector(state), ...sectionsArr, ];
+    const currIframe = findWorkingIframe(iframes);
+    const newIframePayload = { ...iframes, };
+    if (typeof currIframe === 'string') {
+      newIframePayload[currIframe].parsing = false;
+    }
+    console.log('newIframePayload', newIframePayload);
+
+    return from([
+      setSections({ sections: mergeSections, }),
+      setParser({ iframes: newIframePayload, }),
+      playerNext({ auto: true, }),
+    ]);
+  }
+  if (!isIframe && iframeBlocked) {
+    console.log('got into the iframe garbage');
+    const availableIframeKey: string | boolean = findAvailableIframe(iframes);
+    let newIframes = iframes;
+    if (availableIframeKey !== false) {
+      newIframes = {
+        ...iframes,
+        ...{
+          [availableIframeKey as string]: {
+            ...iframes[availableIframeKey as string],
+            parsing: true,
+          },
+        },
+      };
+    }
+    console.log('newIframes', newIframes);
+    const mergeSections = [ ...playerSectionsSelector(state), ...sectionsArr, ];
+    return from([
+      setSections({ sections: mergeSections, }),
+      setParser({
+        iframes,
+        end,
+        type,
+        maxPage,
+        page: pageIndex,
+      }),
+      playerEnd({
+        fromCursor,
+        iframes: newIframes,
+      }),
+    ]);
+  }
   if (message && end) {
     console.log('got end and message', { message, end, });
     return from([

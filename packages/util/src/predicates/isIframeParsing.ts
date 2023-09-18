@@ -4,5 +4,7 @@ export default function isIframeParsing(
   name: string,
   iframes: ParserIframesType
 ): boolean {
-  return iframes?.[name]?.parsing === true;
+  const ilie = iframes?.[name]?.parsing === true;
+  console.log('isIframeParsing', ilie);
+  return ilie;
 }

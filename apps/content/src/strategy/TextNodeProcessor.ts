@@ -1,12 +1,7 @@
 /* eslint-disable class-methods-use-this */
-import {
-  IDOMWalker,
-  NodeProcessingStrategy,
-  ProcessResult,
-} from '@/interfaces/api';
+import { NodeProcessingStrategy, ProcessResult, } from '@/interfaces/api';
 import {
   alterNode,
-  determineVisibility,
   findNextSiblingWithParents,
   getInnerText,
   getSentencesFromText,
@@ -18,19 +13,15 @@ import {
 
 export default class TextNodeProcessor implements NodeProcessingStrategy {
 
-  shouldProcess(node: Node, walkerInstance: IDOMWalker): boolean {
+  shouldProcess(node: Node, isVisible: boolean): boolean {
     return (
+      isVisible &&
       isTextNode(node) &&
-      determineVisibility(
-        node,
-        walkerInstance.playFromCursor,
-        walkerInstance.userGenerated
-      ) &&
       isMinText(removeHTMLSpaces(getInnerText(node.nodeValue || '')))
     );
   }
 
-  process(node: Text, walkerInstance: IDOMWalker): ProcessResult {
+  process(node: Text): ProcessResult {
     console.log('TextNodeProcessor.process', node);
     let nextNode: Node | null = null;
     let parents: Node[] = [];
@@ -66,9 +57,12 @@ export default class TextNodeProcessor implements NodeProcessingStrategy {
       }
     }
 
-    const nodeText = getInnerText(node.nodeValue || '');
-    walkerInstance.pushNode(nodeText, node);
-    alterNode(node, walkerInstance.lastKey + walkerInstance.sections.length);
+    // const nodeText = getInnerText(node.nodeValue || '');
+    // walkerInstance.pushNode(nodeText, node);
+    const domAlterations: (key: number) => void = (key: number) => {
+      console.log('TextNodeProcessor.process.domAlterations', node, key);
+      alterNode(node, key);
+    };
 
     if (firstParagraph) {
       console.log(
@@ -76,10 +70,16 @@ export default class TextNodeProcessor implements NodeProcessingStrategy {
         firstParagraph,
         parents
       );
-      walkerInstance.pushAndClearBuffer();
+      // walkerInstance.pushAndClearBuffer();
     }
 
     return {
+      domAlterations,
+      pushAndClearBufferAfter: !!firstParagraph,
+      nodeToAdd: {
+        text: getInnerText(node.nodeValue || ''),
+        node,
+      },
       iframeBlocked,
       nextNode,
       nextAfterIframe: nextAfterIframe || null,

@@ -84,21 +84,6 @@ export default class DomStrategy {
       ({ maxPage, out, } = getOpenBookSections(1));
       console.log('open-book.sections', out);
     } else {
-      // setWindowSentenceBuffer('');
-      // ({ out, blocked, } = walkTheDOM({
-      //   node:
-      //     !this.working && this.userGenerated
-      //       ? getElementFromPoint(
-      //         (isIframeParsing(hostname, this.parserIframes) &&
-      //             this.parserIframes?.[hostname]?.top) ||
-      //             0
-      //       )
-      //       : nextNode,
-      //   buffer: [],
-      //   lastKey: this.parserKey,
-      //   userGenerated: this.userGenerated,
-      //   playFromCursor: this.fromCursor ? this.skipUntilY : 0,
-      // }));
       this.domWalker.reset();
 
       this.domWalker.playFromCursor = this.fromCursor ? this.skipUntilY : 0;

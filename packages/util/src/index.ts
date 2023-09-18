@@ -41,6 +41,7 @@ export { default as rectSectionQuerySelector, } from './html/rectSectionQuerySel
 export { default as removeAllHelperTags, } from './html/removeAllHelperTags';
 export { default as removeClassFromAll, } from './html/removeClassFromAll';
 export { default as removeHelperTags, } from './html/removeHelperTags';
+export { default as cleanupSections, } from './html/cleanupSections';
 export { default as removeHTMLSpaces, } from './html/removeHTMLSpaces';
 export { default as removeLineBreaks, } from './html/removeLineBreaks';
 export { default as removeWordTags, } from './html/removeWordTags';
