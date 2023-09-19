@@ -1,9 +1,10 @@
+import { Action, } from 'redux';
 import { StateObservable, } from 'redux-observable';
 
 import Speech from '@/speech';
+import { PlayerSectionsType, SectionType, } from '@pericles/constants';
 import {
   RootState,
-  appActiveTabSelector,
   parserEndSelector,
   parserTypeSelector,
   playerCrash,
@@ -15,69 +16,59 @@ import {
 } from '@pericles/store';
 import { hasSectionsInAdvance, isGoogleDocsSvg, } from '@pericles/util';
 
-export const playOrRequest$: any = (
-  state: StateObservable<RootState>,
+const shouldRequestAndPlay = (
+  state: RootState,
+  userGenerated: boolean,
+  playerSections: SectionType[]
+): boolean =>
+  userGenerated ||
+  (!playerSections.length && isGoogleDocsSvg(parserTypeSelector(state)));
+
+const shouldRequestSectionsAndPlay = (
+  state: RootState,
+  playingTab: number,
+  playerSections: PlayerSectionsType[],
+  playerKey: number
+): boolean =>
+  playingTab !== 0 &&
+  !parserEndSelector(state) &&
+  !hasSectionsInAdvance(playerSections, playerKey);
+
+export const playOrRequest$ = (
+  state$: StateObservable<RootState>,
   payload: any,
-  actions: any
-) => {
-  console.log('play.epic', state, payload);
+  actions: any[]
+): Action<any> | false => {
+  const { userGenerated = false, key = -1, } = payload || {};
 
-  const userGenerated = payload?.userGenerated || false;
-  const playerKeyPayload = payload?.key || -1;
-  const playerSections = playerSectionsSelector(state.value);
-  const playerKey =
-    playerKeyPayload !== -1 ? playerKeyPayload : playerKeySelector(state.value);
-  const playingTab = playerTabSelector(state.value);
-  const activeTab = appActiveTabSelector(state.value);
-  console.log('play.epic debug', {
-    actions,
-    playerSections,
-    playerKey,
-    playerKeyPayload,
-    userGenerated,
-    playingTab,
-    activeTab,
-  });
-  if (
-    userGenerated ||
-    (!playerSections.length && isGoogleDocsSvg(parserTypeSelector(state.value)))
-  ) {
+  const state = state$.value;
+  const { playerSections, playerKey, playingTab, } = {
+    playerSections: playerSectionsSelector(state),
+    playerKey: key !== -1 ? key : playerKeySelector(state),
+    playingTab: playerTabSelector(state),
+  };
+
+  if (shouldRequestAndPlay(state, userGenerated, playerSections)) {
     Speech.stop();
-    console.log('playOrRequest.userGenerated.requestAndPlay', {
-      userGenerated,
-      playingTab,
-      activeTab,
-      playerSections,
-    });
-
     return proxyResetAndRequestPlay.request(payload);
   }
 
   if (
-    playingTab !== 0 &&
-    !parserEndSelector(state.value) &&
-    !hasSectionsInAdvance(playerSections, playerKey)
+    shouldRequestSectionsAndPlay(state, playingTab, playerSections, playerKey)
   ) {
     Speech.stop();
-    console.log(
-      'playOrRequest.!hasSectionsInAdvance.requestAndPlay',
-      playerSections,
-      playerKey
-    );
-
     return proxySectionsRequestAndPlay.request(payload);
   }
+
   if (actions.length === 0) {
     Speech.stop();
-    console.log('playOrRequest.playing - key, seek', playerKey, playerSections);
     try {
       Speech.play(playerSections[playerKey].text);
     } catch (e) {
-      console.error('Player has crashed, rip', e);
+      console.error('Player has crashed', playerSections[playerKey].text, e);
       return playerCrash({ message: 'Player has crashed', });
     }
-  } else {
-    console.log('Speech is switching to free, do nothing');
   }
+
   return false;
 };

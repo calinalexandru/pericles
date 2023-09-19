@@ -1,8 +1,10 @@
-import { createAction, } from 'redux-actions';
+import { createAction, } from '@reduxjs/toolkit';
+
+import { ParserIframesType, } from '@pericles/constants';
 
 import { PlayerState, } from '../initialState';
 
-import { createAsyncActions, } from './factories';
+import {  createAsyncActions, } from './factories';
 
 export enum PlayerActionTypes {
   SET = 'PLAYER/SET',
@@ -31,7 +33,6 @@ export enum PlayerActionTypes {
   CRASH = 'PLAYER/CRASH',
   END = 'PLAYER/END',
   TIMEOUT = 'PLAYER/TIMEOUT',
-  HEALTH_CHECK = 'PLAYER/HEALTH_CHECK',
   TOGGLE = 'PLAYER/TOGGLE',
   ERROR = 'PLAYER/ERROR',
 }
@@ -40,7 +41,15 @@ export enum SectionsActionTypes {
   SET = 'SECTIONS/SET',
 }
 
-export const sectionsRequestAndPlay = createAsyncActions<any>(
+type PayloadType = {
+  iframe?: boolean;
+  iframes?: ParserIframesType;
+  userGenerated?: boolean;
+  fromCursor?: boolean;
+  working?: boolean;
+  tab?: number;
+};
+export const sectionsRequestAndPlay = createAsyncActions<PayloadType>(
   'SECTIONS_REQUEST_AND_PLAY'
 );
 
@@ -61,10 +70,13 @@ export type PlayerPlayParams = {
   fromCursor: boolean;
 };
 
-export const playerPlay = createAction<PlayerPlayParams>(
+export const playerPlay = createAsyncActions<PlayerPlayParams>(
   PlayerActionTypes.PLAY
 );
-export const playerProxyPlay = createAction<any>(PlayerActionTypes.PROXY_PLAY);
+
+export const playerProxyPlay = createAction<{ tab: number }>(
+  PlayerActionTypes.PROXY_PLAY
+);
 export const playerPause = createAction(PlayerActionTypes.PAUSE);
 export const playerResume = createAction(PlayerActionTypes.RESUME);
 export const playerContinue = createAction(PlayerActionTypes.CONTINUE);
@@ -93,7 +105,6 @@ export const playerCrash = createAction<{ message: string }>(
 );
 export const playerEnd = createAction<any>(PlayerActionTypes.END);
 export const playerTimeout = createAction(PlayerActionTypes.TIMEOUT);
-export const playerHealthCheck = createAction(PlayerActionTypes.HEALTH_CHECK);
 export const playerToggle = createAction(PlayerActionTypes.TOGGLE);
 
 export const setSections = createAction<any>(SectionsActionTypes.SET);

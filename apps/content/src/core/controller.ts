@@ -5,11 +5,11 @@ import { ATTRIBUTES, PLAYER_STATUS, VARIABLES, } from '@pericles/constants';
 import {
   store,
   parserTypeSelector,
-  setApp,
   setPlayer,
   playerPlay,
   playerStop,
   playerSoftHalt,
+  appActions,
 } from '@pericles/store';
 import { isGoogleBook, } from '@pericles/util';
 
@@ -19,12 +19,12 @@ export default () => {
       const textSelected = window.getSelection()?.toString?.() || '';
       if (textSelected.length) {
         store.dispatch(
-          setApp({
+          appActions.set({
             [VARIABLES.APP.SELECTED_TEXT]: textSelected,
           })
         );
       }
-      store.dispatch(setApp({ skipUntilY: e.pageY, }));
+      store.dispatch(appActions.set({ skipUntilY: e.pageY, }));
     }),
     ignoreElements()
   );
@@ -69,7 +69,9 @@ export default () => {
         setPlayer({ key: sectionId, status: PLAYER_STATUS.LOADING, })
       );
       setTimeout(() => {
-        store.dispatch(playerPlay({ userGenerated: false, fromCursor: false, }));
+        store.dispatch(
+          playerPlay.request({ userGenerated: false, fromCursor: false, })
+        );
       }, 300);
 
       return true;

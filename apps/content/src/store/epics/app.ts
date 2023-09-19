@@ -1,3 +1,4 @@
+import { getType, } from '@reduxjs/toolkit';
 import { Epic, combineEpics, ofType, } from 'redux-observable';
 import {
   debounceTime,
@@ -15,9 +16,9 @@ import {
   WORD_TRACKER_STYLES,
 } from '@pericles/constants';
 import {
-  AppActionTypes,
   AutoscrollActionTypes,
   HighlightActionTypes,
+  appActions,
   appAutoscrollSelector,
   appHighlightColorSelector,
   appHighlightStyleSelector,
@@ -45,7 +46,7 @@ import {
 
 const appNewContentEpic: Epic<any> = (action) =>
   action.pipe(
-    ofType(AppActionTypes.NEW_CONTENT),
+    ofType(getType(appActions.newContent)),
     pluck('payload'),
     filter((payload: any = {}) => {
       console.log('appnewContentEpic', payload);
@@ -57,7 +58,7 @@ const appNewContentEpic: Epic<any> = (action) =>
 
 const appReloadTabEpic: Epic<any> = (action) =>
   action.pipe(
-    ofType(AppActionTypes.RELOAD_TAB),
+    ofType(getType(appActions.reloadTab)),
     tap(() => {
       console.log('appReloadTabEpic');
       window.location.reload();

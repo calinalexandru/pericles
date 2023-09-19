@@ -1,8 +1,6 @@
-import { createAction, } from 'redux-actions';
+import { createAction, } from '@reduxjs/toolkit';
 
 import { SettingsState, } from '../initialState';
-
-import { createAsyncActions, } from './factories';
 
 type SettingsActionPayload = any;
 export enum SettingsActionTypes {
@@ -17,5 +15,3 @@ export const setSettings = createAction<Partial<SettingsState>>(
 export const defaultSettings = createAction<SettingsActionPayload>(
   SettingsActionTypes.DEFAULT
 );
-
-export const freeVoice = createAsyncActions<any>('FREE_VOICE');

@@ -14,7 +14,7 @@ import React from 'react';
 import { useDispatch, } from 'react-redux';
 
 import { ATTRIBUTES, } from '@pericles/constants';
-import { playerStop, routeIndex, } from '@pericles/store';
+import { appActions, playerStop, } from '@pericles/store';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -31,7 +31,7 @@ const PDFPreviewErrorPage: React.FC = () => {
 
   const handleOnClick = () => {
     dispatch(playerStop());
-    dispatch(routeIndex());
+    dispatch(appActions.routeIndex());
   };
 
   return (

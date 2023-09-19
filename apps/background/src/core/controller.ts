@@ -4,11 +4,10 @@ import { filter, map, tap, } from 'rxjs/operators';
 import { ATTRIBUTES, } from '@pericles/constants';
 import {
   store,
-  setApp,
-  appTabClosed,
   playerStop,
   playerDemand,
   playerPlay,
+  appActions,
 } from '@pericles/store';
 import { getBrowserAPI, } from '@pericles/util';
 
@@ -17,7 +16,7 @@ export default () => {
 
   api.tabs.onRemoved.addListener((tabId: number, removeInfo) => {
     console.log('tab closed listener', tabId, removeInfo);
-    store.dispatch(appTabClosed(tabId));
+    store.dispatch(appActions.tabClosed(tabId));
   });
 
   api.contextMenus.create({
@@ -39,7 +38,7 @@ export default () => {
     map((activeInfo) => activeInfo.tabId),
     tap((tabId: number) => {
       console.log('set tab ID', tabId);
-      store.dispatch(setApp({ activeTab: tabId, }));
+      store.dispatch(appActions.set({ activeTab: tabId, }));
     })
   );
 
@@ -73,7 +72,9 @@ export default () => {
     tap(() => {
       store.dispatch(playerStop());
       setTimeout(() => {
-        store.dispatch(playerPlay({ userGenerated: true, fromCursor: true, }));
+        store.dispatch(
+          playerPlay.request({ userGenerated: true, fromCursor: true, })
+        );
       }, 500);
     })
   );

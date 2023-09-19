@@ -18,11 +18,9 @@ import { useSelector, useDispatch, } from 'react-redux';
 
 import { VARIABLES, MESSAGES, ISO_LANGS, } from '@pericles/constants';
 import {
-  appFactoryReset,
+  appActions,
   appLanguageSelector,
-  appReload,
   appThemeModeSelector,
-  setApp,
 } from '@pericles/store';
 import { getIsoLangFromString, t, } from '@pericles/util';
 
@@ -64,8 +62,8 @@ const MiscPage: React.FC = () => {
   const onOtherSettingsChanged = (
     key: string,
     val: number | string | boolean
-  ) => dispatch(setApp({ [key]: val, }));
-  const onReloadApp = () => dispatch(appReload());
+  ) => dispatch(appActions.set({ [key]: val, }));
+  const onReloadApp = () => dispatch(appActions.reload());
 
   const isDarkMode = themeMode === 'dark';
   const isLightMode = themeMode === 'light';
@@ -82,7 +80,7 @@ const MiscPage: React.FC = () => {
           fullWidth={true}
         >
           <Button
-            onClick={() => dispatch(setApp({ themeMode: 'light', }))}
+            onClick={() => dispatch(appActions.set({ themeMode: 'light', }))}
             style={buttonStyle}
             sx={isLightMode ? lightButtonSx : {}}
           >
@@ -92,7 +90,7 @@ const MiscPage: React.FC = () => {
             {t`light`}
           </Button>
           <Button
-            onClick={() => dispatch(setApp({ themeMode: 'dark', }))}
+            onClick={() => dispatch(appActions.set({ themeMode: 'dark', }))}
             style={buttonStyle}
             sx={isDarkMode ? darkButtonSx : {}}
           >
@@ -172,7 +170,7 @@ const MiscPage: React.FC = () => {
           <Button
             onClick={() => {
               setFactoryReset(false);
-              dispatch(appFactoryReset());
+              dispatch(appActions.factoryReset());
             }}
           >
             {t`submit_btn`}

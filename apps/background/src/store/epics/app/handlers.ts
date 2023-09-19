@@ -5,11 +5,10 @@ import Speech from '@/speech';
 import { VARIABLES, } from '@pericles/constants';
 import {
   RootState,
-  appReload,
+  appActions,
   highlightReloadSettings,
   initialState,
   notificationInfo,
-  setApp,
   setHotkeys,
   setPlayer,
   setSettings,
@@ -65,7 +64,7 @@ export const handleFactoryReset$: any = (state: RootState) => {
   } = initialState;
   console.log('appFactoryResetEpic');
   return of(
-    setApp(appDefaultValues),
+    appActions.set(appDefaultValues),
     setPlayer(playerDefaultValues),
     setSettings({
       ...settingsDefaultValues,
@@ -73,7 +72,7 @@ export const handleFactoryReset$: any = (state: RootState) => {
     }),
     setHotkeys(hotkeysDefaultValues),
     notificationInfo({ text: 'Your setting have been reset.', }),
-    appReload()
+    appActions.reload()
   );
 };
 

@@ -6,7 +6,16 @@ import { Store, wrapStore, } from 'webext-redux';
 import core from '@/core';
 import { WEBEXT_PORT, } from '@pericles/constants';
 import {
-  RootState, initialState, setApp, store, 
+  RootState,
+  appActions,
+  appReducer,
+  hotkeysReducer,
+  initialState,
+  notificationReducer,
+  parserReducer,
+  playerReducer,
+  settingsReducer,
+  store,
 } from '@pericles/store';
 import { getBrowserAPI, } from '@pericles/util';
 
@@ -14,12 +23,6 @@ import appEpic from './store/epics/app';
 import notificationEpic from './store/epics/notification';
 import playerEpic from './store/epics/player';
 import settingsEpic from './store/epics/settings';
-import appReducer from './store/reducers/app';
-import hotkeysReducer from './store/reducers/hotkeys';
-import notificationReducer from './store/reducers/notification';
-import parserReducer from './store/reducers/parser';
-import playerReducer from './store/reducers/player';
-import settingsReducer from './store/reducers/settings';
 
 // Since we are in a service worker, this is not persistent
 // and this will be reset to false, as expected, whenever
@@ -63,7 +66,7 @@ const init = async (preloadedState: RootState): Promise<void | Error> => {
           const activeTabId = activeTab.id;
 
           console.log('dispatch tabId', activeTabId);
-          store.dispatch(setApp({ activeTab: activeTabId, }));
+          store.dispatch(appActions.set({ activeTab: activeTabId, }));
           resolve();
         }
       );

@@ -1,3 +1,11 @@
+/* slices */
+export * from './reducers/app';
+export { default as hotkeysReducer, } from './reducers/hotkeys';
+export { default as notificationReducer, } from './reducers/notification';
+export { default as parserReducer, } from './reducers/parser';
+export { default as playerReducer, } from './reducers/player';
+export { default as settingsReducer, } from './reducers/settings';
+
 /* app */
 export { default as appSelector, } from './selectors/app/appSelector';
 export { default as appHighlightColorSelector, } from './selectors/app/appHighlightColorSelector';

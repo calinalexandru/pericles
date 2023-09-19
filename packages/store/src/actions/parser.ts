@@ -1,4 +1,4 @@
-import { createAction, } from 'redux-actions';
+import { createAction, } from '@reduxjs/toolkit';
 
 import { ParserState, } from '../initialState';
 

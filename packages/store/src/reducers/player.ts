@@ -1,12 +1,9 @@
 import { handleActions, } from 'redux-actions';
 
 import { PLAYER_STATUS, } from '@pericles/constants';
-import {
-  PlayerActionTypes,
-  PlayerState,
-  SectionsActionTypes,
-  initialState,
-} from '@pericles/store';
+
+import { PlayerActionTypes, SectionsActionTypes, } from '../actions/player';
+import { PlayerState, initialState, } from '../initialState';
 
 const { player: defaultValues, } = initialState;
 

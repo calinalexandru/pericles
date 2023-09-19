@@ -49,7 +49,9 @@ const settingsSetEpic: Epic<any> = (action, state) =>
       ) {
         if (Speech.isReplayStarved(Object.keys(filteredPayload))) {
           Speech.stop();
-          return of(playerPlay({ userGenerated: false, fromCursor: false, }));
+          return of(
+            playerPlay.request({ userGenerated: false, fromCursor: false, })
+          );
         }
       }
 

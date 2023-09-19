@@ -28,10 +28,7 @@ import {
   playerSoftNext,
   playerSoftPrev,
   playerStop as actionPlayerStop,
-  playerHealthCheck,
-  playerStatusSelector,
 } from '@pericles/store';
-import { isStopped, } from '@pericles/util';
 
 import routes from './routes';
 import { paletteDark, paletteLight, } from './theme';
@@ -97,21 +94,6 @@ const App: React.FC = () => {
       playerPrev();
     },
   } as any;
-
-  const playerStatus = useSelector(playerStatusSelector);
-
-  // TODO:: not sure about this
-  // we want to trigger this hook once
-  // with the initial playerStatus found in state
-  // on application mount to decide
-  // if we want to dispatch a heath check
-  // useEffect(() => {
-  //   // if (!isStopped(playerStatus)) {
-  //   //   dispatch(playerHealthCheck());
-  //   // }
-
-  //   /* eslint-disable react-hooks/exhaustive-deps */
-  // }, [ dispatch, ]);
 
   const onKeyUp = (e: KeyboardEvent) => {
     if (disableHotkeys) return;

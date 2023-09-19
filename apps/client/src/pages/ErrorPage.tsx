@@ -14,7 +14,7 @@ import React from 'react';
 import { useDispatch, } from 'react-redux';
 
 import { ATTRIBUTES, } from '@pericles/constants';
-import { playerStop, routeIndex, setPlayer, } from '@pericles/store';
+import { appActions, playerStop, setPlayer, } from '@pericles/store';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -34,7 +34,7 @@ const ErrorPage: React.FC = () => {
   const onErrorClose = () => {
     dispatch(setPlayer({ buffering: false, }));
     dispatch(playerStop());
-    dispatch(routeIndex());
+    dispatch(appActions.routeIndex());
   };
 
   return (

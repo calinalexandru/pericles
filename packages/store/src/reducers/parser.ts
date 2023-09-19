@@ -1,11 +1,7 @@
 import { handleActions, } from 'redux-actions';
 
-import {
-  PageActionTypes,
-  ParserActionTypes,
-  ParserState,
-  initialState,
-} from '@pericles/store';
+import { PageActionTypes, ParserActionTypes, } from '../actions/parser';
+import { ParserState, initialState, } from '../initialState';
 
 const { parser: defaultValues, } = initialState;
 

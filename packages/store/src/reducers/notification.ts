@@ -1,10 +1,7 @@
 import { handleActions, } from 'redux-actions';
 
-import {
-  NotificationActionTypes,
-  NotificationState,
-  initialState,
-} from '@pericles/store';
+import { NotificationActionTypes, } from '../actions/notification';
+import { NotificationState, initialState, } from '../initialState';
 
 const { notification: defaultValues, } = initialState;
 

@@ -1,4 +1,4 @@
-import { store, setSettings, appInit, } from '@pericles/store';
+import { store, setSettings, appActions, } from '@pericles/store';
 import { getBrowserAPIVoices, } from '@pericles/util';
 
 export default () => {
@@ -10,5 +10,5 @@ export default () => {
     .catch((e) => console.log(e));
 
   // hook for azure neural voices
-  store.dispatch(appInit());
+  store.dispatch(appActions.init());
 };

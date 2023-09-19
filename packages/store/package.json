@@ -23,6 +23,7 @@
   "license": "MIT",
   "dependencies": {
     "@pericles/constants": "workspace:*",
+    "@reduxjs/toolkit": "^1.9.5",
     "ramda": "0.27.1",
     "redux": "4.1.2",
     "redux-actions": "2.6.5",

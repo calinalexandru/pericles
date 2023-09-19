@@ -1,7 +1,7 @@
+import { Action, } from 'redux';
 import { Epic, combineEpics, ofType, } from 'redux-observable';
-import { from, of, } from 'rxjs';
+import { from, interval, of, } from 'rxjs';
 import {
-  catchError,
   concatMap,
   debounceTime,
   delay,
@@ -9,22 +9,25 @@ import {
   first,
   ignoreElements,
   map,
+  mergeMap,
   pluck,
   switchMap,
   tap,
-  timeout,
 } from 'rxjs/operators';
 
 import Speech from '@/speech';
 import {
   ATTRIBUTES,
   PARSER_TYPES,
+  PLAYER_STATUS,
   ParserTypes,
-  VARIABLES,
+  PlayerStatusTypes,
 } from '@pericles/constants';
 import {
   PageActionTypes,
   PlayerActionTypes,
+  RootState,
+  appActions,
   appActiveTabSelector,
   appSelectedTextSelector,
   appSkipDeadSectionsSelector,
@@ -38,7 +41,6 @@ import {
   parserMaxPageSelector,
   parserPageSelector,
   parserTypeSelector,
-  playerHealthCheck,
   playerIdle,
   playerNext,
   playerNextAuto,
@@ -59,52 +61,42 @@ import {
   proxyResetAndRequestPlay,
   proxySectionsRequestAndPlay,
   resetParser,
-  routeError,
-  routeIndex,
-  routeSkip,
   sectionsRequestAndPlay,
   setParser,
   setPlayer,
 } from '@pericles/store';
 import {
-  isError,
   isGoogleBook,
   isIframeParsing,
   isPaused,
-  isPlaying,
   isStopped,
   mpToContent,
 } from '@pericles/util';
 
 import { playOrRequest$, } from './handlers';
 
-// const HEALTH_CHECK_INTERVAL = 1000;
-// const periodicHealthCheckEpic: Epic<PlayerAction> = (action, state) =>
-//   interval(HEALTH_CHECK_INTERVAL).pipe(
-//     mergeMap(() => {
-//       console.log('checking the boy health')
-//       if (!isStopped(playerStatusSelector(state.value))) {
-//         console.log('dispatching medicine')
-//         return of(playerHealthCheck());
-//       }
-//       return of(playerIdle());
-//     })
-//   );
-
-const healthCheckEpic: Epic<any> = (action) =>
-  action.pipe(
-    ofType(PlayerActionTypes.HEALTH_CHECK),
-    switchMap(() =>
-      action.pipe(
-        ofType(PlayerActionTypes.SET, PlayerActionTypes.ERROR),
-        first(),
-        pluck('payload', VARIABLES.PLAYER.STATUS),
-        filter((status: number) => isPlaying(status) || isError(status)),
-        timeout(ATTRIBUTES.MISC.PLAY_TIMEOUT),
-        catchError(() => of('timeout'))
-      )
-    ),
-    map((result) => (result === 'timeout' ? routeError() : playerIdle()))
+let healthCheckCounter = 0;
+const HEALTH_CHECK_INTERVAL = 1000;
+// TODO: Improve poor man's health check
+const periodicHealthCheckEpic: Epic<Action<any>, Action<any>, RootState> = (
+  action,
+  state
+) =>
+  interval(HEALTH_CHECK_INTERVAL).pipe(
+    mergeMap(() => {
+      if (
+        (
+          [ PLAYER_STATUS.WAITING, PLAYER_STATUS.LOADING, ] as PlayerStatusTypes[]
+        ).includes(playerStatusSelector(state.value))
+      ) {
+        healthCheckCounter++;
+      } else {
+        healthCheckCounter = 0;
+      }
+      return healthCheckCounter > 5
+        ? from([ playerStop(), appActions.routeError(), ])
+        : of(playerIdle());
+    })
   );
 
 const proxyPlayEpic: Epic<any> = (action, state) =>
@@ -114,7 +106,7 @@ const proxyPlayEpic: Epic<any> = (action, state) =>
       console.log('player.proxyPlay', action, state);
     }),
     pluck('payload'),
-    map(playerPlay)
+    map(playerPlay.request)
   );
 
 const proxyResetAndRequestPlayEpic: Epic<any> = (action, state) =>
@@ -149,36 +141,21 @@ const proxySectionsRequestAndPlayEpic: Epic<any> = (action, state) =>
     ignoreElements()
   );
 
-const playEpic: Epic<any> = (action, state) =>
-  action.pipe(
-    ofType(PlayerActionTypes.PLAY),
-    tap(() => {
-      console.log('player.play', action, state);
-    }),
+const playEpic: Epic<any> = (action$, state$) =>
+  action$.pipe(
+    ofType(playerPlay.actionTypes.REQUEST),
+    tap(() => console.log('player.play', action$, state$)),
     pluck('payload'),
     concatMap((payload: any = {}) => {
-      console.log('checkAuth', { ...state.value, }, { ...payload, });
-      const userGenerated: boolean = payload?.userGenerated || false;
-      // let text;
-      const actions: any = [];
+      const actions: Action<any>[] = [];
+      const initialActions = [ setPlayer({ buffering: true, }), ];
 
-      const out = [
-        ...actions,
-        setPlayer({
-          buffering: true,
-        }),
-      ];
+      const playOrRequestResponse = playOrRequest$(state$, payload, actions);
+      const additionalActions = playOrRequestResponse
+        ? [ playOrRequestResponse, ]
+        : [ playerIdle(), ];
 
-      if (userGenerated) out.push(playerHealthCheck());
-      console.log('checkAuth.out', out, actions);
-      if (!actions.length) {
-        const playOrRequestResponse = playOrRequest$(state, payload, actions);
-        if (playOrRequestResponse) out.push(playOrRequestResponse);
-        out.push(playerIdle());
-        console.log('checkAuth.out.playOrReq', out);
-      }
-      return from(out);
-      // console.log('notification.clear');
+      return from([ ...initialActions, ...additionalActions, ]);
     })
   );
 
@@ -188,7 +165,7 @@ const timeoutEpic: Epic<any> = (action) =>
     tap(() => {
       console.log('player has timed out');
     }),
-    map(routeSkip)
+    map(appActions.routeSkip)
   );
 
 const pauseEpic: Epic<any> = (action) =>
@@ -425,7 +402,9 @@ const endEpic: Epic<any> = (action, state) =>
       action.pipe(ofType(PageActionTypes.MOVE_COMPLETE), first())
     ),
     delay(500),
-    concatMap(() => of(playerPlay({ userGenerated: false, fromCursor: false, })))
+    concatMap(() =>
+      of(playerPlay.request({ userGenerated: false, fromCursor: false, }))
+    )
   );
 
 const endPageEpic: Epic<any> = (action, state) =>
@@ -441,7 +420,7 @@ const nextAutoEpic: Epic<any> = (action) =>
     tap(() => {
       console.log('player.nextAuto');
     }),
-    map(playerPlay)
+    map(playerPlay.request)
   );
 
 const nextEpicThrottled: Epic<any> = (action) =>
@@ -451,7 +430,7 @@ const nextEpicThrottled: Epic<any> = (action) =>
     tap(() => {
       console.log('player.nextSlow');
     }),
-    map(playerPlay)
+    map(playerPlay.request)
   );
 
 const demandPlayEpic: Epic<any> = (action, state) =>
@@ -494,7 +473,7 @@ const prevEpicThrottled: Epic<any> = (action) =>
     tap(() => {
       console.log('player.prev');
     }),
-    map(playerPlay)
+    map(playerPlay.request)
   );
 
 const crashEpic: Epic<any> = (action, state) =>
@@ -506,8 +485,8 @@ const crashEpic: Epic<any> = (action, state) =>
     pluck('payload', 'message'),
     concatMap((text) =>
       appSkipDeadSectionsSelector(state.value)
-        ? of(routeIndex(), playerNext({ auto: false, }))
-        : of(notificationWarning({ text, }), routeSkip())
+        ? of(appActions.routeIndex(), playerNext({ auto: false, }))
+        : of(notificationWarning({ text, }), appActions.routeSkip())
     )
   );
 
@@ -535,10 +514,11 @@ export default combineEpics(
   softHaltEpic,
   endEpic,
   timeoutEpic,
-  healthCheckEpic,
   toggleEpic,
   softNextEpic,
   softPrevEpic,
   proxyResetAndRequestPlayEpic,
-  proxySectionsRequestAndPlayEpic
-);
+  proxySectionsRequestAndPlayEpic,
+  periodicHealthCheckEpic
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+) as any;

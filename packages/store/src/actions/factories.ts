@@ -1,4 +1,4 @@
-import { createAction, } from 'redux-actions';
+import { createAction, } from '@reduxjs/toolkit';
 
 export type AsyncActionStages = 'IDLE' | 'REQUEST' | 'SUCCESS' | 'FAILURE';
 
@@ -18,9 +18,9 @@ export function createAsyncActions<
   SuccessPayload = void
 >(baseAction: string) {
   const actionTypes = createAsyncActionTypes(baseAction);
-  // type OptionalPayload<P> = P extends undefined ? void : P | undefined;
 
   return {
+    actionTypes,
     idle: createAction(actionTypes.IDLE),
     request: createAction<RequestPayload>(actionTypes.REQUEST),
     success: createAction<SuccessPayload>(actionTypes.SUCCESS),

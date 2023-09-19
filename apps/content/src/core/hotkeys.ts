@@ -25,7 +25,9 @@ export default () => {
 
   const hotkeyEvents = new Map<HotkeyEvent, () => void>();
   hotkeyEvents.set('start', () => {
-    store.dispatch(playerPlay({ userGenerated: true, fromCursor: false, }));
+    store.dispatch(
+      playerPlay.request({ userGenerated: true, fromCursor: false, })
+    );
   });
   hotkeyEvents.set('play', () => {
     store.dispatch(playerToggle());

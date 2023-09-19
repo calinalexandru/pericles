@@ -6,7 +6,7 @@ import {
   highlightClearSections,
   highlightClearWords,
   highlightSection as actionHighlightSection,
-  setApp,
+  appActions,
 } from '@pericles/store';
 import { mpToContent, } from '@pericles/util';
 
@@ -15,17 +15,18 @@ export default function useAppSettings() {
 
   const setAppSetting = useCallback(
     (key: string, val: number | string | boolean) =>
-      dispatch(setApp({ [key]: val, })),
+      dispatch(appActions.set({ [key]: val, })),
     [ dispatch, ]
   );
 
   const setRoute = useCallback(
-    (val: string) => dispatch(setApp({ [VARIABLES.APP.ROUTE]: val, })),
+    (val: string) => dispatch(appActions.set({ [VARIABLES.APP.ROUTE]: val, })),
     [ dispatch, ]
   );
 
   const setRouteTab = useCallback(
-    (val: string) => dispatch(setApp({ [VARIABLES.APP.ROUTE_TAB]: val, })),
+    (val: string) =>
+      dispatch(appActions.set({ [VARIABLES.APP.ROUTE_TAB]: val, })),
     [ dispatch, ]
   );
 

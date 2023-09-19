@@ -1,10 +1,7 @@
 import { handleActions, } from 'redux-actions';
 
-import {
-  initialState,
-  HotkeysActionTypes,
-  HotkeysState,
-} from '@pericles/store';
+import { HotkeysActionTypes, } from '../actions/hotkeys';
+import { HotkeysState, initialState, } from '../initialState';
 
 const { hotkeys: defaultValues, } = initialState;
 

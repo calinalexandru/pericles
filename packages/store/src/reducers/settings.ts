@@ -1,10 +1,7 @@
 import { handleActions, } from 'redux-actions';
 
-import {
-  SettingsActionTypes,
-  SettingsState,
-  initialState,
-} from '@pericles/store';
+import { SettingsActionTypes, } from '../actions/settings';
+import { SettingsState, initialState, } from '../initialState';
 
 const { settings: defaultValues, } = initialState;
 

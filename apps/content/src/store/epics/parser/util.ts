@@ -1,3 +1,4 @@
+import { PayloadAction, } from '@reduxjs/toolkit';
 import { Action, } from 'redux';
 import { Observable, from, } from 'rxjs';
 
@@ -13,6 +14,7 @@ import {
 } from '@pericles/constants';
 import {
   RootState,
+  appActions,
   appSkipUntilYSelector,
   notificationError,
   parserIframesSelector,
@@ -24,7 +26,6 @@ import {
   playerProxyPlay,
   playerSectionsSelector,
   playerStop,
-  routeErrorPdf,
   sectionsRequestAndPlay,
   setParser,
   setPlayer,
@@ -210,7 +211,7 @@ const handleError = () =>
   from([
     setPlayer({ status: PLAYER_STATUS.ERROR, }),
     sectionsRequestAndPlay.success(),
-    routeErrorPdf(),
+    appActions.routeErrorPdf(),
   ]);
 
 const handleIframeEnd = (
@@ -318,7 +319,7 @@ export const processResponse = (
     error = '',
   }: PayloadResponseType,
   state: RootState
-): Observable<Action<any>> => {
+): Observable<PayloadAction<any>> => {
   console.log('processResponse', {
     message,
     skip,

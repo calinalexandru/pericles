@@ -16,7 +16,7 @@ export default function usePlayer() {
 
   const play = useCallback(
     (params: PlayerPlayParams) => {
-      dispatch(playerPlay(params));
+      dispatch(playerPlay.request(params));
     },
     [ dispatch, ]
   );

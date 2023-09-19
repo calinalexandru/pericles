@@ -14,11 +14,10 @@ import { useDispatch, useSelector, } from 'react-redux';
 
 import { VARIABLES, } from '@pericles/constants';
 import {
+  appActions,
   appSkipDeadSectionsSelector,
   playerNext,
   playerStop,
-  routeIndex,
-  setApp,
 } from '@pericles/store';
 import { t, } from '@pericles/util';
 
@@ -59,7 +58,9 @@ const SkipPage: React.FC = () => {
   const skipDeadSections = useSelector(appSkipDeadSectionsSelector);
 
   const handleAutoSkip = useCallback(() => {
-    dispatch(setApp({ [VARIABLES.APP.SKIP_DEAD_SECTIONS]: !skipDeadSections, }));
+    dispatch(
+      appActions.set({ [VARIABLES.APP.SKIP_DEAD_SECTIONS]: !skipDeadSections, })
+    );
   }, [ dispatch, skipDeadSections, ]);
 
   const checkbox = useMemo(
@@ -86,7 +87,7 @@ const SkipPage: React.FC = () => {
         <Button
           variant="contained"
           onClick={() => {
-            dispatch(routeIndex());
+            dispatch(appActions.routeIndex());
             dispatch(playerStop());
           }}
         >
@@ -96,7 +97,7 @@ const SkipPage: React.FC = () => {
           color="secondary"
           variant="contained"
           onClick={() => {
-            dispatch(routeIndex());
+            dispatch(appActions.routeIndex());
             dispatch(playerNext({ auto: false, }));
           }}
         >

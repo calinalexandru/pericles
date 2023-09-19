@@ -1,4 +1,4 @@
-import { Action, } from 'redux';
+import { PayloadAction, } from '@reduxjs/toolkit';
 import { Epic, combineEpics, ofType, } from 'redux-observable';
 import { from, of, } from 'rxjs';
 import {
@@ -42,21 +42,16 @@ import {
   wrapWordTagAzure,
 } from '@pericles/util';
 
-import {
-  logInitialData,
-  logSectionData,
-  mapPayloadToResponse,
-  processResponse,
-} from './util';
+import { PayloadType, mapPayloadToResponse, processResponse, } from './util';
 
-export const getSectionsAndPlayEpic: Epic<
-  Action<any>,
-  Action<any>,
+export const sectionsRequestAndPlayRequestEpic: Epic<
+  PayloadAction<PayloadType>,
+  PayloadAction<any>,
   RootState
 > = (action$, state$) =>
   action$.pipe(
-    ofType(sectionsRequestAndPlay.request),
-    pluck('payload'),
+    ofType(sectionsRequestAndPlay.actionTypes.REQUEST),
+    map((action) => action.payload),
     withLatestFrom(state$),
     map(([ payload, state, ]) => mapPayloadToResponse(payload, state)),
     withLatestFrom(state$),
@@ -203,10 +198,11 @@ export const clearHelperTagsEpic: Epic<any> = (action) =>
 export default combineEpics(
   pageNextEpic,
   pagePrevEpic,
-  getSectionsAndPlayEpic,
+  sectionsRequestAndPlayRequestEpic,
   clearHelperTagsEpic,
   wordsUpdateEpic,
   wordsUpdateWorkerEpic,
   pageMoveEpic,
   pageAutosetEpic
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 ) as any;

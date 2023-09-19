@@ -2,7 +2,7 @@ import { combineEpics, createEpicMiddleware, } from 'redux-observable';
 import thunk from 'redux-thunk';
 import { applyMiddleware, } from 'webext-redux';
 
-import { appNewContent, store, } from '@pericles/store';
+import { appActions, store, } from '@pericles/store';
 import { getBrowserAPI, } from '@pericles/util';
 
 import appEpic from '../store/epics/app';
@@ -38,7 +38,7 @@ export default (): void => {
     }
 
     setTimeout(() => {
-      store.dispatch(appNewContent({ iframe: window !== window.top, }));
+      store.dispatch(appActions.newContent({ iframe: window !== window.top, }));
     }, 50);
 
     store.subscribe(() => {
