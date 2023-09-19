@@ -1,6 +1,5 @@
 import { Action, } from 'redux';
 import { Observable, from, } from 'rxjs';
-import { tap, } from 'rxjs/operators';
 
 import DomStrategy from '@/strategy/DomStrategy';
 import {
@@ -10,6 +9,7 @@ import {
   ParserIframesType,
   ParserTypes,
   SectionType,
+  VoiceType,
 } from '@pericles/constants';
 import {
   RootState,
@@ -30,44 +30,32 @@ import {
   setPlayer,
   setSections,
   settingsVoiceSelector,
+  settingsVoicesSelector,
 } from '@pericles/store';
 import {
   findAvailableIframe,
   findWorkingIframe,
   getIframesForStore,
+  getIsoLangFromString,
   getParserType,
-  getPremiumVoiceId,
   isGoogleBook,
   isGoogleUtility,
   isGrammarlyApp,
   isIframeParsing,
   isPdfPage,
-  isPremiumVoice,
   isWindowTop,
   splitSentencesIntoWords,
   t,
 } from '@pericles/util';
 
-export const mergedLanguages = [ 'ja', 'cn', 'ko', ];
-
 export type PayloadType = {
   iframe?: boolean;
-  iframes?: any;
+  iframes?: ParserIframesType;
   userGenerated?: boolean;
   fromCursor?: boolean;
   working?: boolean;
   tab?: number;
 };
-
-export const logInitialData = () =>
-  tap((data: any) => {
-    console.log('getSectionsAndPlayEpic.init', data);
-  });
-
-export const logSectionData = () =>
-  tap((data: any) => {
-    console.log('sectionsData', data);
-  });
 
 export type PayloadResponseType = {
   type?: ParserTypes;
@@ -86,90 +74,48 @@ export type PayloadResponseType = {
 
 const domStrategy = new DomStrategy();
 
-export const mapPayloadToResponse = (
-  payload: PayloadType,
-  state: RootState
-): PayloadResponseType => {
-  console.log('mapPayloadToResponse.payload', payload);
-  const parserType = getParserType(window);
-  console.log('getSectionsAndPlayEpic.parserType', parserType);
-  if (isGrammarlyApp(parserType)) {
-    return {
-      skip: true,
-      message: t`grammarly_app_not_supported`,
-    };
+const isAsianLanguage = (state: RootState): boolean => {
+  const voiceProp = settingsVoiceSelector(state);
+  const voices = settingsVoicesSelector(state);
+  if (voices.at(voiceProp)) {
+    const mergedLanguages = [ 'ja', 'cn', 'ko', ];
+    const { lang, } = voices.at(voiceProp) as VoiceType;
+    return !!mergedLanguages.includes(getIsoLangFromString(lang));
   }
+  return false;
+};
 
-  const isIframe = !isWindowTop();
+const shouldSkipParsing = (
+  parserType: ParserTypes,
+  parserIframes: ParserIframesType
+): boolean => {
+  const windowIsIframe = !isWindowTop();
   const { hostname, } = window.location;
-  if (isPdfPage(window)) {
-    return {
-      error: 'Pdf page error',
-    };
-  }
-  const parserIframes = payload?.iframes || parserIframesSelector(state);
-  if (
-    (isGoogleBook(parserType) && !isIframe) ||
+  return (
+    (isGoogleBook(parserType) && !windowIsIframe) ||
     (!isGoogleUtility(parserType) &&
-      !isIframe &&
+      !windowIsIframe &&
       findWorkingIframe(parserIframes) !== false) ||
     (!isGoogleUtility(parserType) &&
-      isIframe &&
+      windowIsIframe &&
       !isIframeParsing(hostname, parserIframes))
-  ) {
-    return { skip: true, };
-  }
-
-  const iframes =
-    (Object.keys(parserIframes).length && parserIframes) ||
-    (!isGoogleUtility(parserType) && getIframesForStore(window)) ||
-    {};
-  const userGenerated = payload?.userGenerated || false;
-  const fromCursor = payload.fromCursor || false;
-  const tab = payload.tab || 0;
-  const parserKey = parserKeySelector(state);
-  const voiceProp = settingsVoiceSelector(state);
-  const skipUntilY = appSkipUntilYSelector(state);
-  const voices: any = settingsVoiceSelector(state);
-  const newVoiceProp = isPremiumVoice(voiceProp)
-    ? getPremiumVoiceId(voiceProp)
-    : voiceProp;
-  const { lang, } = voices[newVoiceProp] || {};
-  const jpLang = !!mergedLanguages.includes(lang);
-
-  domStrategy.setup(
-    parserType,
-    parserKey,
-    userGenerated,
-    fromCursor ? skipUntilY : 0,
-    parserIframes
   );
+};
 
-  const { out, maxPage, pageIndex, end, iframeBlocked, } =
-    domStrategy.getSections();
+const prepareIframesData = (
+  parserType: ParserTypes,
+  parserIframes: ParserIframesType
+): ParserIframesType =>
+  (Object.keys(parserIframes).length && parserIframes) ||
+  (!isGoogleUtility(parserType) && getIframesForStore(window)) ||
+  {};
 
-  console.log('domStrategy.getSections', {
-    userGenerated,
-    out,
-    maxPage,
-    pageIndex,
-    end,
-    iframeBlocked,
-  });
-
-  if (!out.length)
-    return {
-      iframeBlocked,
-      fromCursor,
-      iframes,
-      sections: [],
-      end: true,
-      type: parserType,
-      maxPage,
-      tab,
-      pageIndex,
-    };
-
+const processSections = (
+  out: SectionType[],
+  jpLang: boolean,
+  parserKey: number
+): SectionType[] => {
+  if (!out.length) return [];
   const sectionsArr = out.map((data) => data.text);
   splitSentencesIntoWords(
     Object.keys(sectionsArr).map(
@@ -177,10 +123,69 @@ export const mapPayloadToResponse = (
     ),
     jpLang
   );
+  return out.map(({ text, pos, }) => ({ text, ...(pos && { pos, }), }));
+};
+
+const handleDomStrategy = (
+  parserType: ParserTypes,
+  iframes: ParserIframesType,
+  state: RootState,
+  payload: PayloadType
+) => {
+  const userGenerated = payload?.userGenerated || false;
+  const fromCursor = payload.fromCursor || false;
+  const parserKey = parserKeySelector(state);
+  const skipUntilY = appSkipUntilYSelector(state);
+
+  domStrategy.setup(
+    parserType,
+    parserKey,
+    userGenerated,
+    fromCursor ? skipUntilY : 0,
+    iframes
+  );
+
+  return domStrategy.getSections();
+};
+
+export const mapPayloadToResponse = (
+  payload: PayloadType,
+  state: RootState
+): PayloadResponseType => {
+  console.log('mapPayloadToResponse', { payload, state, });
+  const parserType = getParserType(window);
+  if (isGrammarlyApp(parserType))
+    return { skip: true, message: t`grammarly_app_not_supported`, };
+  if (isPdfPage(window)) return { error: 'Pdf page error', };
+  if (
+    shouldSkipParsing(
+      parserType,
+      payload?.iframes || parserIframesSelector(state)
+    )
+  )
+    return { skip: true, };
+
+  const iframes = prepareIframesData(
+    parserType,
+    payload?.iframes || parserIframesSelector(state)
+  );
+
+  const fromCursor = payload.fromCursor || false;
+  const tab = payload.tab || 0;
+  const parserKey = parserKeySelector(state);
+  const isAsian = isAsianLanguage(state);
+
+  const { out, maxPage, pageIndex, end, iframeBlocked, } = handleDomStrategy(
+    parserType,
+    iframes,
+    state,
+    payload
+  );
+  const sections = processSections(out, isAsian, parserKey);
 
   return {
     iframeBlocked,
-    sections: out.map(({ text, pos, }) => ({ text, ...(pos && { pos, }), })),
+    sections,
     fromCursor,
     iframes,
     end:
@@ -192,7 +197,7 @@ export const mapPayloadToResponse = (
           PARSER_TYPES.GOOGLE_FORM,
         ] as ParserTypes[]
       ).includes(parserType) ||
-      sectionsArr.length < ATTRIBUTES.MISC.MIN_SECTIONS ||
+      sections.length < ATTRIBUTES.MISC.MIN_SECTIONS ||
       end,
     maxPage,
     pageIndex,
@@ -201,99 +206,84 @@ export const mapPayloadToResponse = (
   };
 };
 
-export const processResponse = (
-  {
-    fromCursor = false,
-    message = '',
-    skip = false,
-    end = false,
-    iframeBlocked = false,
-    maxPage = 0,
-    type = PARSER_TYPES.DEFAULT,
-    pageIndex = 0,
-    iframes = {},
-    sections: sectionsArr = [],
-    tab = 0,
-    error = '',
-  }: PayloadResponseType,
+const handleError = () =>
+  from([
+    setPlayer({ status: PLAYER_STATUS.ERROR, }),
+    sectionsRequestAndPlay.success(),
+    routeErrorPdf(),
+  ]);
+
+const handleIframeEnd = (
+  iframes: ParserIframesType,
+  sectionsArr: SectionType[],
   state: RootState
-): Observable<Action<any>> => {
-  const isIframe = !isWindowTop();
-  if (error) {
-    return from([
-      setPlayer({ status: PLAYER_STATUS.ERROR, }),
-      sectionsRequestAndPlay.success(),
-      routeErrorPdf(),
-    ]);
-  }
-  if (isIframe && end) {
-    const mergeSections = [ ...playerSectionsSelector(state), ...sectionsArr, ];
-    const currIframe = findWorkingIframe(iframes);
-    const newIframePayload = { ...iframes, };
-    if (typeof currIframe === 'string') {
-      newIframePayload[currIframe].parsing = false;
-    }
-    console.log('newIframePayload', newIframePayload);
-
-    return from([
-      setSections({ sections: mergeSections, }),
-      setParser({ iframes: newIframePayload, }),
-      playerNext({ auto: true, }),
-    ]);
-  }
-  if (!isIframe && iframeBlocked) {
-    console.log('got into the iframe garbage');
-    const availableIframeKey: string | boolean = findAvailableIframe(iframes);
-    let newIframes = iframes;
-    if (availableIframeKey !== false) {
-      newIframes = {
-        ...iframes,
-        ...{
-          [availableIframeKey as string]: {
-            ...iframes[availableIframeKey as string],
-            parsing: true,
-          },
-        },
-      };
-    }
-    console.log('newIframes', newIframes);
-    const mergeSections = [ ...playerSectionsSelector(state), ...sectionsArr, ];
-    return from([
-      setSections({ sections: mergeSections, }),
-      setParser({
-        iframes,
-        end,
-        type,
-        maxPage,
-        page: pageIndex,
-      }),
-      playerEnd({
-        fromCursor,
-        iframes: newIframes,
-      }),
-    ]);
-  }
-  if (message && end) {
-    console.log('got end and message', { message, end, });
-    return from([
-      playerStop(),
-      sectionsRequestAndPlay.failure(new Error(message)),
-      notificationError({ text: message, }),
-    ]);
-  }
-
-  if (skip) {
-    return from([ playerIdle(), ]);
-  }
-
+) => {
   const mergeSections = [ ...playerSectionsSelector(state), ...sectionsArr, ];
-  console.log({ mergeSections, });
-  if (!mergeSections.length && isGoogleBook(type)) {
-    return from([
-      setParser({ type, maxPage, page: pageIndex, end, }),
-      playerNext({ auto: false, }),
-    ]);
+  const currIframe = findWorkingIframe(iframes);
+  const newIframePayload = { ...iframes, };
+  if (
+    typeof currIframe === 'string' &&
+    Object.hasOwn(newIframePayload, currIframe)
+  ) {
+    /* eslint-disable-next-line security/detect-object-injection */
+    newIframePayload[currIframe].parsing = false;
   }
+
+  return from([
+    setSections({ sections: mergeSections, }),
+    setParser({ iframes: newIframePayload, }),
+    playerNext({ auto: true, }),
+  ]);
+};
+
+const handleIframeStart = (
+  iframes: ParserIframesType,
+  sectionsArr: SectionType[],
+  state: RootState,
+  end: boolean,
+  type: ParserTypes,
+  pageIndex: number,
+  maxPage: number
+) => {
+  const availableIframeKey: string | boolean = findAvailableIframe(iframes);
+  let newIframes = iframes;
+  if (availableIframeKey !== false) {
+    newIframes = {
+      ...iframes,
+      [availableIframeKey as string]: {
+        ...iframes[availableIframeKey as string],
+        parsing: true,
+      },
+    };
+  }
+  const mergeSections = [ ...playerSectionsSelector(state), ...sectionsArr, ];
+  return from([
+    setSections({ sections: mergeSections, }),
+    setParser({ iframes, end, type, maxPage, page: pageIndex, }),
+    playerEnd({ iframes: newIframes, }),
+  ]);
+};
+
+const handleMessageEnd = (message: string) =>
+  from([
+    playerStop(),
+    sectionsRequestAndPlay.failure(new Error(message)),
+    notificationError({ text: message, }),
+  ]);
+
+const handleSkip = () => from([ playerIdle(), ]);
+
+const handleDefault = (
+  sectionsArr: SectionType[],
+  type: ParserTypes,
+  state: RootState,
+  iframes: ParserIframesType,
+  pageIndex: number,
+  maxPage: number,
+  end: boolean,
+  tab: number
+) => {
+  const mergeSections = [ ...playerSectionsSelector(state), ...sectionsArr, ];
   return from(
     maxPage === 0 || maxPage > parserPageSelector(state)
       ? [
@@ -310,5 +300,62 @@ export const processResponse = (
         sectionsRequestAndPlay.success(),
       ]
       : [ playerStop(), sectionsRequestAndPlay.success(), ]
+  );
+};
+
+export const processResponse = (
+  {
+    message = '',
+    skip = false,
+    end = false,
+    iframeBlocked = false,
+    maxPage = 0,
+    type = PARSER_TYPES.DEFAULT,
+    pageIndex = 0,
+    iframes = {},
+    sections: sectionsArr = [],
+    tab = 0,
+    error = '',
+  }: PayloadResponseType,
+  state: RootState
+): Observable<Action<any>> => {
+  console.log('processResponse', {
+    message,
+    skip,
+    end,
+    maxPage,
+    type,
+    iframes,
+    sectionsArr,
+    tab,
+    error,
+    state,
+  });
+  const windowIsIframe = !isWindowTop();
+
+  if (error) return handleError();
+  if (windowIsIframe && end)
+    return handleIframeEnd(iframes, sectionsArr, state);
+  if (!windowIsIframe && iframeBlocked)
+    return handleIframeStart(
+      iframes,
+      sectionsArr,
+      state,
+      end,
+      type,
+      pageIndex,
+      maxPage
+    );
+  if (message && end) return handleMessageEnd(message);
+  if (skip) return handleSkip();
+  return handleDefault(
+    sectionsArr,
+    type,
+    state,
+    iframes,
+    pageIndex,
+    maxPage,
+    end,
+    tab
   );
 };

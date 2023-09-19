@@ -110,9 +110,6 @@ export { default as getEnglishVoiceKey, } from './voices/getEnglishVoiceKey';
 export { default as getIsoLang, } from './voices/getIsoLang';
 export { default as getIsoLangFromString, } from './voices/getIsoLangFromString';
 export { default as getNativeNameFromIsoLang, } from './voices/getNativeNameFromIsoLang';
-export { default as getPremiumVoiceId, } from './voices/getPremiumVoiceId';
 export { default as getTagsFromCountry, } from './voices/getTagsFromCountry';
-export { default as isPremiumVoice, } from './voices/isPremiumVoice';
-export { default as setPremiumVoiceId, } from './voices/setPremiumVoiceId';
 
 export * from './Localization';
