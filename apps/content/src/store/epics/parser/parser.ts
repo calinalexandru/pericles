@@ -1,5 +1,5 @@
-import { PayloadAction, getType, } from '@reduxjs/toolkit';
-import { Epic, ofType, } from 'redux-observable';
+import { getType, } from '@reduxjs/toolkit';
+import { combineEpics, ofType, } from 'redux-observable';
 import { from, of, } from 'rxjs';
 import {
   catchError,
@@ -17,8 +17,7 @@ import {
 import mutationCheck from '@/util/mutationCheck';
 import { PARSER_TYPES, ParserTypes, } from '@pericles/constants';
 import {
-  RootState,
-  combineAnyEpics,
+  EpicFunction,
   parserActions,
   parserTypeSelector,
   playerActions,
@@ -29,17 +28,17 @@ import {
   getGoogleDocsPageByScroll,
   getViewportByDocType,
   isGoogleBook,
+  isWindowTop,
   removeAllHelperTags,
   scrollToGoogleDocsPage,
 } from '@pericles/util';
 
-import { PayloadType, mapPayloadToResponse, processResponse, } from './util';
+import { mapPayloadToResponse, processResponse, } from './util';
 
-export const sectionsRequestAndPlayRequestEpic: Epic<
-  PayloadAction<PayloadType>,
-  PayloadAction<any>,
-  RootState
-> = (action$, state$) =>
+export const sectionsRequestAndPlayRequestEpic: EpicFunction = (
+  action$,
+  state$
+) =>
   action$.pipe(
     ofType(getType(playerActions.sectionsRequestAndPlay)),
     map((action) => action.payload),
@@ -49,13 +48,13 @@ export const sectionsRequestAndPlayRequestEpic: Epic<
     concatMap(([ response, state, ]) => processResponse(response, state))
   );
 
-export const pageMoveEpic: Epic<any> = (action, state) =>
+export const pageMoveEpic: EpicFunction = (action, state) =>
   action.pipe(
     ofType(getType(parserActions.pageMove)),
     pluck('payload'),
-    tap(async (payload) => {
+    tap((payload) => {
       console.log('pageMoveEpic', payload);
-      const isIframe = payload.iframe;
+      const isIframe = !isWindowTop();
       const parserType = parserTypeSelector(state.value);
       if (
         !isIframe &&
@@ -70,68 +69,64 @@ export const pageMoveEpic: Epic<any> = (action, state) =>
       }
     }),
     delay(500),
-    map(parserActions.pageMoveComplete)
+    map(() => parserActions.pageMoveComplete())
   );
 
-export const pageNextEpic: Epic<any> = (action, state) =>
-  action.pipe(
-    ofType(getType(parserActions.nextPage)),
-    pluck('payload'),
-    filter(
-      (payload = {}) =>
-        payload.iframe && isGoogleBook(parserTypeSelector(state.value))
-    ),
-    tap(async () => {
-      console.log('pageNextEpic');
-      await clickNextGoogleBookPage();
-    }),
-    switchMap((isAllowed) =>
-      from(
-        isAllowed &&
-          mutationCheck(
-            getViewportByDocType(window, parserTypeSelector(state.value)),
-            500
-          )
-      )
-    ),
-    catchError(() => of(false)),
-    concatMap((check) =>
-      of(check ? parserActions.pageMoveComplete() : playerActions.idle())
-    )
-  );
+// export const pageNextEpic: EpicFunction = (action, state) =>
+//   action.pipe(
+//     ofType(getType(parserActions.nextPage)),
+//     filter(
+//       () => !isWindowTop() && isGoogleBook(parserTypeSelector(state.value))
+//     ),
+//     switchMap(() =>
+//       from(clickNextGoogleBookPage()).pipe(
+//         map(() => of(true)),
+//         catchError(() => of(false))
+//       )
+//     ),
+//     switchMap(() =>
+//       from(
+//         mutationCheck(
+//           getViewportByDocType(window, parserTypeSelector(state.value)),
+//           500
+//         )
+//       ).pipe(
+//         of(parserActions.pageMoveComplete()),
+//         catchError(() => of(playerActions.idle()))
+//       )
+//     )
+//   );
 
-export const pagePrevEpic: Epic<any> = (action, state) =>
-  action.pipe(
-    ofType(getType(parserActions.prevPage)),
-    pluck('payload'),
-    filter(
-      (payload = {}) =>
-        payload.iframe && isGoogleBook(parserTypeSelector(state.value))
-    ),
-    tap(async () => {
-      console.log('pagePrevEpic');
-      await clickPrevGoogleBookPage();
-    }),
-    switchMap((isAllowed) =>
-      from(
-        isAllowed &&
-          mutationCheck(
-            getViewportByDocType(window, parserTypeSelector(state.value)),
-            500
-          )
-      )
-    ),
-    catchError(() => of(false)),
-    concatMap((check) =>
-      of(check ? parserActions.pageMoveComplete() : playerActions.idle())
-    )
-  );
+// export const pagePrevEpic: EpicFunction = (action, state) =>
+//   action.pipe(
+//     ofType(getType(parserActions.prevPage)),
+//     pluck('payload'),
+//     filter(
+//       () => !isWindowTop() && isGoogleBook(parserTypeSelector(state.value))
+//     ),
+//     tap(async () => {
+//       console.log('pagePrevEpic');
+//       await clickPrevGoogleBookPage();
+//     }),
+//     switchMap((isAllowed) =>
+//       from(
+//         isAllowed &&
+//           mutationCheck(
+//             getViewportByDocType(window, parserTypeSelector(state.value)),
+//             500
+//           )
+//       )
+//     ),
+//     catchError(() => of(false)),
+//     concatMap((check) =>
+//       of(check ? parserActions.pageMoveComplete() : playerActions.idle())
+//     )
+//   );
 
-export const pageAutosetEpic: Epic<any> = (action) =>
+export const pageAutosetEpic: EpicFunction = (action) =>
   action.pipe(
     ofType(getType(parserActions.pageAutoset)),
-    pluck('payload'),
-    filter((payload) => !payload.iframe),
+    filter(() => isWindowTop() === true),
     map(() => {
       console.log('pageAutosetEpic', action);
       const pageIndex = getGoogleDocsPageByScroll();
@@ -140,7 +135,7 @@ export const pageAutosetEpic: Epic<any> = (action) =>
     })
   );
 
-export const clearHelperTagsEpic: Epic<any> = (action) =>
+export const clearHelperTagsEpic: EpicFunction = (action) =>
   action.pipe(
     ofType(getType(parserActions.reset)),
     pluck('payload', 'revertHtml'),
@@ -149,9 +144,9 @@ export const clearHelperTagsEpic: Epic<any> = (action) =>
     ignoreElements()
   );
 
-export default combineAnyEpics(
-  pageNextEpic,
-  pagePrevEpic,
+export default combineEpics(
+  // pageNextEpic,
+  // pagePrevEpic,
   sectionsRequestAndPlayRequestEpic,
   clearHelperTagsEpic,
   pageMoveEpic,

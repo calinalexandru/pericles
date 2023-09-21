@@ -31,8 +31,8 @@ export default (): void => {
         const parserIframes = parserIframesSelector(state);
         const { event, params, } = out;
         const {
-          charIndex,
-          length,
+          charIndex = 0,
+          length = 0,
           errorMessage,
           // index,
         } = params || {};
@@ -95,11 +95,9 @@ export default (): void => {
         case 'onError':
           console.log('onError');
           if (errorMessage) {
-            store.dispatch(playerActions.crash({ message: errorMessage, }));
+            store.dispatch(playerActions.crash(errorMessage));
           } else {
-            store.dispatch(
-              playerActions.crash({ message: 'generic player crash', })
-            );
+            store.dispatch(playerActions.crash('generic player crash'));
           }
           break;
         default:

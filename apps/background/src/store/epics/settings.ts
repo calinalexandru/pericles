@@ -1,10 +1,12 @@
 import { getType, } from '@reduxjs/toolkit';
-import { Epic, combineEpics, ofType, } from 'redux-observable';
+import { combineEpics, ofType, } from 'redux-observable';
 import { of, } from 'rxjs';
-import { pluck, map, concatMap, } from 'rxjs/operators';
+import { pluck, concatMap, } from 'rxjs/operators';
 
 import Speech from '@/speech';
 import {
+  EpicFunction,
+  SettingsState,
   playerActions,
   playerStatusSelector,
   settingsActions,
@@ -13,25 +15,19 @@ import { isPaused, isPlayingOrReady, } from '@pericles/util';
 
 const settingsItems = [ 'volume', 'pitch', 'rate', 'voice', ];
 
-const filterObjectByKeys = (obj: any, keys: string[]) =>
+const filterObjectByKeys = (obj: Partial<SettingsState>, keys: string[]) =>
   Object.keys(obj)
     .filter((key) => keys.includes(key))
     .reduce((acc, key) => {
-      acc[key] = obj[key];
+      acc[key] = (obj as any)[key];
       return acc;
     }, {} as { [key: string]: string });
 
-const settingsSetEpic: Epic<any> = (action, state) =>
+const settingsSetEpic: EpicFunction = (action, state) =>
   action.pipe(
-    ofType(getType(settingsActions.set), getType(settingsActions.default)),
+    ofType(getType(settingsActions.set)),
     pluck('payload'),
-    map((payload) => {
-      console.log('settings.set', payload);
-      const seek = Speech.getSeekerTime();
-      Speech.setSettingsFromObj(payload);
-      return { payload, seek, };
-    }),
-    concatMap(({ payload = {}, }) => {
+    concatMap((payload) => {
       console.log('settings.set epic', payload, state.value);
 
       const filteredPayload = filterObjectByKeys(payload, settingsItems);

@@ -1,7 +1,7 @@
 export default async function clickNextGoogleBookPage(): Promise<
   boolean | Error
   > {
-  let t: any;
+  let t: number;
   return new Promise((resolve, reject) => {
     try {
       const nextButton = document.querySelector<HTMLElement>(

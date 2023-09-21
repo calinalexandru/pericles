@@ -1,4 +1,4 @@
-import { createAction, createSlice, PayloadAction, } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, } from '@reduxjs/toolkit';
 
 import { ROUTES, } from '@pericles/constants';
 
@@ -23,26 +23,24 @@ const appSlice = createSlice({
     routeSkip: (appState) => {
       appState.route = ROUTES.SKIP;
     },
+    tabClosed: (appState, _action: PayloadAction<number>) => appState,
+    init: (appState) => appState,
+    reload: (appState) => appState,
+    reloadTab: (appState) => appState,
+    factoryReset: (appState) => appState,
+    newContent: (appState) => appState,
+    autoscrollSet: (appState, _action: PayloadAction<{ section: number }>) =>
+      appState,
+    autoscrollClear: (appState) => appState,
+    highlightSection: (appState) => appState,
+    highlightWord: (
+      appState,
+      _action: PayloadAction<{ charIndex: number; charLength: number }>
+    ) => appState,
+    highlightReloadSettings: (appState) => appState,
+    highlightClearSections: (appState) => appState,
+    highlightClearWords: (appState) => appState,
   },
 });
 
-const sideEffectActions = {
-  tabClosed: createAction<number>('app/tabClosed'),
-  init: createAction('app/init'),
-  reload: createAction('app/reload'),
-  reloadTab: createAction('app/reloadTab'),
-  factoryReset: createAction('app/factoryReset'),
-  newContent: createAction<any>('app/newContent'),
-  autoscrollSet: createAction<{ section: number }>('app/autoscrollSet'),
-  autoscrollClear: createAction('app/autoscrollClear'),
-  highlightSection: createAction('app/highlightSection'),
-  highlightWord: createAction<any>('app/highlightWord'),
-  highlightClearWords: createAction('app/highlightClearWords'),
-  highlightClearSections: createAction('app/highlightClearSections'),
-  highlightReloadSettings: createAction('app/highlightReloadSettings'),
-};
-
-const { actions: reducerActions, reducer, } = appSlice;
-
-export const appActions = { ...reducerActions, ...sideEffectActions, };
-export const appReducer = reducer;
+export const { actions: appActions, reducer: appReducer, } = appSlice;

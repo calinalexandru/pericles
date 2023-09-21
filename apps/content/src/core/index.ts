@@ -2,7 +2,9 @@ import { combineEpics, createEpicMiddleware, } from 'redux-observable';
 import thunk from 'redux-thunk';
 import { applyMiddleware, } from 'webext-redux';
 
-import { appActions, store, } from '@pericles/store';
+import {
+  AllActions, appActions, RootState, store, 
+} from '@pericles/store';
 import { getBrowserAPI, } from '@pericles/util';
 
 import appEpic from '../store/epics/app';
@@ -23,7 +25,11 @@ export default (): void => {
     console.log('init content');
     initialized = true;
     const rootEpic = combineEpics(parserEpic, appEpic);
-    const observableMiddleware = createEpicMiddleware();
+    const observableMiddleware = createEpicMiddleware<
+      AllActions,
+      AllActions,
+      RootState
+    >();
     store.initialize(
       applyMiddleware(store.createStore(), thunk, observableMiddleware)
     );
@@ -38,7 +44,7 @@ export default (): void => {
     }
 
     setTimeout(() => {
-      store.dispatch(appActions.newContent({ iframe: window !== window.top, }));
+      store.dispatch(appActions.newContent());
     }, 50);
 
     store.subscribe(() => {

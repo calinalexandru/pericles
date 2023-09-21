@@ -1,9 +1,9 @@
-import { StateObservable, } from 'redux-observable';
 import { of, } from 'rxjs';
 
 import Speech from '@/speech';
 import { VARIABLES, } from '@pericles/constants';
 import {
+  AppState,
   RootState,
   appActions,
   hotkeysActions,
@@ -31,10 +31,7 @@ export function handleAppInit(state: RootState): void {
   }
 }
 
-export function handleAppSet(
-  state: StateObservable<RootState>,
-  payload: any = {}
-): void {
+export function handleAppSet(payload: Partial<AppState>): void {
   console.log('app.set', payload);
 
   const highlightSettingsKeys = [
@@ -44,7 +41,7 @@ export function handleAppSet(
   const highlightSettings = Object.keys(payload)
     .filter((key) => highlightSettingsKeys.includes(key))
     .reduce((obj, key) => {
-      obj[key] = payload[key];
+      obj[key] = (payload as any)[key];
       return obj;
     }, {} as { [key: string]: string });
 
@@ -54,7 +51,7 @@ export function handleAppSet(
   }
 }
 
-export const handleFactoryReset$: any = (state: RootState) => {
+export const handleFactoryReset$ = (state: RootState) => {
   const {
     player: playerDefaultValues,
     app: appDefaultValues,

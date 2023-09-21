@@ -11,14 +11,7 @@ module.exports = {
     'plugin:sonarjs/recommended',
     'plugin:@typescript-eslint/recommended',
   ],
-  plugins: [
-    '@typescript-eslint',
-    'react-hooks',
-    'prettier',
-    'security',
-    'react-perf',
-    'sonarjs',
-  ],
+  plugins: ['@typescript-eslint', 'react-hooks', 'prettier', 'security', 'react-perf', 'sonarjs'],
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
@@ -48,6 +41,10 @@ module.exports = {
     },
   },
   rules: {
+    '@typescript-eslint/no-unused-vars': ['warn', {
+      args: 'after-used',
+      argsIgnorePattern: '^_',
+    }],
     'import/order': [
       'error',
       {

@@ -15,9 +15,5 @@ const settingsSlice = createSlice({
   },
 });
 
-const sideEffectActions = {};
-
-const { actions: reducerActions, reducer, } = settingsSlice;
-
-export const settingsActions = { ...reducerActions, ...sideEffectActions, };
-export const settingsReducer = reducer;
+export const { actions: settingsActions, reducer: settingsReducer, } =
+  settingsSlice;

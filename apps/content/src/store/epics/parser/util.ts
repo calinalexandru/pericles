@@ -13,6 +13,7 @@ import {
   VoiceType,
 } from '@pericles/constants';
 import {
+  AllActions,
   RootState,
   appActions,
   appSkipUntilYSelector,
@@ -47,7 +48,6 @@ export type PayloadType = {
   iframes?: ParserIframesType;
   userGenerated?: boolean;
   fromCursor?: boolean;
-  working?: boolean;
   tab?: number;
 };
 
@@ -309,7 +309,7 @@ export const processResponse = (
     error = '',
   }: PayloadResponseType,
   state: RootState
-): Observable<PayloadAction<any>> => {
+): Observable<AllActions> => {
   console.log('processResponse', {
     message,
     skip,

@@ -1,13 +1,13 @@
 import { useCallback, } from 'react';
 import { useDispatch, } from 'react-redux';
 
-import { PlayerPlayParams, playerActions, } from '@pericles/store';
+import { PlayPayloadType, playerActions, } from '@pericles/store';
 
 export default function usePlayer() {
   const dispatch = useDispatch();
 
   const play = useCallback(
-    (params: PlayerPlayParams) => {
+    (params: PlayPayloadType) => {
       dispatch(playerActions.play(params));
     },
     [ dispatch, ]
@@ -30,7 +30,7 @@ export default function usePlayer() {
   }, [ dispatch, ]);
 
   const prev = useCallback(() => {
-    dispatch(playerActions.prev());
+    dispatch(playerActions.prev({ auto: false, }));
   }, [ dispatch, ]);
 
   return {

@@ -1,5 +1,5 @@
 import { getType, } from '@reduxjs/toolkit';
-import { Epic, combineEpics, ofType, } from 'redux-observable';
+import { combineEpics, ofType, } from 'redux-observable';
 import {
   concatMap,
   filter,
@@ -9,7 +9,12 @@ import {
   tap,
 } from 'rxjs/operators';
 
-import { appActions, playerActions, playerTabSelector, } from '@pericles/store';
+import {
+  appActions,
+  EpicFunction,
+  playerActions,
+  playerTabSelector,
+} from '@pericles/store';
 
 import {
   handleAppInit,
@@ -18,38 +23,38 @@ import {
   handleFactoryReset$,
 } from './handlers';
 
-const appInitEpic: Epic<any> = (action, state) =>
+const appInitEpic: EpicFunction = (action, state) =>
   action.pipe(
     ofType(getType(appActions.init)),
     tap(() => handleAppInit(state.value)),
     ignoreElements()
   );
 
-const tabClosedEpic: Epic<any> = (action, state) =>
+const tabClosedEpic: EpicFunction = (action, state) =>
   action.pipe(
     ofType(getType(appActions.tabClosed)),
     pluck('payload'),
     filter((tab) => tab === playerTabSelector(state.value)),
-    map(playerActions.halt)
+    map(() => playerActions.halt())
   );
 
-const appSetEpic: Epic<any> = (action, state) =>
+const appSetEpic: EpicFunction = (action) =>
   action.pipe(
     ofType(getType(appActions.set)),
     pluck('payload'),
     tap((payload) => {
-      handleAppSet(state.value, payload);
+      handleAppSet(payload);
     }),
     ignoreElements()
   );
 
-const appFactoryResetEpic: Epic<any> = (action, state) =>
+const appFactoryResetEpic: EpicFunction = (action, state) =>
   action.pipe(
     ofType(getType(appActions.factoryReset)),
     concatMap(() => handleFactoryReset$(state.value))
   );
 
-const appReloadEpic: Epic<any> = (action) =>
+const appReloadEpic: EpicFunction = (action) =>
   action.pipe(
     ofType(getType(appActions.reload)),
     tap(handleAppReload),

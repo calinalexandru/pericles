@@ -6,6 +6,7 @@ import { Store, wrapStore, } from 'webext-redux';
 import core from '@/core';
 import { WEBEXT_PORT, } from '@pericles/constants';
 import {
+  AllActions,
   RootState,
   appActions,
   appReducer,
@@ -31,7 +32,11 @@ let isInitialized: boolean = false;
 
 const init = async (preloadedState: RootState): Promise<void | Error> => {
   console.log('preloadedState', preloadedState);
-  const observableMiddleware = createEpicMiddleware();
+  const observableMiddleware = createEpicMiddleware<
+    AllActions,
+    AllActions,
+    RootState
+  >();
   store.initialize(
     createStore(
       combineReducers({

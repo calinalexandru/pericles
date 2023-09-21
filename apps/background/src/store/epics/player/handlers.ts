@@ -1,9 +1,10 @@
-import { Action, } from 'redux';
 import { StateObservable, } from 'redux-observable';
 
 import Speech from '@/speech';
 import { PlayerSectionsType, SectionType, } from '@pericles/constants';
 import {
+  AllActions,
+  PlayPayloadType,
   RootState,
   parserEndSelector,
   parserTypeSelector,
@@ -34,15 +35,15 @@ const shouldRequestSectionsAndPlay = (
 
 export const playOrRequest$ = (
   state$: StateObservable<RootState>,
-  payload: any,
-  actions: any[]
-): Action<any> | false => {
-  const { userGenerated = false, key = -1, } = payload || {};
+  payload: PlayPayloadType,
+  actions: AllActions[]
+): AllActions | false => {
+  const { userGenerated = false, } = payload || {};
 
   const state = state$.value;
   const { playerSections, playerKey, playingTab, } = {
     playerSections: playerSectionsSelector(state),
-    playerKey: key !== -1 ? key : playerKeySelector(state),
+    playerKey: playerKeySelector(state),
     playingTab: playerTabSelector(state),
   };
 
@@ -64,7 +65,7 @@ export const playOrRequest$ = (
       Speech.play(playerSections[playerKey].text);
     } catch (e) {
       console.error('Player has crashed', playerSections[playerKey].text, e);
-      return playerActions.crash({ message: 'Player has crashed', });
+      return playerActions.crash('Player has crashed');
     }
   }
 

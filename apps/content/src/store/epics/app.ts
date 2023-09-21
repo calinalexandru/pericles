@@ -1,5 +1,5 @@
-import { PayloadAction, getType, } from '@reduxjs/toolkit';
-import { Epic, ofType, } from 'redux-observable';
+import { getType, } from '@reduxjs/toolkit';
+import { combineEpics, ofType, } from 'redux-observable';
 import {
   debounceTime,
   filter,
@@ -16,7 +16,7 @@ import {
   WORD_TRACKER_STYLES,
 } from '@pericles/constants';
 import {
-  RootState,
+  EpicFunction,
   appActions,
   appAutoscrollSelector,
   appHighlightColorSelector,
@@ -25,7 +25,6 @@ import {
   appWordTrackerColorSelector,
   appWordTrackerSelector,
   appWordTrackerStyleSelector,
-  combineAnyEpics,
   parserTypeSelector,
   playerKeySelector,
   playerSectionsSelector,
@@ -35,24 +34,20 @@ import {
   getRectSectionsById,
   getSectionsById,
   getSectionWords,
+  isWindowTop,
   removeClassFromAll,
   setSectionBackground,
   setWordBackground,
 } from '@pericles/util';
 
-const appNewContentEpic: Epic<any> = (action) =>
+const appNewContentEpic: EpicFunction = (action) =>
   action.pipe(
     ofType(getType(appActions.newContent)),
-    pluck('payload'),
-    filter((payload: any = {}) => {
-      console.log('appnewContentEpic', payload);
-
-      return !payload?.iframe;
-    }),
-    map(appActions.highlightReloadSettings)
+    filter(() => isWindowTop() === true),
+    map(() => appActions.highlightReloadSettings())
   );
 
-const appReloadTabEpic: Epic<any> = (action) =>
+const appReloadTabEpic: EpicFunction = (action) =>
   action.pipe(
     ofType(getType(appActions.reloadTab)),
     tap(() => {
@@ -62,10 +57,7 @@ const appReloadTabEpic: Epic<any> = (action) =>
     ignoreElements()
   );
 
-const highlightSectionEpic: Epic<PayloadAction, PayloadAction, RootState> = (
-  action$,
-  state
-) =>
+const highlightSectionEpic: EpicFunction = (action$, state) =>
   action$.pipe(
     ofType(getType(appActions.highlightSection)),
     tap(() => {
@@ -99,15 +91,12 @@ const highlightSectionEpic: Epic<PayloadAction, PayloadAction, RootState> = (
     ignoreElements()
   );
 
-const highlightWordEpic: Epic<PayloadAction, PayloadAction, RootState> = (
-  action$,
-  state
-) =>
+const highlightWordEpic: EpicFunction = (action$, state) =>
   action$.pipe(
     ofType(getType(appActions.highlightWord)),
     filter(() => appWordTrackerSelector(state.value) === true),
     pluck('payload'),
-    tap((data: any) => {
+    tap((data) => {
       const { charIndex, charLength, } = data;
       const parserKey = playerKeySelector(state.value);
       const wordList = getSectionWords(parserKey);
@@ -153,11 +142,7 @@ const highlightWordEpic: Epic<PayloadAction, PayloadAction, RootState> = (
     ignoreElements()
   );
 
-const autoscrollRunEpic: Epic<
-  PayloadAction<{ section: number }>,
-  never,
-  RootState
-> = (action, state) =>
+const autoscrollRunEpic: EpicFunction = (action, state) =>
   action.pipe(
     ofType(getType(appActions.autoscrollSet)),
     debounceTime(500),
@@ -173,9 +158,7 @@ const autoscrollRunEpic: Epic<
     ignoreElements()
   );
 
-const autoscrollClearEpic: Epic<PayloadAction, PayloadAction, RootState> = (
-  action$
-) =>
+const autoscrollClearEpic: EpicFunction = (action$) =>
   action$.pipe(
     ofType(getType(appActions.autoscrollClear)),
     tap(() => {
@@ -184,11 +167,7 @@ const autoscrollClearEpic: Epic<PayloadAction, PayloadAction, RootState> = (
     ignoreElements()
   );
 
-const highlightReloadSettingsEpic: Epic<
-  PayloadAction,
-  PayloadAction,
-  RootState
-> = (action, state) =>
+const highlightReloadSettingsEpic: EpicFunction = (action, state) =>
   action.pipe(
     ofType(getType(appActions.highlightReloadSettings)),
     tap(() => {
@@ -199,10 +178,7 @@ const highlightReloadSettingsEpic: Epic<
     ignoreElements()
   );
 
-const highlightClearWordsEpic: Epic<PayloadAction, PayloadAction, RootState> = (
-  action,
-  state
-) =>
+const highlightClearWordsEpic: EpicFunction = (action, state) =>
   action.pipe(
     ofType(getType(appActions.highlightClearWords)),
     tap(() => {
@@ -213,11 +189,7 @@ const highlightClearWordsEpic: Epic<PayloadAction, PayloadAction, RootState> = (
     ignoreElements()
   );
 
-const highlightClearSectionsEpic: Epic<
-  PayloadAction,
-  PayloadAction,
-  RootState
-> = (action, state) =>
+const highlightClearSectionsEpic: EpicFunction = (action, state) =>
   action.pipe(
     ofType(getType(appActions.highlightClearSections)),
     tap(() => {
@@ -227,7 +199,7 @@ const highlightClearSectionsEpic: Epic<
     ignoreElements()
   );
 
-export default combineAnyEpics(
+export default combineEpics(
   appReloadTabEpic,
   appNewContentEpic,
   highlightSectionEpic,

@@ -1,4 +1,4 @@
-import { PayloadAction, createAction, createSlice, } from '@reduxjs/toolkit';
+import { PayloadAction, createSlice, } from '@reduxjs/toolkit';
 
 import { ParserState, initialState, } from '../initialState';
 
@@ -15,18 +15,15 @@ const parserSlice = createSlice({
     pageSet: (parserState, action: PayloadAction<number>) => {
       parserState.page = action.payload;
     },
+
+    // side effect actions
+    nextPage: (parserState) => parserState,
+    prevPage: (parserState) => parserState,
+    pageMoveComplete: (parserState) => parserState,
+    pageAutoset: (parserState) => parserState,
+    pageMove: (parserState, _action: PayloadAction<{ index: number }>) =>
+      parserState,
   },
 });
 
-const sideEffectActions = {
-  nextPage: createAction('parser/nextPage'),
-  prevPage: createAction('parser/prevPage'),
-  pageMove: createAction<{ index: number }>('parser/pageMove'),
-  pageMoveComplete: createAction('parser/pageMoveComplete'),
-  pageAutoset: createAction('parser/pageAutoset'),
-};
-
-const { actions: reducerActions, reducer, } = parserSlice;
-
-export const parserActions = { ...reducerActions, ...sideEffectActions, };
-export const parserReducer = reducer;
+export const { actions: parserActions, reducer: parserReducer, } = parserSlice;

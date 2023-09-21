@@ -1,4 +1,4 @@
-import { PayloadAction, createAction, createSlice, } from '@reduxjs/toolkit';
+import { PayloadAction, createSlice, } from '@reduxjs/toolkit';
 
 import {
   PLAYER_STATUS,
@@ -8,17 +8,11 @@ import {
 
 import { PlayerState, initialState, } from '../initialState';
 
-export type PlayerPlayParams = {
-  userGenerated: boolean;
-  fromCursor: boolean;
-};
-
 export type PlayPayloadType = {
   iframe?: boolean;
   iframes?: ParserIframesType;
   userGenerated?: boolean;
   fromCursor?: boolean;
-  working?: boolean;
   tab?: number;
 };
 
@@ -32,7 +26,7 @@ const playerSlice = createSlice({
     reset: (playerState, action: PayloadAction<Partial<PlayerState>>) => {
       Object.assign(playerState, { ...initialState.player, ...action.payload, });
     },
-    play: (playerState, action: PayloadAction<PlayerPlayParams>) => {
+    play: (playerState, action: PayloadAction<PlayPayloadType>) => {
       console.log('player.play', action);
       playerState.buffering = true;
       playerState.status = PLAYER_STATUS.LOADING;
@@ -84,42 +78,45 @@ const playerSlice = createSlice({
       playerState.key = key;
       playerState.status = PLAYER_STATUS.READY;
     },
-    prev: (playerState) => {
+    prev: (playerState, action: PayloadAction<{ auto: boolean }>) => {
       const curKey = playerState.key;
       const key = curKey > 0 ? curKey - 1 : 0;
-      console.log('player.prev.key', key);
+      console.log('player.prev.key', key, action);
       playerState.key = key;
       playerState.status = PLAYER_STATUS.READY;
     },
+
+    // side effect actions
+    end: (
+      playerState,
+      _action: PayloadAction<{ iframes: ParserIframesType }>
+    ) => playerState,
+    toggle: (playerState) => playerState,
+    timeout: (playerState) => playerState,
+    prevSlow: (playerState) => playerState,
+    prevMove: (playerState) => playerState,
+    softPrev: (playerState) => playerState,
+    nextSlow: (playerState) => playerState,
+    nextMove: (playerState) => playerState,
+    nextAuto: (playerState) => playerState,
+    softNext: (playerState) => playerState,
+    crash: (playerState, _action: PayloadAction<string>) => playerState,
+    idle: (playerState) => playerState,
+    proxySectionsRequestAndPlay: (
+      playerState,
+      _action: PayloadAction<PlayPayloadType>
+    ) => playerState,
+    proxyResetAndRequestPlay: (
+      playerState,
+      _action: PayloadAction<PlayPayloadType>
+    ) => playerState,
+    sectionsRequestAndPlay: (
+      playerState,
+      _action: PayloadAction<PlayPayloadType>
+    ) => playerState,
+    proxyPlay: (playerState, _action: PayloadAction<{ tab: number }>) =>
+      playerState,
   },
 });
 
-const sideEffectActions = {
-  idle: createAction('player/idle'),
-  proxyPlay: createAction<{ tab: number }>('player/proxyPlay'),
-  softNext: createAction('player/softNext'),
-  nextAuto: createAction('player/nextAuto'),
-  nextMove: createAction('player/nextMove'),
-  nextSlow: createAction('player/nextSlow'),
-  softPrev: createAction('player/softPrev'),
-  prevMove: createAction('player/prevMove'),
-  prevSlow: createAction('player/prevSlow'),
-  crash: createAction<{ message: string }>('player/crash'),
-  end: createAction<{ iframes: ParserIframesType }>('player/end'),
-  timeout: createAction('player/timeout'),
-  toggle: createAction('player/toggle'),
-  sectionsRequestAndPlay: createAction<PlayPayloadType>(
-    'player/sectionsRequestAndPlay'
-  ),
-  proxySectionsRequestAndPlay: createAction<PlayPayloadType>(
-    'player/proxySectionsRequestAndPlay'
-  ),
-  proxyResetAndRequestPlay: createAction<PlayPayloadType>(
-    'player/proxyResetAndRequestPlay'
-  ),
-};
-
-const { actions: reducerActions, reducer, } = playerSlice;
-
-export const playerActions = { ...reducerActions, ...sideEffectActions, };
-export const playerReducer = reducer;
+export const { actions: playerActions, reducer: playerReducer, } = playerSlice;

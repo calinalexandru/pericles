@@ -1,3 +1,13 @@
+import { Epic, } from 'redux-observable';
+
+import { RootState, } from './initialState';
+import { appActions, } from './reducers/app';
+import { hotkeysActions, } from './reducers/hotkeys';
+import { notificationActions, } from './reducers/notification';
+import { parserActions, } from './reducers/parser';
+import { playerActions, } from './reducers/player';
+import { settingsActions, } from './reducers/settings';
+
 export { default as combineAnyEpics, } from './combineAnyEpics';
 
 /* slices */
@@ -7,6 +17,33 @@ export * from './reducers/notification';
 export * from './reducers/parser';
 export * from './reducers/settings';
 export * from './reducers/player';
+
+type AppActions = ReturnType<typeof appActions[keyof typeof appActions]>;
+type HotkeysActions = ReturnType<
+  typeof hotkeysActions[keyof typeof hotkeysActions]
+>;
+type NotificationActions = ReturnType<
+  typeof notificationActions[keyof typeof notificationActions]
+>;
+type ParserActions = ReturnType<
+  typeof parserActions[keyof typeof parserActions]
+>;
+type PlayerActions = ReturnType<
+  typeof playerActions[keyof typeof playerActions]
+>;
+type SettingsActions = ReturnType<
+  typeof settingsActions[keyof typeof settingsActions]
+>;
+
+export type AllActions =
+  | PlayerActions
+  | AppActions
+  | HotkeysActions
+  | NotificationActions
+  | ParserActions
+  | SettingsActions;
+
+export type EpicFunction = Epic<AllActions, AllActions, RootState>;
 
 /* app */
 export { default as appSelector, } from './selectors/app/appSelector';

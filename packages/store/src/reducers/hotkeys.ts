@@ -15,9 +15,5 @@ const hotkeysSlice = createSlice({
   },
 });
 
-const sideEffectActions = {};
-
-const { actions: reducerActions, reducer, } = hotkeysSlice;
-
-export const hotkeysActions = { ...reducerActions, ...sideEffectActions, };
-export const hotkeysReducer = reducer;
+export const { actions: hotkeysActions, reducer: hotkeysReducer, } =
+  hotkeysSlice;
