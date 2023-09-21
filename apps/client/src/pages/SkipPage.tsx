@@ -16,8 +16,7 @@ import { VARIABLES, } from '@pericles/constants';
 import {
   appActions,
   appSkipDeadSectionsSelector,
-  playerNext,
-  playerStop,
+  playerActions,
 } from '@pericles/store';
 import { t, } from '@pericles/util';
 
@@ -88,7 +87,7 @@ const SkipPage: React.FC = () => {
           variant="contained"
           onClick={() => {
             dispatch(appActions.routeIndex());
-            dispatch(playerStop());
+            dispatch(playerActions.stop());
           }}
         >
           {t`stop_btn`}
@@ -98,7 +97,7 @@ const SkipPage: React.FC = () => {
           variant="contained"
           onClick={() => {
             dispatch(appActions.routeIndex());
-            dispatch(playerNext({ auto: false, }));
+            dispatch(playerActions.next({ auto: false, }));
           }}
         >
           {t`resume_btn`}

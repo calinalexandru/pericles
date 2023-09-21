@@ -23,11 +23,8 @@ import {
   appRouteSelector,
   hotkeysSelector,
   hotkeysDisableSelector,
-  notificationClear,
-  playerToggle as actionPlayerToggle,
-  playerSoftNext,
-  playerSoftPrev,
-  playerStop as actionPlayerStop,
+  notificationActions,
+  playerActions,
 } from '@pericles/store';
 
 import routes from './routes';
@@ -69,13 +66,13 @@ const App: React.FC = () => {
   const spinner = useMemo(() => <LoadingSpinner />, []);
 
   const onClearNotification = () => {
-    dispatch(notificationClear());
+    dispatch(notificationActions.clear());
   };
 
-  const playerToggle = () => dispatch(actionPlayerToggle());
-  const playerNext = () => dispatch(playerSoftNext());
-  const playerPrev = () => dispatch(playerSoftPrev());
-  const playerStop = () => dispatch(actionPlayerStop());
+  const playerToggle = () => dispatch(playerActions.toggle());
+  const playerNext = () => dispatch(playerActions.softNext());
+  const playerPrev = () => dispatch(playerActions.softPrev());
+  const playerStop = () => dispatch(playerActions.stop());
   const hotkeyEvents = {
     play: () => {
       // console.log('hotkeyEvents.toggle');

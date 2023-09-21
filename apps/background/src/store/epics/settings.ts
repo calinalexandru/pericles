@@ -1,14 +1,13 @@
+import { getType, } from '@reduxjs/toolkit';
 import { Epic, combineEpics, ofType, } from 'redux-observable';
 import { of, } from 'rxjs';
 import { pluck, map, concatMap, } from 'rxjs/operators';
 
 import Speech from '@/speech';
 import {
+  playerActions,
   playerStatusSelector,
-  SettingsActionTypes,
-  playerPlay,
-  playerStop,
-  playerIdle,
+  settingsActions,
 } from '@pericles/store';
 import { isPaused, isPlayingOrReady, } from '@pericles/util';
 
@@ -24,7 +23,7 @@ const filterObjectByKeys = (obj: any, keys: string[]) =>
 
 const settingsSetEpic: Epic<any> = (action, state) =>
   action.pipe(
-    ofType(SettingsActionTypes.SET, SettingsActionTypes.DEFAULT),
+    ofType(getType(settingsActions.set), getType(settingsActions.default)),
     pluck('payload'),
     map((payload) => {
       console.log('settings.set', payload);
@@ -41,7 +40,7 @@ const settingsSetEpic: Epic<any> = (action, state) =>
         isPaused(playerStatusSelector(state.value)) &&
         Object.keys(filteredPayload).length > 0
       ) {
-        return of(playerStop());
+        return of(playerActions.stop());
       }
       if (
         isPlayingOrReady(playerStatusSelector(state.value)) &&
@@ -50,12 +49,12 @@ const settingsSetEpic: Epic<any> = (action, state) =>
         if (Speech.isReplayStarved(Object.keys(filteredPayload))) {
           Speech.stop();
           return of(
-            playerPlay.request({ userGenerated: false, fromCursor: false, })
+            playerActions.play({ userGenerated: false, fromCursor: false, })
           );
         }
       }
 
-      return of(playerIdle());
+      return of(playerActions.idle());
     })
   );
 

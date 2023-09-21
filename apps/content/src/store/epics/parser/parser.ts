@@ -1,11 +1,12 @@
-import { PayloadAction, } from '@reduxjs/toolkit';
-import { Epic, combineEpics, ofType, } from 'redux-observable';
+import { PayloadAction, getType, } from '@reduxjs/toolkit';
+import { Epic, ofType, } from 'redux-observable';
 import { from, of, } from 'rxjs';
 import {
   catchError,
   concatMap,
   delay,
   filter,
+  ignoreElements,
   map,
   pluck,
   switchMap,
@@ -16,30 +17,20 @@ import {
 import mutationCheck from '@/util/mutationCheck';
 import { PARSER_TYPES, ParserTypes, } from '@pericles/constants';
 import {
-  PageActionTypes,
-  ParserActionTypes,
   RootState,
-  pageMoveComplete,
-  parserIdle,
-  parserResetComplete,
+  combineAnyEpics,
+  parserActions,
   parserTypeSelector,
-  parserWordsUpdateWorker,
-  playerIdle,
-  playerKeySelector,
-  sectionsRequestAndPlay,
-  setParser,
+  playerActions,
 } from '@pericles/store';
 import {
   clickNextGoogleBookPage,
   clickPrevGoogleBookPage,
   getGoogleDocsPageByScroll,
-  getSectionsById,
   getViewportByDocType,
   isGoogleBook,
   removeAllHelperTags,
-  removeWordTags,
   scrollToGoogleDocsPage,
-  wrapWordTagAzure,
 } from '@pericles/util';
 
 import { PayloadType, mapPayloadToResponse, processResponse, } from './util';
@@ -50,7 +41,7 @@ export const sectionsRequestAndPlayRequestEpic: Epic<
   RootState
 > = (action$, state$) =>
   action$.pipe(
-    ofType(sectionsRequestAndPlay.actionTypes.REQUEST),
+    ofType(getType(playerActions.sectionsRequestAndPlay)),
     map((action) => action.payload),
     withLatestFrom(state$),
     map(([ payload, state, ]) => mapPayloadToResponse(payload, state)),
@@ -60,7 +51,7 @@ export const sectionsRequestAndPlayRequestEpic: Epic<
 
 export const pageMoveEpic: Epic<any> = (action, state) =>
   action.pipe(
-    ofType(PageActionTypes.MOVE),
+    ofType(getType(parserActions.pageMove)),
     pluck('payload'),
     tap(async (payload) => {
       console.log('pageMoveEpic', payload);
@@ -79,12 +70,12 @@ export const pageMoveEpic: Epic<any> = (action, state) =>
       }
     }),
     delay(500),
-    map(pageMoveComplete)
+    map(parserActions.pageMoveComplete)
   );
 
 export const pageNextEpic: Epic<any> = (action, state) =>
   action.pipe(
-    ofType(PageActionTypes.NEXT),
+    ofType(getType(parserActions.nextPage)),
     pluck('payload'),
     filter(
       (payload = {}) =>
@@ -104,12 +95,14 @@ export const pageNextEpic: Epic<any> = (action, state) =>
       )
     ),
     catchError(() => of(false)),
-    concatMap((check) => of(check ? pageMoveComplete() : playerIdle()))
+    concatMap((check) =>
+      of(check ? parserActions.pageMoveComplete() : playerActions.idle())
+    )
   );
 
 export const pagePrevEpic: Epic<any> = (action, state) =>
   action.pipe(
-    ofType(PageActionTypes.PREV),
+    ofType(getType(parserActions.prevPage)),
     pluck('payload'),
     filter(
       (payload = {}) =>
@@ -129,80 +122,38 @@ export const pagePrevEpic: Epic<any> = (action, state) =>
       )
     ),
     catchError(() => of(false)),
-    concatMap((check) => of(check ? pageMoveComplete() : playerIdle()))
+    concatMap((check) =>
+      of(check ? parserActions.pageMoveComplete() : playerActions.idle())
+    )
   );
 
 export const pageAutosetEpic: Epic<any> = (action) =>
   action.pipe(
-    ofType(PageActionTypes.AUTOSET),
+    ofType(getType(parserActions.pageAutoset)),
     pluck('payload'),
     filter((payload) => !payload.iframe),
     map(() => {
       console.log('pageAutosetEpic', action);
       const pageIndex = getGoogleDocsPageByScroll();
       console.log('page.autoset', pageIndex);
-      return setParser({ page: pageIndex, });
-    })
-  );
-
-export const wordsUpdateEpic: Epic<any> = (action, state) =>
-  action.pipe(
-    ofType(ParserActionTypes.WORDS_UPDATE),
-    pluck('payload', 'wordList'),
-    map((wordList) => {
-      console.log('wordsUpdateEpic');
-      const sectionsArr = getSectionsById(playerKeySelector(state.value));
-      removeWordTags(sectionsArr);
-      return parserWordsUpdateWorker({
-        sections: sectionsArr,
-        wordList,
-      });
-    })
-  );
-
-export const wordsUpdateWorkerEpic: Epic<any> = (action) =>
-  action.pipe(
-    ofType(ParserActionTypes.WORDS_UPDATE_WORKER),
-    pluck('payload'),
-    map(({ sections: sectionsArr, wordList, wordIndex = 0, }) => {
-      const [ { childNodes: [ node = false, ] = [], } = {}, ] = sectionsArr;
-      console.log('wordsUpdateEpicWorker', sectionsArr, node);
-      if (node) {
-        const out = wrapWordTagAzure({
-          node,
-          wordList,
-          wordIndex,
-        });
-        const sectionsSliced = sectionsArr.slice(1);
-        if (sectionsSliced.length) {
-          return parserWordsUpdateWorker({
-            sections: sectionsSliced,
-            wordList: out.wordList,
-            wordIndex: out.wordIndex,
-          });
-        }
-      }
-      return parserIdle();
+      return parserActions.set({ page: pageIndex, });
     })
   );
 
 export const clearHelperTagsEpic: Epic<any> = (action) =>
   action.pipe(
-    ofType(ParserActionTypes.RESET),
+    ofType(getType(parserActions.reset)),
     pluck('payload', 'revertHtml'),
     filter((revertHtml) => revertHtml === true),
     tap(removeAllHelperTags),
-    map(parserResetComplete)
+    ignoreElements()
   );
 
-export default combineEpics(
+export default combineAnyEpics(
   pageNextEpic,
   pagePrevEpic,
   sectionsRequestAndPlayRequestEpic,
   clearHelperTagsEpic,
-  wordsUpdateEpic,
-  wordsUpdateWorkerEpic,
   pageMoveEpic,
   pageAutosetEpic
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-) as any;
+);

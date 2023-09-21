@@ -4,6 +4,7 @@
   "description": "Speech synthesis redesigned. Listen to emails, documents & websites.",
   "main": "index.js",
   "scripts": {
+    "watch": "NODE_OPTIONS=--openssl-legacy-provider turbo run watch",
     "start": "NODE_OPTIONS=--openssl-legacy-provider turbo run start",
     "build": "NODE_OPTIONS=--openssl-legacy-provider turbo run build",
     "dev": "NODE_OPTIONS=--openssl-legacy-provider turbo run dev",

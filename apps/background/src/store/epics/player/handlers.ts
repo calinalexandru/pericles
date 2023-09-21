@@ -7,12 +7,10 @@ import {
   RootState,
   parserEndSelector,
   parserTypeSelector,
-  playerCrash,
+  playerActions,
   playerKeySelector,
   playerSectionsSelector,
   playerTabSelector,
-  proxyResetAndRequestPlay,
-  proxySectionsRequestAndPlay,
 } from '@pericles/store';
 import { hasSectionsInAdvance, isGoogleDocsSvg, } from '@pericles/util';
 
@@ -50,14 +48,14 @@ export const playOrRequest$ = (
 
   if (shouldRequestAndPlay(state, userGenerated, playerSections)) {
     Speech.stop();
-    return proxyResetAndRequestPlay.request(payload);
+    return playerActions.proxyResetAndRequestPlay(payload);
   }
 
   if (
     shouldRequestSectionsAndPlay(state, playingTab, playerSections, playerKey)
   ) {
     Speech.stop();
-    return proxySectionsRequestAndPlay.request(payload);
+    return playerActions.proxySectionsRequestAndPlay(payload);
   }
 
   if (actions.length === 0) {
@@ -66,7 +64,7 @@ export const playOrRequest$ = (
       Speech.play(playerSections[playerKey].text);
     } catch (e) {
       console.error('Player has crashed', playerSections[playerKey].text, e);
-      return playerCrash({ message: 'Player has crashed', });
+      return playerActions.crash({ message: 'Player has crashed', });
     }
   }
 

@@ -1,10 +1,12 @@
+export { default as combineAnyEpics, } from './combineAnyEpics';
+
 /* slices */
 export * from './reducers/app';
-export { default as hotkeysReducer, } from './reducers/hotkeys';
-export { default as notificationReducer, } from './reducers/notification';
-export { default as parserReducer, } from './reducers/parser';
-export { default as playerReducer, } from './reducers/player';
-export { default as settingsReducer, } from './reducers/settings';
+export * from './reducers/hotkeys';
+export * from './reducers/notification';
+export * from './reducers/parser';
+export * from './reducers/settings';
+export * from './reducers/player';
 
 /* app */
 export { default as appSelector, } from './selectors/app/appSelector';
@@ -65,12 +67,6 @@ export { default as settingsRateSelector, } from './selectors/settings/settingsR
 export { default as settingsVoiceSelector, } from './selectors/settings/settingsVoiceSelector';
 export { default as settingsVoicesSelector, } from './selectors/settings/settingsVoicesSelector';
 
-export * from './actions/notification';
-export * from './actions/player';
-export * from './actions/parser';
-export * from './actions/settings';
-export * from './actions/app';
-export * from './actions/hotkeys';
 export * from './initialState';
 
 export { default as store, } from './ReduxStore';

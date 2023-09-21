@@ -8,20 +8,20 @@ const appSlice = createSlice({
   name: 'app',
   initialState: initialState.app,
   reducers: {
-    set: (state, action: PayloadAction<Partial<AppState>>) => {
-      Object.assign(state, action.payload);
+    set: (appState, action: PayloadAction<Partial<AppState>>) => {
+      Object.assign(appState, action.payload);
     },
-    routeIndex: (state) => {
-      state.route = ROUTES.INDEX;
+    routeIndex: (appState) => {
+      appState.route = ROUTES.INDEX;
     },
-    routeError: (state) => {
-      state.route = ROUTES.ERROR;
+    routeError: (appState) => {
+      appState.route = ROUTES.ERROR;
     },
-    routeErrorPdf: (state) => {
-      state.route = ROUTES.ERROR_PDF;
+    routeErrorPdf: (appState) => {
+      appState.route = ROUTES.ERROR_PDF;
     },
-    routeSkip: (state) => {
-      state.route = ROUTES.SKIP;
+    routeSkip: (appState) => {
+      appState.route = ROUTES.SKIP;
     },
   },
 });
@@ -33,6 +33,13 @@ const sideEffectActions = {
   reloadTab: createAction('app/reloadTab'),
   factoryReset: createAction('app/factoryReset'),
   newContent: createAction<any>('app/newContent'),
+  autoscrollSet: createAction<{ section: number }>('app/autoscrollSet'),
+  autoscrollClear: createAction('app/autoscrollClear'),
+  highlightSection: createAction('app/highlightSection'),
+  highlightWord: createAction<any>('app/highlightWord'),
+  highlightClearWords: createAction('app/highlightClearWords'),
+  highlightClearSections: createAction('app/highlightClearSections'),
+  highlightReloadSettings: createAction('app/highlightReloadSettings'),
 };
 
 const { actions: reducerActions, reducer, } = appSlice;

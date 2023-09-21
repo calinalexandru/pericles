@@ -2,13 +2,7 @@ import { combineLatest, fromEventPattern, } from 'rxjs';
 import { filter, map, tap, } from 'rxjs/operators';
 
 import { ATTRIBUTES, } from '@pericles/constants';
-import {
-  store,
-  playerStop,
-  playerDemand,
-  playerPlay,
-  appActions,
-} from '@pericles/store';
+import { store, appActions, playerActions, } from '@pericles/store';
 import { getBrowserAPI, } from '@pericles/util';
 
 export default () => {
@@ -54,8 +48,8 @@ export default () => {
     ),
     tap(() => {
       console.log('reading selection');
-      store.dispatch(playerStop());
-      store.dispatch(playerDemand());
+      store.dispatch(playerActions.stop());
+      store.dispatch(playerActions.demand());
     })
   );
 
@@ -70,10 +64,10 @@ export default () => {
       (menuItemId) => menuItemId === ATTRIBUTES.CONTEXT_MENU.READ_FROM_HERE
     ),
     tap(() => {
-      store.dispatch(playerStop());
+      store.dispatch(playerActions.stop());
       setTimeout(() => {
         store.dispatch(
-          playerPlay.request({ userGenerated: true, fromCursor: true, })
+          playerActions.play({ userGenerated: true, fromCursor: true, })
         );
       }, 500);
     })

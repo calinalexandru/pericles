@@ -6,12 +6,11 @@ import { VARIABLES, } from '@pericles/constants';
 import {
   RootState,
   appActions,
-  highlightReloadSettings,
+  hotkeysActions,
   initialState,
-  notificationInfo,
-  setHotkeys,
-  setPlayer,
-  setSettings,
+  notificationActions,
+  playerActions,
+  settingsActions,
   settingsPitchSelector,
   settingsRateSelector,
   settingsVoiceSelector,
@@ -51,7 +50,7 @@ export function handleAppSet(
 
   if (Object.keys(highlightSettings).length > 0) {
     console.log('app.set -> highlight.reloadSettings');
-    mpToContent(highlightReloadSettings());
+    mpToContent(appActions.highlightReloadSettings());
   }
 }
 
@@ -60,18 +59,17 @@ export const handleFactoryReset$: any = (state: RootState) => {
     player: playerDefaultValues,
     app: appDefaultValues,
     settings: settingsDefaultValues,
-    hotkeys: hotkeysDefaultValues,
   } = initialState;
   console.log('appFactoryResetEpic');
   return of(
     appActions.set(appDefaultValues),
-    setPlayer(playerDefaultValues),
-    setSettings({
+    playerActions.set(playerDefaultValues),
+    settingsActions.set({
       ...settingsDefaultValues,
       voice: getEnglishVoiceKey(settingsVoicesSelector(state)),
     }),
-    setHotkeys(hotkeysDefaultValues),
-    notificationInfo({ text: 'Your setting have been reset.', }),
+    hotkeysActions.default(),
+    notificationActions.info('Your setting have been reset.'),
     appActions.reload()
   );
 };

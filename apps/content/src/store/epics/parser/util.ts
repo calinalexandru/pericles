@@ -1,5 +1,4 @@
 import { PayloadAction, } from '@reduxjs/toolkit';
-import { Action, } from 'redux';
 import { Observable, from, } from 'rxjs';
 
 import DomStrategy from '@/strategy/DomStrategy';
@@ -9,6 +8,7 @@ import {
   PLAYER_STATUS,
   ParserIframesType,
   ParserTypes,
+  PlayerSectionsType,
   SectionType,
   VoiceType,
 } from '@pericles/constants';
@@ -16,20 +16,13 @@ import {
   RootState,
   appActions,
   appSkipUntilYSelector,
-  notificationError,
+  notificationActions,
+  parserActions,
   parserIframesSelector,
   parserKeySelector,
   parserPageSelector,
-  playerEnd,
-  playerIdle,
-  playerNext,
-  playerProxyPlay,
+  playerActions,
   playerSectionsSelector,
-  playerStop,
-  sectionsRequestAndPlay,
-  setParser,
-  setPlayer,
-  setSections,
   settingsVoiceSelector,
   settingsVoicesSelector,
 } from '@pericles/store';
@@ -61,7 +54,7 @@ export type PayloadType = {
 export type PayloadResponseType = {
   type?: ParserTypes;
   fromCursor?: boolean;
-  sections?: SectionType[];
+  sections?: PlayerSectionsType[];
   end?: boolean;
   iframeBlocked?: boolean;
   pageIndex?: number;
@@ -115,7 +108,7 @@ const processSections = (
   out: SectionType[],
   jpLang: boolean,
   parserKey: number
-): SectionType[] => {
+): PlayerSectionsType[] => {
   if (!out.length) return [];
   const sectionsArr = out.map((data) => data.text);
   splitSentencesIntoWords(
@@ -124,7 +117,10 @@ const processSections = (
     ),
     jpLang
   );
-  return out.map(({ text, pos, }) => ({ text, ...(pos && { pos, }), }));
+  return out.map(({ text, pos, }) => ({
+    text,
+    ...(pos && { pos, }),
+  })) as PlayerSectionsType[];
 };
 
 const handleDomStrategy = (
@@ -209,14 +205,13 @@ export const mapPayloadToResponse = (
 
 const handleError = () =>
   from([
-    setPlayer({ status: PLAYER_STATUS.ERROR, }),
-    sectionsRequestAndPlay.success(),
+    playerActions.set({ status: PLAYER_STATUS.ERROR, }),
     appActions.routeErrorPdf(),
   ]);
 
 const handleIframeEnd = (
   iframes: ParserIframesType,
-  sectionsArr: SectionType[],
+  sectionsArr: PlayerSectionsType[],
   state: RootState
 ) => {
   const mergeSections = [ ...playerSectionsSelector(state), ...sectionsArr, ];
@@ -231,15 +226,15 @@ const handleIframeEnd = (
   }
 
   return from([
-    setSections({ sections: mergeSections, }),
-    setParser({ iframes: newIframePayload, }),
-    playerNext({ auto: true, }),
+    playerActions.setSections(mergeSections),
+    parserActions.set({ iframes: newIframePayload, }),
+    playerActions.next({ auto: true, }),
   ]);
 };
 
 const handleIframeStart = (
   iframes: ParserIframesType,
-  sectionsArr: SectionType[],
+  sectionsArr: PlayerSectionsType[],
   state: RootState,
   end: boolean,
   type: ParserTypes,
@@ -259,23 +254,19 @@ const handleIframeStart = (
   }
   const mergeSections = [ ...playerSectionsSelector(state), ...sectionsArr, ];
   return from([
-    setSections({ sections: mergeSections, }),
-    setParser({ iframes, end, type, maxPage, page: pageIndex, }),
-    playerEnd({ iframes: newIframes, }),
+    playerActions.setSections(mergeSections),
+    parserActions.set({ iframes, end, type, maxPage, page: pageIndex, }),
+    playerActions.end({ iframes: newIframes, }),
   ]);
 };
 
 const handleMessageEnd = (message: string) =>
-  from([
-    playerStop(),
-    sectionsRequestAndPlay.failure(new Error(message)),
-    notificationError({ text: message, }),
-  ]);
+  from([ playerActions.stop(), notificationActions.error(message), ]);
 
-const handleSkip = () => from([ playerIdle(), ]);
+const handleSkip = () => from([ playerActions.idle(), ]);
 
 const handleDefault = (
-  sectionsArr: SectionType[],
+  sectionsArr: PlayerSectionsType[],
   type: ParserTypes,
   state: RootState,
   iframes: ParserIframesType,
@@ -288,8 +279,8 @@ const handleDefault = (
   return from(
     maxPage === 0 || maxPage > parserPageSelector(state)
       ? [
-        setSections({ sections: mergeSections, }),
-        setParser({
+        playerActions.setSections(mergeSections),
+        parserActions.set({
           ...(iframes && { iframes, }),
           key: mergeSections.length,
           end,
@@ -297,10 +288,9 @@ const handleDefault = (
           maxPage,
           page: pageIndex,
         }),
-        playerProxyPlay({ tab, }),
-        sectionsRequestAndPlay.success(),
+        playerActions.proxyPlay({ tab, }),
       ]
-      : [ playerStop(), sectionsRequestAndPlay.success(), ]
+      : [ playerActions.stop(), ]
   );
 };
 

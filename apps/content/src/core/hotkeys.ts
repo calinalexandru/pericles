@@ -5,12 +5,8 @@ import {
   store,
   hotkeysDisableSelector,
   hotkeysSelector,
-  playerPlay,
-  playerToggle,
-  playerStop,
-  playerSoftNext,
-  playerSoftPrev,
   HotkeysState,
+  playerActions,
 } from '@pericles/store';
 
 const userIsTyping = (e: KeyboardEvent): boolean => {
@@ -26,20 +22,20 @@ export default () => {
   const hotkeyEvents = new Map<HotkeyEvent, () => void>();
   hotkeyEvents.set('start', () => {
     store.dispatch(
-      playerPlay.request({ userGenerated: true, fromCursor: false, })
+      playerActions.play({ userGenerated: true, fromCursor: false, })
     );
   });
   hotkeyEvents.set('play', () => {
-    store.dispatch(playerToggle());
+    store.dispatch(playerActions.toggle());
   });
   hotkeyEvents.set('stop', () => {
-    store.dispatch(playerStop());
+    store.dispatch(playerActions.stop());
   });
   hotkeyEvents.set('next', () => {
-    store.dispatch(playerSoftNext());
+    store.dispatch(playerActions.softNext());
   });
   hotkeyEvents.set('prev', () => {
-    store.dispatch(playerSoftPrev());
+    store.dispatch(playerActions.softPrev());
   });
 
   const keysMap: Map<string, { key: string; code: string }> = new Map();

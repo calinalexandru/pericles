@@ -2,12 +2,7 @@ import { useCallback, } from 'react';
 import { useDispatch, } from 'react-redux';
 
 import { VARIABLES, } from '@pericles/constants';
-import {
-  highlightClearSections,
-  highlightClearWords,
-  highlightSection as actionHighlightSection,
-  appActions,
-} from '@pericles/store';
+import { appActions, } from '@pericles/store';
 import { mpToContent, } from '@pericles/util';
 
 export default function useAppSettings() {
@@ -31,15 +26,15 @@ export default function useAppSettings() {
   );
 
   const clearWords = useCallback((tab: number) => {
-    mpToContent(highlightClearWords(), tab);
+    mpToContent(appActions.highlightClearWords(), tab);
   }, []);
 
   const clearSections = useCallback((tab: number) => {
-    mpToContent(highlightClearSections(), tab);
+    mpToContent(appActions.highlightClearSections(), tab);
   }, []);
 
   const highlightSection = useCallback((tab: number) => {
-    mpToContent(actionHighlightSection(), tab);
+    mpToContent(appActions.highlightSection(), tab);
   }, []);
 
   return {

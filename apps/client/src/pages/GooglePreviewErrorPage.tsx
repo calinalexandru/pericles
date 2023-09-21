@@ -5,8 +5,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 import { useDispatch, } from 'react-redux';
 
-import { playerStop, } from '@pericles/store';
-// import { mpToContent, } from '@pericles/util';
+import { playerActions, } from '@pericles/store';
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -27,7 +26,7 @@ const GooglePreviewErrorPage: React.FC = () => {
   const dispatch = useDispatch();
 
   const handleClose = () => {
-    dispatch(playerStop());
+    dispatch(playerActions.stop());
     window.close();
   };
 

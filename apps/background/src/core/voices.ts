@@ -1,11 +1,11 @@
-import { store, setSettings, appActions, } from '@pericles/store';
+import { store, appActions, settingsActions, } from '@pericles/store';
 import { getBrowserAPIVoices, } from '@pericles/util';
 
 export default () => {
   // hook for system voices
   getBrowserAPIVoices()
     .then((voices) => {
-      store.dispatch(setSettings({ voices, }));
+      store.dispatch(settingsActions.set({ voices, }));
     })
     .catch((e) => console.log(e));
 

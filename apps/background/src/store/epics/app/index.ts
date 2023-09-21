@@ -9,7 +9,7 @@ import {
   tap,
 } from 'rxjs/operators';
 
-import { appActions, playerHalt, playerTabSelector, } from '@pericles/store';
+import { appActions, playerActions, playerTabSelector, } from '@pericles/store';
 
 import {
   handleAppInit,
@@ -30,7 +30,7 @@ const tabClosedEpic: Epic<any> = (action, state) =>
     ofType(getType(appActions.tabClosed)),
     pluck('payload'),
     filter((tab) => tab === playerTabSelector(state.value)),
-    map(playerHalt)
+    map(playerActions.halt)
   );
 
 const appSetEpic: Epic<any> = (action, state) =>

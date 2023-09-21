@@ -1,31 +1,32 @@
-import { handleActions, } from 'redux-actions';
+import { PayloadAction, createSlice, } from '@reduxjs/toolkit';
 
-import { NotificationActionTypes, } from '../actions/notification';
-import { NotificationState, initialState, } from '../initialState';
+import { initialState, } from '../initialState';
 
-const { notification: defaultValues, } = initialState;
-
-export default handleActions<NotificationState, Partial<NotificationState>>(
-  {
-    [NotificationActionTypes.ERROR]: (state, { payload, }) => ({
-      type: 'error',
-      text: payload.text || '',
-    }),
-    [NotificationActionTypes.INFO]: (state, { payload, }) => ({
-      type: 'info',
-      text: payload.text || '',
-    }),
-    [NotificationActionTypes.SUCCESS]: (state, { payload, }) => ({
-      type: 'success',
-      text: payload.text || '',
-    }),
-    [NotificationActionTypes.WARNING]: (state, { payload, }) => ({
-      type: 'warning',
-      text: payload.text || '',
-    }),
-    [NotificationActionTypes.CLEAR]: () => ({
-      ...defaultValues,
-    }),
+const notificationSlice = createSlice({
+  name: 'notification',
+  initialState: initialState.notification,
+  reducers: {
+    error: (notificationState, action: PayloadAction<string>) => {
+      notificationState.type = 'error';
+      notificationState.text = action.payload;
+    },
+    warning: (notificationState, action: PayloadAction<string>) => {
+      notificationState.type = 'warning';
+      notificationState.text = action.payload;
+    },
+    info: (notificationState, action: PayloadAction<string>) => {
+      notificationState.type = 'info';
+      notificationState.text = action.payload;
+    },
+    success: (notificationState, action: PayloadAction<string>) => {
+      notificationState.type = 'success';
+      notificationState.text = action.payload;
+    },
+    clear: (notificationState) => {
+      Object.assign(notificationState, initialState.notification);
+    },
   },
-  defaultValues
-);
+});
+
+export const { actions: notificationActions, reducer: notificationReducer, } =
+  notificationSlice;

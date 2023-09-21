@@ -26,15 +26,14 @@
     "@reduxjs/toolkit": "^1.9.5",
     "ramda": "0.27.1",
     "redux": "4.1.2",
-    "redux-actions": "2.6.5",
     "redux-observable": "2.0.0",
     "redux-thunk": "2.4.1",
     "reselect": "4.1.5",
+    "rxjs": "7.5.1",
     "webext-redux": "^2.1.9"
   },
   "devDependencies": {
     "@pericles/eslint-config": "workspace:*",
-    "@types/redux-actions": "^2.6.2",
     "cross-env": "^7.0.3",
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",

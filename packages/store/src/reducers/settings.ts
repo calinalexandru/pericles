@@ -1,19 +1,23 @@
-import { handleActions, } from 'redux-actions';
+import { PayloadAction, createSlice, } from '@reduxjs/toolkit';
 
-import { SettingsActionTypes, } from '../actions/settings';
 import { SettingsState, initialState, } from '../initialState';
 
-const { settings: defaultValues, } = initialState;
-
-export default handleActions<SettingsState, Partial<SettingsState>>(
-  {
-    [SettingsActionTypes.SET]: (state, { payload, }) => ({
-      ...state,
-      ...payload,
-    }),
-    [SettingsActionTypes.DEFAULT]: () => ({
-      ...defaultValues,
-    }),
+const settingsSlice = createSlice({
+  name: 'settings',
+  initialState: initialState.settings,
+  reducers: {
+    set: (settingsState, action: PayloadAction<Partial<SettingsState>>) => {
+      Object.assign(settingsState, action.payload);
+    },
+    default: (settingsState) => {
+      Object.assign(settingsState, initialState.settings);
+    },
   },
-  defaultValues
-);
+});
+
+const sideEffectActions = {};
+
+const { actions: reducerActions, reducer, } = settingsSlice;
+
+export const settingsActions = { ...reducerActions, ...sideEffectActions, };
+export const settingsReducer = reducer;

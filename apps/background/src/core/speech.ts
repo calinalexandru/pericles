@@ -10,13 +10,8 @@ import {
   playerKeySelector,
   playerStatusSelector,
   playerTabSelector,
-  highlightSection,
-  autoscrollSet,
-  highlightWord,
-  setPlayer,
-  playerNext,
-  playerCrash,
-  playerEnd,
+  appActions,
+  playerActions,
 } from '@pericles/store';
 import {
   findAvailableIframe,
@@ -37,6 +32,7 @@ export default (): void => {
         const { event, params, } = out;
         const {
           charIndex,
+          length,
           errorMessage,
           // index,
         } = params || {};
@@ -46,13 +42,16 @@ export default (): void => {
         case 'onStart':
           console.log('onStart', { playingTab, playerKey, });
           store.dispatch(
-            setPlayer({
+            playerActions.set({
               status: PLAYER_STATUS.PLAYING,
               buffering: false,
             })
           );
           mpToContent(
-            [ highlightSection(), autoscrollSet({ section: playerKey, }), ],
+            [
+              appActions.highlightSection(),
+              appActions.autoscrollSet({ section: playerKey, }),
+            ],
             playingTab
           );
           break;
@@ -65,7 +64,7 @@ export default (): void => {
             console.log('going to next', {
               playerStatus: playerStatusSelector(state),
             });
-            store.dispatch(playerNext({ auto: true, }));
+            store.dispatch(playerActions.next({ auto: true, }));
           } else if (parserEndSelector(state)) {
             console.log('parserIframes', parserIframes);
             const availableIframeKey = findAvailableIframe(parserIframes);
@@ -83,22 +82,24 @@ export default (): void => {
             }
             console.log('onEnd.iframe', newIframes);
             console.log('going to next.iframe');
-            store.dispatch(playerEnd({ iframes: newIframes, }));
+            store.dispatch(playerActions.end({ iframes: newIframes, }));
           }
           break;
         case 'onBoundary':
           console.log('onBoundary', charIndex, length);
           mpToContent(
-            highlightWord({ charIndex, charLength: length, }),
+            appActions.highlightWord({ charIndex, charLength: length, }),
             playingTab
           );
           break;
         case 'onError':
           console.log('onError');
           if (errorMessage) {
-            store.dispatch(playerCrash({ message: errorMessage, }));
+            store.dispatch(playerActions.crash({ message: errorMessage, }));
           } else {
-            store.dispatch(playerCrash({ message: 'generic player crash', }));
+            store.dispatch(
+              playerActions.crash({ message: 'generic player crash', })
+            );
           }
           break;
         default:

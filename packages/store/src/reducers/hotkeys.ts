@@ -1,19 +1,23 @@
-import { handleActions, } from 'redux-actions';
+import { PayloadAction, createSlice, } from '@reduxjs/toolkit';
 
-import { HotkeysActionTypes, } from '../actions/hotkeys';
-import { HotkeysState, initialState, } from '../initialState';
+import { AppState, initialState, } from '../initialState';
 
-const { hotkeys: defaultValues, } = initialState;
-
-export default handleActions<HotkeysState, Partial<HotkeysState>>(
-  {
-    [HotkeysActionTypes.SET]: (state, { payload, }) => ({
-      ...state,
-      ...payload,
-    }),
-    [HotkeysActionTypes.DEFAULT]: () => ({
-      ...defaultValues,
-    }),
+const hotkeysSlice = createSlice({
+  name: 'hotkeys',
+  initialState: initialState.hotkeys,
+  reducers: {
+    set: (hotkeysState, action: PayloadAction<Partial<AppState>>) => {
+      Object.assign(hotkeysState, action.payload);
+    },
+    default: (hotkeysState) => {
+      Object.assign(hotkeysState, initialState.hotkeys);
+    },
   },
-  defaultValues
-);
+});
+
+const sideEffectActions = {};
+
+const { actions: reducerActions, reducer, } = hotkeysSlice;
+
+export const hotkeysActions = { ...reducerActions, ...sideEffectActions, };
+export const hotkeysReducer = reducer;

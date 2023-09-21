@@ -1,18 +1,27 @@
-import { Epic, combineEpics, ofType, } from 'redux-observable';
+import { PayloadAction, getType, } from '@reduxjs/toolkit';
+import { Epic, ofType, } from 'redux-observable';
 import { delay, map, } from 'rxjs/operators';
 
-import { NotificationActionTypes, notificationClear, } from '@pericles/store';
+import {
+  RootState,
+  notificationActions,
+  combineAnyEpics,
+} from '@pericles/store';
 
-const notificationSetEpic: Epic<any> = (action) =>
+const notificationSetEpic: Epic<
+  PayloadAction<string>,
+  PayloadAction<any>,
+  RootState
+> = (action) =>
   action.pipe(
     ofType(
-      NotificationActionTypes.INFO,
-      NotificationActionTypes.WARNING,
-      NotificationActionTypes.ERROR,
-      NotificationActionTypes.SUCCESS
+      getType(notificationActions.info),
+      getType(notificationActions.success),
+      getType(notificationActions.warning),
+      getType(notificationActions.error)
     ),
     delay(6000),
-    map(notificationClear)
+    map(() => notificationActions.clear())
   );
 
-export default combineEpics(notificationSetEpic);
+export default combineAnyEpics(notificationSetEpic);

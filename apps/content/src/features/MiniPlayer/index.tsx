@@ -13,10 +13,8 @@ import {
 import {
   appMiniPlayerSelector,
   parserTypeSelector,
+  playerActions,
   playerKeySelector,
-  playerNext,
-  playerPause,
-  playerResume,
   playerSectionsSelector,
   playerStatusSelector,
 } from '@pericles/store';
@@ -37,13 +35,13 @@ export default function MiniPlayer() {
   console.log('MiniPlayer', { parserType, sections, status, });
   const dispatch = useDispatch();
   const onNext = () => {
-    dispatch(playerNext({ auto: false, }));
+    dispatch(playerActions.next({ auto: false, }));
   };
   const onPause = () => {
-    dispatch(playerPause());
+    dispatch(playerActions.pause());
   };
   const onResume = () => {
-    dispatch(playerResume());
+    dispatch(playerActions.resume());
   };
   const isPlaying = PLAYER_STATUS.PLAYING === status;
   const isLoading = (

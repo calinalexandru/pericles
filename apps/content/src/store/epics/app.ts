@@ -1,5 +1,5 @@
-import { getType, } from '@reduxjs/toolkit';
-import { Epic, combineEpics, ofType, } from 'redux-observable';
+import { PayloadAction, getType, } from '@reduxjs/toolkit';
+import { Epic, ofType, } from 'redux-observable';
 import {
   debounceTime,
   filter,
@@ -16,8 +16,7 @@ import {
   WORD_TRACKER_STYLES,
 } from '@pericles/constants';
 import {
-  AutoscrollActionTypes,
-  HighlightActionTypes,
+  RootState,
   appActions,
   appAutoscrollSelector,
   appHighlightColorSelector,
@@ -26,10 +25,7 @@ import {
   appWordTrackerColorSelector,
   appWordTrackerSelector,
   appWordTrackerStyleSelector,
-  highlightClearSectionsComplete,
-  highlightClearWordsComplete,
-  highlightReloadSettings,
-  highlightSectionComplete,
+  combineAnyEpics,
   parserTypeSelector,
   playerKeySelector,
   playerSectionsSelector,
@@ -53,7 +49,7 @@ const appNewContentEpic: Epic<any> = (action) =>
 
       return !payload?.iframe;
     }),
-    map(highlightReloadSettings)
+    map(appActions.highlightReloadSettings)
   );
 
 const appReloadTabEpic: Epic<any> = (action) =>
@@ -66,9 +62,12 @@ const appReloadTabEpic: Epic<any> = (action) =>
     ignoreElements()
   );
 
-const highlightSectionEpic: Epic<any> = (action$, state) =>
+const highlightSectionEpic: Epic<PayloadAction, PayloadAction, RootState> = (
+  action$,
+  state
+) =>
   action$.pipe(
-    ofType(HighlightActionTypes.SECTION),
+    ofType(getType(appActions.highlightSection)),
     tap(() => {
       console.log(
         'highlightSectionEpic.init',
@@ -89,20 +88,23 @@ const highlightSectionEpic: Epic<any> = (action$, state) =>
         addClassToElements(activeRectSections, highlightStyle);
       } else {
         const activeSections = getSectionsById(playerKeySelector(state.value));
-        // console.log('highlightSectionEpic', {
-        //   playerKey: playerKeySelector(state.value),
-        //   activeSections,
-        //   highlightStyle,
-        // });
+        console.log('highlightSectionEpic', {
+          playerKey: playerKeySelector(state.value),
+          activeSections,
+          highlightStyle,
+        });
         addClassToElements(activeSections, highlightStyle);
       }
     }),
-    map(highlightSectionComplete)
+    ignoreElements()
   );
 
-const highlightWordEpic: Epic<any> = (action$, state) =>
+const highlightWordEpic: Epic<PayloadAction, PayloadAction, RootState> = (
+  action$,
+  state
+) =>
   action$.pipe(
-    ofType(HighlightActionTypes.WORD),
+    ofType(getType(appActions.highlightWord)),
     filter(() => appWordTrackerSelector(state.value) === true),
     pluck('payload'),
     tap((data: any) => {
@@ -151,12 +153,16 @@ const highlightWordEpic: Epic<any> = (action$, state) =>
     ignoreElements()
   );
 
-const autoscrollRunEpic: Epic<any> = (action$, state) =>
-  action$.pipe(
-    ofType(AutoscrollActionTypes.SET),
+const autoscrollRunEpic: Epic<
+  PayloadAction<{ section: number }>,
+  never,
+  RootState
+> = (action, state) =>
+  action.pipe(
+    ofType(getType(appActions.autoscrollSet)),
     debounceTime(500),
-    pluck('payload', 'section'),
-    tap((section: any) => {
+    map((act) => act.payload.section),
+    tap((section) => {
       const parserType = parserTypeSelector(state.value);
       const { top = 0, } =
         playerSectionsSelector(state.value)?.[section]?.pos || {};
@@ -167,18 +173,24 @@ const autoscrollRunEpic: Epic<any> = (action$, state) =>
     ignoreElements()
   );
 
-const autoscrollClearEpic: Epic<any> = (action$) =>
+const autoscrollClearEpic: Epic<PayloadAction, PayloadAction, RootState> = (
+  action$
+) =>
   action$.pipe(
-    ofType(AutoscrollActionTypes.CLEAR),
+    ofType(getType(appActions.autoscrollClear)),
     tap(() => {
       Autoscroll.clear();
     }),
     ignoreElements()
   );
 
-const highlightReloadSettingsEpic: Epic<any> = (action, state) =>
+const highlightReloadSettingsEpic: Epic<
+  PayloadAction,
+  PayloadAction,
+  RootState
+> = (action, state) =>
   action.pipe(
-    ofType(HighlightActionTypes.RELOAD_SETTINGS),
+    ofType(getType(appActions.highlightReloadSettings)),
     tap(() => {
       console.log('highlight.reloadSettings epic', state.value);
       setWordBackground(appWordTrackerColorSelector(state.value));
@@ -187,28 +199,35 @@ const highlightReloadSettingsEpic: Epic<any> = (action, state) =>
     ignoreElements()
   );
 
-const highlightClearWordsEpic: Epic<any> = (action, state) =>
+const highlightClearWordsEpic: Epic<PayloadAction, PayloadAction, RootState> = (
+  action,
+  state
+) =>
   action.pipe(
-    ofType(HighlightActionTypes.CLEAR_WORDS),
+    ofType(getType(appActions.highlightClearWords)),
     tap(() => {
       // console.log('highlight.clearWords');
       removeClassFromAll(appWordTrackerStyleSelector(state.value));
       removeClassFromAll(ATTRIBUTES.ATTRS.PREV_WORD_TRACKER);
     }),
-    map(highlightClearWordsComplete)
+    ignoreElements()
   );
 
-const highlightClearSectionsEpic: Epic<any> = (action, state) =>
+const highlightClearSectionsEpic: Epic<
+  PayloadAction,
+  PayloadAction,
+  RootState
+> = (action, state) =>
   action.pipe(
-    ofType(HighlightActionTypes.CLEAR_SECTIONS),
+    ofType(getType(appActions.highlightClearSections)),
     tap(() => {
       // console.log('highlight.clearSections');
       removeClassFromAll(appHighlightStyleSelector(state.value));
     }),
-    map(highlightClearSectionsComplete)
+    ignoreElements()
   );
 
-export default combineEpics(
+export default combineAnyEpics(
   appReloadTabEpic,
   appNewContentEpic,
   highlightSectionEpic,
