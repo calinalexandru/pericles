@@ -1,7 +1,8 @@
 /* eslint-disable class-methods-use-this */
 import {
   alterNode,
-  findNextSiblingWithParents,
+  combineSmallSentences,
+  findNextSiblingWithIframe,
   getInnerText,
   getSentencesFromText,
   isMaxText,
@@ -14,6 +15,8 @@ import { NodeProcessingStrategy, ProcessResult, } from './IDom';
 
 export default class TextNodeProcessor implements NodeProcessingStrategy {
 
+  private remainingSentences: { text: string }[] = [];
+
   shouldProcess(node: Node, isVisible: boolean): boolean {
     return (
       isVisible &&
@@ -23,9 +26,8 @@ export default class TextNodeProcessor implements NodeProcessingStrategy {
   }
 
   process(node: Text): ProcessResult {
-    console.log('TextNodeProcessor.process', node);
+    console.log('TextNodeProcessor.process', node.nodeValue);
     let nextNode: Node | null = null;
-    let parents: Node[] = [];
     let nextAfterIframe: Node | null = null;
     let firstParagraph: { text: string } | null = null;
     let iframeBlocked = false;
@@ -34,45 +36,37 @@ export default class TextNodeProcessor implements NodeProcessingStrategy {
       node.nodeValue &&
       isMaxText(removeHTMLSpaces(getInnerText(node.nodeValue)))
     ) {
-      const sentences = getSentencesFromText(node.nodeValue) || [];
-      [ firstParagraph, ] = sentences;
-      parents = [];
+      if (this.remainingSentences.length === 0) {
+        // If we don't have any sentences cached, get them all
+        this.remainingSentences = combineSmallSentences(
+          getSentencesFromText(node.nodeValue) || []
+        );
+      }
 
-      // Ensure nodeValue is defined and is a string
-      const nodeValueLength = node.nodeValue.length;
+      // console.log(
+      //   'TextNodeProcessor.process.remainingSentences',
+      //   JSON.stringify(this.remainingSentences.map(({ text, }) => text))
+      // );
 
-      // Ensure firstParagraph.text is defined and is a string
-      const firstParagraphLength =
-        firstParagraph !== null ? firstParagraph.text.length : 0;
+      const currentSentence = this.remainingSentences.shift()?.text || '';
 
-      nextNode = node.splitText(
-        firstParagraph && nodeValueLength >= firstParagraphLength
-          ? firstParagraphLength
-          : Math.floor(nodeValueLength / 2)
-      );
+      if (currentSentence) {
+        nextNode = node.splitText(currentSentence.length);
+        // Here, we are going to check the first sentence for the next process cycle
+        [ firstParagraph, ] = this.remainingSentences;
+      }
     } else {
-      const result = findNextSiblingWithParents(node);
+      const result = findNextSiblingWithIframe(node);
       console.log('TextNodeProcessor.process.result', result);
-      if (result !== null && 'next' in result && 'parents' in result) {
-        ({ next: nextNode, parents, nextAfterIframe, iframeBlocked, } = result);
+      if (result !== null && 'next' in result) {
+        ({ next: nextNode, nextAfterIframe, iframeBlocked, } = result);
       }
     }
 
-    // const nodeText = getInnerText(node.nodeValue || '');
-    // walkerInstance.pushNode(nodeText, node);
     const domAlterations: (key: number) => void = (key: number) => {
       console.log('TextNodeProcessor.process.domAlterations', node, key);
       alterNode(node, key);
     };
-
-    if (firstParagraph) {
-      console.log(
-        'util.processTextNode.pushAndClearBuffer invokation',
-        firstParagraph,
-        parents
-      );
-      // walkerInstance.pushAndClearBuffer();
-    }
 
     return {
       domAlterations,

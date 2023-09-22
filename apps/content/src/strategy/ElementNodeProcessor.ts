@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
 import {
   alterDom,
-  findNextSiblingWithParents,
+  findNextSiblingWithIframe,
   getInnerText,
   isHtmlElement,
   validateElementNode,
@@ -30,7 +30,7 @@ export default class ElementNodeProcessor implements NodeProcessingStrategy {
       console.log('ElementNodeProcessor.process.domAlterations', node, key);
       alterDom(node, key);
     };
-    const result = findNextSiblingWithParents(node);
+    const result = findNextSiblingWithIframe(node);
     console.log('ElementNodeProcessor.process', node, result);
     if (result !== null && 'next' in result) {
       ({ next: nextNode, nextAfterIframe = null, iframeBlocked, } = result);

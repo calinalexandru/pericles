@@ -11,7 +11,13 @@ function extractSplitIndices(nodeValue: string): number[] {
     const nextChar = chars[index + 1];
     const prevChar = chars[index - 1];
 
-    if (nextChar && !squareBracket && char === ' ' && nextChar !== ' ' && prevChar !== ' ') {
+    if (
+      nextChar &&
+      !squareBracket &&
+      char === ' ' &&
+      nextChar !== ' ' &&
+      prevChar !== ' '
+    ) {
       indices.push(index);
     }
   });
@@ -31,14 +37,17 @@ export default function wrapWordTag(
   // Return early if the node does not have a valid value.
   if (!node || !node.nodeValue) return charIndex;
 
-  const {nodeValue,} = node;
+  const { nodeValue, } = node;
   const leftTrimmedNodeValue = nodeValue.trimLeft();
   const leftTrim = nodeValue.length - leftTrimmedNodeValue.length;
 
   const splitIndices = extractSplitIndices(leftTrimmedNodeValue);
 
   const splitIndexMap = jp
-    ? Array.from({ length: leftTrimmedNodeValue.length, }, (_, index) => index + 1)
+    ? Array.from(
+      { length: leftTrimmedNodeValue.length, },
+      (_, index) => index + 1
+    )
     : splitIndices;
 
   splitIndexMap.sort((a, b) => b - a); // Sort indices in descending order.
@@ -54,10 +63,5 @@ export default function wrapWordTag(
     alterNodeWord(node, charIndex);
   }
 
-  return (
-    (splitIndexMap[0] || 0) + 
-    charIndex + 
-    1 + 
-    (nodeValue.length || 0)
-  );
+  return (splitIndexMap[0] || 0) + charIndex + 1 + (nodeValue.length || 0);
 }

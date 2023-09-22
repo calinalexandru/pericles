@@ -17,24 +17,27 @@ export type Position = {
   height: number;
 };
 
-export const getPosition = (
-  node: Node | Element | HTMLElement | Text,
-  relativeToParent = false
-): Position => {
-  const element: Element =
-    relativeToParent && node?.parentElement
-      ? (node.parentElement as Element)
-      : (node as Element);
-  const {
-    top = 0,
-    width = 0,
-    height = 0,
-  } = element?.getBoundingClientRect?.() || {};
+export const getPosition = (node: HTMLElement | Text): Position => {
+  let rect: DOMRect;
+
+  if (node instanceof Text) {
+    const range = document.createRange();
+    range.selectNode(node);
+    rect = range.getBoundingClientRect();
+  } else {
+    rect = node.getBoundingClientRect();
+  }
+
+  const { top = 0, width = 0, height = 0, } = rect;
+
+  // If the node is part of an iframe, adjust its position
+  // based on the iframe's position
   const { y: adjustY = 0, } =
-    node?.ownerDocument?.defaultView?.frameElement?.getBoundingClientRect?.() ||
+    node.ownerDocument?.defaultView?.frameElement?.getBoundingClientRect() ||
     {};
+
   return {
-    top: Math.floor(top) + Math.floor(window.scrollY) + Math.floor(adjustY),
+    top: Math.floor(top + window.scrollY + adjustY),
     width: Math.floor(width),
     height: Math.floor(height),
   };

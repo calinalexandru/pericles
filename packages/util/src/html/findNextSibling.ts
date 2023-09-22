@@ -3,10 +3,9 @@ import { ATTRIBUTES, } from '@pericles/constants';
 import canAccessIframe from '../helpers/canAccessIframe';
 import getIframeDocument from '../helpers/getIframeDocument';
 
-type SiblingWithParents = {
+type Siblings = {
   iframeBlocked: boolean;
   next: Node | null;
-  parents: Node[];
   nextAfterIframe: Node | null;
 };
 
@@ -89,28 +88,22 @@ export function findNextSibling(
  * For iframes, it retrieves the sibling both inside and outside the iframe.
  * @param {Node} el - The starting node.
  * @param {boolean} accessIframe - Whether to look inside iframes.
- * @returns {SiblingWithParents} - An object containing the sibling, parents, and the next iframe sibling.
+ * @returns {Siblings} - An object containing the sibling and the next iframe sibling.
  */
-export function findNextSiblingWithParents(
+export function findNextSiblingWithIframe(
   el: Node,
   accessIframe: boolean = true
-): SiblingWithParents {
-  const parents: Node[] = [];
+): Siblings {
   let nextAfterIframe: Node | null = null;
   const { node: sibling, iframeBlocked, } = findNextSibling(el, accessIframe);
   if (accessIframe === true && iframeBlocked) {
     if (sibling instanceof Node) {
       ({ node: nextAfterIframe, } = findNextSibling(sibling, false));
     }
-    return { iframeBlocked: true, next: sibling, parents, nextAfterIframe, };
-  }
-  let parent = el.parentNode;
-  while (parent) {
-    parents.push(parent);
-    parent = parent.parentNode;
+    return { iframeBlocked: true, next: sibling, nextAfterIframe, };
   }
   if (sibling instanceof HTMLIFrameElement) {
     ({ node: nextAfterIframe, } = findNextSibling(sibling, false));
   }
-  return { iframeBlocked: false, next: sibling, parents, nextAfterIframe, };
+  return { iframeBlocked: false, next: sibling, nextAfterIframe, };
 }

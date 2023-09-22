@@ -73,7 +73,8 @@ export default class DOMWalker implements IDOMWalker {
   }
 
   pushNode(text: string, node: HTMLElement | Text): void {
-    const pos = getPosition(node, true);
+    console.log('pushNode', text, node);
+    const pos = getPosition(node);
     const outer = { text, pos, };
     this.appendSentenceBuffer(outer);
   }

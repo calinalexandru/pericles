@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import {
-  findNextSiblingWithParents,
+  findNextSiblingWithIframe,
   isSkippableByDesign,
   isWikipedia,
 } from '@pericles/util';
@@ -14,7 +14,7 @@ export default class AnyNodeProcessor implements NodeProcessingStrategy {
   }
 
   process(node: Node, isVisible: boolean): ProcessResult {
-    const nextSiblingResult = findNextSiblingWithParents(node);
+    const nextSiblingResult = findNextSiblingWithIframe(node);
     console.log('AnyNodeProcessor.process', node);
     if (
       nextSiblingResult.next &&

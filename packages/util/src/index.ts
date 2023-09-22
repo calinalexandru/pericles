@@ -65,6 +65,7 @@ export { default as isPdfPage, } from './location/isPdfPage';
 export { default as mpToContent, } from './mp';
 /* nlp */
 export { default as getSentencesFromText, } from './nlp/getSentencesFromText';
+export { default as combineSmallSentences, } from './nlp/combineSmallSentences';
 /* predicates */
 export { default as hasSectionsInAdvance, } from './predicates/hasSectionsInAdvance';
 export { default as isElementNode, } from './predicates/isElementNode';

@@ -29,11 +29,7 @@ export default function splitSentencesIntoWords(
       wordIndex = 0;
     }
     if (isTextNode(section.childNodes[0])) {
-      wordIndex = wrapWordTag(
-        section.childNodes[0],
-        wordIndex,
-        jp
-      );
+      wordIndex = wrapWordTag(section.childNodes[0], wordIndex, jp);
     }
     oldKey = newKey;
   });
