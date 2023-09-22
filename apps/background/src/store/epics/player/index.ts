@@ -1,4 +1,4 @@
-import { getType,  } from '@reduxjs/toolkit';
+import { getType, } from '@reduxjs/toolkit';
 import { combineEpics, ofType, } from 'redux-observable';
 import { from, interval, of, } from 'rxjs';
 import {
@@ -77,8 +77,8 @@ const proxyPlayEpic: EpicFunction = (action, state) =>
     tap(() => {
       console.log('player.proxyPlay', action, state);
     }),
-    pluck('payload'),
-    map(() => playerActions.play({ userGenerated: false, fromCursor: false, }))
+    map((act) => act.payload),
+    map((payload) => playerActions.play(payload))
   );
 
 const proxyResetAndRequestPlayEpic: EpicFunction = (action, state) =>
@@ -233,7 +233,7 @@ const nextEpic: EpicFunction = (action, state) =>
     ofType(getType(playerActions.next)),
     pluck('payload'),
     filter(
-      (payload: { auto: boolean }) =>
+      (payload) =>
         (!isGoogleBook(parserTypeSelector(state.value)) || payload.auto) &&
         !isStopped(playerStatusSelector(state.value))
     ),
@@ -257,7 +257,7 @@ const nextPageEpic: EpicFunction = (action, state) =>
     ofType(getType(playerActions.next)),
     pluck('payload'),
     filter(
-      (payload: { auto: boolean }) =>
+      (payload) =>
         !payload.auto && isGoogleBook(parserTypeSelector(state.value))
     ),
     concatMap(() => from([ playerActions.stop(), playerActions.nextMove(), ]))
@@ -288,7 +288,7 @@ const prevPageEpic: EpicFunction = (action, state) =>
     ofType(getType(playerActions.prev)),
     pluck('payload'),
     filter(
-      (payload: { auto: boolean }) =>
+      (payload) =>
         !payload.auto && isGoogleBook(parserTypeSelector(state.value))
     ),
     concatMap(() => from([ playerActions.stop(), playerActions.prevMove(), ]))
@@ -436,7 +436,7 @@ const prevEpic: EpicFunction = (action, state) =>
     ofType(getType(playerActions.prev)),
     pluck('payload'),
     filter(
-      (payload: { auto: boolean }) =>
+      (payload) =>
         (!isGoogleBook(parserTypeSelector(state.value)) || payload?.auto) &&
         !isStopped(playerStatusSelector(state.value))
     ),

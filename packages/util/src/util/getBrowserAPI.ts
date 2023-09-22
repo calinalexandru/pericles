@@ -1,5 +1,3 @@
-/* global chrome */
-
 export type BrowserApiType = typeof chrome;
 
 export type GetBrowserApiType = {

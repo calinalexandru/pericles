@@ -1,47 +1,63 @@
 import alterNodeWord from './alterNodeWord';
 
-const sortFunc = (a: number, b: number) => b - a;
+function extractSplitIndices(nodeValue: string): number[] {
+  let squareBracket = false;
+  const indices: number[] = [];
+
+  nodeValue.split('').forEach((char, index, chars) => {
+    if (char === '[') squareBracket = true;
+    if (char === ']') squareBracket = false;
+
+    const nextChar = chars[index + 1];
+    const prevChar = chars[index - 1];
+
+    if (nextChar && !squareBracket && char === ' ' && nextChar !== ' ' && prevChar !== ' ') {
+      indices.push(index);
+    }
+  });
+
+  return indices;
+}
+
+function containsSquareBrackets(nodeValue: string): boolean {
+  return !!nodeValue.match(/\[([0-9]+)\]/gim);
+}
 
 export default function wrapWordTag(
   node: Text,
   charIndex: number = 0,
   jp: boolean = false
 ): number {
+  // Return early if the node does not have a valid value.
   if (!node || !node.nodeValue) return charIndex;
-  const { nodeValue, } = node;
+
+  const {nodeValue,} = node;
   const leftTrimmedNodeValue = nodeValue.trimLeft();
   const leftTrim = nodeValue.length - leftTrimmedNodeValue.length;
-  const chars = leftTrimmedNodeValue.split('');
-  let squareBracket = false;
 
-  const splitIndexArr = chars
-    .map((char, key) => {
-      if (char === '[') squareBracket = true;
-      if (char === ']') squareBracket = false;
-      const next = chars[key + 1];
-      const prev = chars[key - 1];
-      return next &&
-        !squareBracket &&
-        char === ' ' &&
-        next !== ' ' &&
-        prev !== ' '
-        ? key
-        : null;
-    })
-    .filter((char: any) => char > 0);
+  const splitIndices = extractSplitIndices(leftTrimmedNodeValue);
 
-  const splitIndexMap: any = jp
-    ? chars.map((ch, key) => key + 1)
-    : splitIndexArr;
-  splitIndexMap.sort(sortFunc);
+  const splitIndexMap = jp
+    ? Array.from({ length: leftTrimmedNodeValue.length, }, (_, index) => index + 1)
+    : splitIndices;
 
-  splitIndexMap.forEach((splitIndex: number) => {
+  splitIndexMap.sort((a, b) => b - a); // Sort indices in descending order.
+
+  splitIndexMap.forEach((splitIndex) => {
     alterNodeWord(
       node.splitText(leftTrim + splitIndex),
       charIndex + splitIndex + 1
     );
   });
-  if (!squareBracket && !node.nodeValue.match(/\[([0-9]+)\]/gim))
+
+  if (!containsSquareBrackets(nodeValue)) {
     alterNodeWord(node, charIndex);
-  return (splitIndexMap[0] || 0) + charIndex + 1 + (node.nodeValue.length || 0);
+  }
+
+  return (
+    (splitIndexMap[0] || 0) + 
+    charIndex + 
+    1 + 
+    (nodeValue.length || 0)
+  );
 }

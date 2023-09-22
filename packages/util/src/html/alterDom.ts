@@ -1,16 +1,16 @@
-import { NODE_TYPES, } from '@pericles/constants';
-
+import isHTMLElement from '../predicates/isHtmlElement';
+import isTextNode from '../predicates/isTextNode';
 import isValidTag from '../predicates/isValidTag';
 
 import alterNode from './alterNode';
 
 export default function alterDom(el: Node, key: number) {
   if (!el?.childNodes?.length) return;
-  el.childNodes.forEach((element: any) => {
-    if (element.nodeType === NODE_TYPES.TEXT) {
-      alterNode(element as Element, key);
-    } else if (element.nodeType === NODE_TYPES.ELEMENT && isValidTag(element)) {
-      alterDom(element as Node, key);
+  el.childNodes.forEach((element: Node) => {
+    if (isTextNode(element)) {
+      alterNode(element, key);
+    } else if (isHTMLElement(element) && isValidTag(element)) {
+      alterDom(element, key);
     }
   });
 }

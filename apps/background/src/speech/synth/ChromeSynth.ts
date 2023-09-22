@@ -58,6 +58,7 @@ export default class ChromeSynth extends BaseSynth implements ISynth {
     let voiceObj: chrome.tts.TtsVoice | null;
     try {
       voiceObj = await this.getVoiceByKey(this.voice);
+      console.log('voiceObj', this.voice, voiceObj)
     } catch (e) {
       console.error(
         'ChromeSynth.speak - voiceObj is not of type chrome.tts.TtsVoice'

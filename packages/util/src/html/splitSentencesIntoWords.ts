@@ -1,5 +1,7 @@
 import { ATTRIBUTES, } from '@pericles/constants';
 
+import isTextNode from '../predicates/isTextNode';
+
 import getSelfIframes from './getSelfIframes';
 import sectionQuerySelector from './sectionQuerySelector';
 import wrapWordTag from './wrapWordTag';
@@ -26,11 +28,13 @@ export default function splitSentencesIntoWords(
     if (oldKey !== newKey) {
       wordIndex = 0;
     }
-    wordIndex = wrapWordTag(
-      section.childNodes[0] as unknown as Text,
-      wordIndex,
-      jp
-    );
+    if (isTextNode(section.childNodes[0])) {
+      wordIndex = wrapWordTag(
+        section.childNodes[0],
+        wordIndex,
+        jp
+      );
+    }
     oldKey = newKey;
   });
 }

@@ -13,8 +13,10 @@ export default function useSettings(): UseSettingsHook {
   const dispatch = useDispatch();
 
   const setSetting = useCallback(
-    (key: string, val: number | string | boolean) =>
-      dispatch(settingsActions.set({ [key]: val, })),
+    (key: string, val: number | string | boolean) => {
+      console.log('settings.set', key, val);
+      dispatch(settingsActions.set({ [key]: val, }));
+    },
     [ dispatch, ]
   );
 

@@ -11,7 +11,7 @@ import {
   playerStatusSelector,
   settingsActions,
 } from '@pericles/store';
-import { isPaused, isPlayingOrReady, } from '@pericles/util';
+import { isPaused, isPlaying, isPlayingOrReady, } from '@pericles/util';
 
 const settingsItems = [ 'volume', 'pitch', 'rate', 'voice', ];
 
@@ -28,8 +28,7 @@ const settingsSetEpic: EpicFunction = (action, state) =>
     ofType(getType(settingsActions.set)),
     pluck('payload'),
     concatMap((payload) => {
-      console.log('settings.set epic', payload, state.value);
-
+      Speech.setSettingsFromObj(payload);
       const filteredPayload = filterObjectByKeys(payload, settingsItems);
 
       if (
@@ -38,8 +37,9 @@ const settingsSetEpic: EpicFunction = (action, state) =>
       ) {
         return of(playerActions.stop());
       }
+      console.log('settings.set epic', payload, state.value, filteredPayload);
       if (
-        isPlayingOrReady(playerStatusSelector(state.value)) &&
+        isPlaying(playerStatusSelector(state.value)) &&
         Object.keys(filteredPayload).length > 0
       ) {
         if (Speech.isReplayStarved(Object.keys(filteredPayload))) {
