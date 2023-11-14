@@ -49,6 +49,7 @@ const init = async (preloadedState: RootState): Promise<void | Error> => {
       }),
       preloadedState,
       applyMiddleware(observableMiddleware, thunk)
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     ) as any
   );
   wrapStore(store.current as Store, { portName: WEBEXT_PORT, });

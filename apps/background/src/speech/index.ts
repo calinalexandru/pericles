@@ -1,6 +1,7 @@
 import { Subject, } from 'rxjs';
 
-import { DEFAULT_VALUES, SettingKeys, } from '@pericles/constants';
+import { DEFAULT_VALUES,  } from '@pericles/constants';
+import { SettingsState, } from '@pericles/store';
 
 import ChromeSynth from './synth/ChromeSynth';
 import { UtteranceEvent, } from './synth/Utterance';
@@ -10,7 +11,19 @@ interface StreamParams {
   params: UtteranceEvent;
 }
 
+type SettingsValues = {
+  volume: number;
+  pitch: number;
+  rate: number;
+  voice: number;
+};
+
 export default class Speech {
+
+  private static settingsMap: Map<
+    keyof SettingsValues,
+    (value: number) => void
+  > = new Map();
 
   public static synth: ChromeSynth = new ChromeSynth();
 
@@ -23,6 +36,10 @@ export default class Speech {
   private static rate: number = DEFAULT_VALUES.SETTINGS.RATE;
 
   constructor() {
+    Speech.settingsMap.set('volume', Speech.setVolume);
+    Speech.settingsMap.set('pitch', Speech.setPitch);
+    Speech.settingsMap.set('rate', Speech.setRate);
+    Speech.settingsMap.set('voice', Speech.setVoice);
     Speech.attachStreams();
   }
 
@@ -31,7 +48,7 @@ export default class Speech {
 
     console.log('Attaching streams...');
     events.forEach((event) => {
-      (this.synth as any)[event] = (params: any) => {
+      (this.synth as any)[event] = (params: UtteranceEvent) => {
         console.log(`SpeechFacade.synth.${event}`, params);
         this.stream$.next({ event, params, });
       };
@@ -118,29 +135,17 @@ export default class Speech {
     Speech.synth.setVoice(newVal);
   }
 
-  static getSettingByIndex(name: SettingKeys) {
-    return Speech.getSettingsMap()[name];
-  }
-
-  static getSettingsMap() {
-    return {
-      volume: Speech.setVolume.bind(null),
-      pitch: Speech.setPitch.bind(null),
-      rate: Speech.setRate.bind(null),
-      voice: Speech.setVoice.bind(null),
-    };
-  }
-
-  public static setSettingsFromObj(settings: any) {
+  public static setSettingsFromObj(settings: Partial<SettingsState>) {
     console.log('setSettingsFromObj', settings);
-    let fn: any;
-    Object.keys(settings).forEach((index: string) => {
-      const key = index as SettingKeys;
-      fn = Speech.getSettingByIndex(key);
-      if (fn && settings[key] !== undefined) {
-        fn(settings[key] as any);
+
+    for (const [ key, value, ] of Object.entries(settings)) {
+      if (typeof value === 'number') {
+        const settingFunction = this.settingsMap.get(
+          key as keyof SettingsValues
+        );
+        settingFunction?.(value);
       }
-    });
+    }
   }
 
   static isReplayStarved(settings: any) {

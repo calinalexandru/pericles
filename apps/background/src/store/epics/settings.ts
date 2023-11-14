@@ -13,15 +13,22 @@ import {
 } from '@pericles/store';
 import { isPaused, isPlaying, isPlayingOrReady, } from '@pericles/util';
 
-const settingsItems = [ 'volume', 'pitch', 'rate', 'voice', ];
+function filterObjectByKeys<T, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> {
+  return keys.reduce((acc, key) => {
+    acc[key] = obj[key];
+    return acc;
+  }, {} as Pick<T, K>);
+}
 
-const filterObjectByKeys = (obj: Partial<SettingsState>, keys: string[]) =>
-  Object.keys(obj)
-    .filter((key) => keys.includes(key))
-    .reduce((acc, key) => {
-      acc[key] = (obj as any)[key];
-      return acc;
-    }, {} as { [key: string]: string });
+type SettingsKeys = 'volume' | 'pitch' | 'rate' | 'voice';
+type SettingsKeysState = {
+  volume: number;
+  pitch: number;
+  rate: number;
+  voice: number;
+};
+
+const settingsItems: SettingsKeys[] = [ 'volume', 'pitch', 'rate', 'voice', ];
 
 const settingsSetEpic: EpicFunction = (action, state) =>
   action.pipe(
@@ -29,7 +36,11 @@ const settingsSetEpic: EpicFunction = (action, state) =>
     pluck('payload'),
     concatMap((payload) => {
       Speech.setSettingsFromObj(payload);
-      const filteredPayload = filterObjectByKeys(payload, settingsItems);
+
+      const filteredPayload = filterObjectByKeys<
+        Partial<SettingsState>,
+        SettingsKeysState
+      >(payload, settingsItems);
 
       if (
         isPaused(playerStatusSelector(state.value)) &&
